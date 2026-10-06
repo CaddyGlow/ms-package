@@ -1,0 +1,203 @@
+name: Microsoft packages CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+concurrency:
+  group: ${{ github.workflow }}-checks-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+permissions:
+  contents: read
+defaults:
+  run:
+    working-directory: ms-package
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: ms-package
+      - name: Require pinned release dependencies
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        env:
+          ARCHIVE_RS_REF: ${{ vars.ARCHIVE_RS_REF || 'df3cb823c343f60b0a2a1ce70bac21a0f517fb14' }}
+          CABINET_REF: ${{ vars.CABINET_REF || 'fb5c78b1bc07df078453aab484b2c8ce6fabb481' }}
+          MS_COMPRESS_REF: ${{ vars.MS_COMPRESS_REF || '325015ce8c039287b42266f88157a7ec430867dd' }}
+          WIM_RS_REF: ${{ vars.WIM_RS_REF || '541921ebda00790766ddb4b7fb8888fc1f3c1fbe' }}
+          MKISO_RS_REF: ${{ vars.MKISO_RS_REF || '2ba7aa5ff6240040defe51447e09edb68b34ab59' }}
+          WINDOWS_UUP_REF: ${{ vars.WINDOWS_UUP_REF || '67800fdf50d55cd7859715f477b4f858de2e3ae7' }}
+        run: python3 scripts/check-release-refs.py
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.ARCHIVE_RS_REPOSITORY || format('{0}/archive-rs', github.repository_owner) }}
+          ref: ${{ vars.ARCHIVE_RS_REF || 'df3cb823c343f60b0a2a1ce70bac21a0f517fb14' }}
+          path: archive-rs
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.CABINET_REPOSITORY || format('{0}/cabinet', github.repository_owner) }}
+          ref: ${{ vars.CABINET_REF || 'fb5c78b1bc07df078453aab484b2c8ce6fabb481' }}
+          path: cabinet
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.MS_COMPRESS_REPOSITORY || format('{0}/ms-compress', github.repository_owner) }}
+          ref: ${{ vars.MS_COMPRESS_REF || '325015ce8c039287b42266f88157a7ec430867dd' }}
+          path: ms-compress
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.WIM_RS_REPOSITORY || format('{0}/wim-rs', github.repository_owner) }}
+          ref: ${{ vars.WIM_RS_REF || '541921ebda00790766ddb4b7fb8888fc1f3c1fbe' }}
+          path: wim-rs
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.MKISO_RS_REPOSITORY || format('{0}/mkiso-rs', github.repository_owner) }}
+          ref: ${{ vars.MKISO_RS_REF || '2ba7aa5ff6240040defe51447e09edb68b34ab59' }}
+          path: mkiso-rs
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.WINDOWS_UUP_REPOSITORY || format('{0}/windows-uup', github.repository_owner) }}
+          ref: ${{ vars.WINDOWS_UUP_REF || '67800fdf50d55cd7859715f477b4f858de2e3ae7' }}
+          path: windows-uup
+      - uses: dtolnay/rust-toolchain@1.99.0
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: validation
+          workspaces: ms-package -> target
+      - run: cargo fmt --all -- --check
+      - run: cargo test --all-targets --all-features --locked
+      - run: cargo clippy --all-targets --all-features --locked -- -D warnings
+      - run: cargo check --all-features --target wasm32-unknown-unknown --locked
+      - run: cargo test --doc --locked
+      - run: cargo doc --no-deps --locked
+        env:
+          RUSTDOCFLAGS: -D warnings
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: ms-package
+      - name: Require pinned release dependencies
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        env:
+          ARCHIVE_RS_REF: ${{ vars.ARCHIVE_RS_REF || 'df3cb823c343f60b0a2a1ce70bac21a0f517fb14' }}
+          CABINET_REF: ${{ vars.CABINET_REF || 'fb5c78b1bc07df078453aab484b2c8ce6fabb481' }}
+          MS_COMPRESS_REF: ${{ vars.MS_COMPRESS_REF || '325015ce8c039287b42266f88157a7ec430867dd' }}
+          WIM_RS_REF: ${{ vars.WIM_RS_REF || '541921ebda00790766ddb4b7fb8888fc1f3c1fbe' }}
+          MKISO_RS_REF: ${{ vars.MKISO_RS_REF || '2ba7aa5ff6240040defe51447e09edb68b34ab59' }}
+          WINDOWS_UUP_REF: ${{ vars.WINDOWS_UUP_REF || '67800fdf50d55cd7859715f477b4f858de2e3ae7' }}
+        run: python3 scripts/check-release-refs.py
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.ARCHIVE_RS_REPOSITORY || format('{0}/archive-rs', github.repository_owner) }}
+          ref: ${{ vars.ARCHIVE_RS_REF || 'df3cb823c343f60b0a2a1ce70bac21a0f517fb14' }}
+          path: archive-rs
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.CABINET_REPOSITORY || format('{0}/cabinet', github.repository_owner) }}
+          ref: ${{ vars.CABINET_REF || 'fb5c78b1bc07df078453aab484b2c8ce6fabb481' }}
+          path: cabinet
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.MS_COMPRESS_REPOSITORY || format('{0}/ms-compress', github.repository_owner) }}
+          ref: ${{ vars.MS_COMPRESS_REF || '325015ce8c039287b42266f88157a7ec430867dd' }}
+          path: ms-compress
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.WIM_RS_REPOSITORY || format('{0}/wim-rs', github.repository_owner) }}
+          ref: ${{ vars.WIM_RS_REF || '541921ebda00790766ddb4b7fb8888fc1f3c1fbe' }}
+          path: wim-rs
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.MKISO_RS_REPOSITORY || format('{0}/mkiso-rs', github.repository_owner) }}
+          ref: ${{ vars.MKISO_RS_REF || '2ba7aa5ff6240040defe51447e09edb68b34ab59' }}
+          path: mkiso-rs
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.WINDOWS_UUP_REPOSITORY || format('{0}/windows-uup', github.repository_owner) }}
+          ref: ${{ vars.WINDOWS_UUP_REF || '67800fdf50d55cd7859715f477b4f858de2e3ae7' }}
+          path: windows-uup
+      - uses: dtolnay/rust-toolchain@1.99.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: validation
+          workspaces: ms-package -> target
+      - run: cargo test --all-targets --all-features --locked
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: ms-package
+      - name: Require pinned release dependencies
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        env:
+          ARCHIVE_RS_REF: ${{ vars.ARCHIVE_RS_REF || 'df3cb823c343f60b0a2a1ce70bac21a0f517fb14' }}
+          CABINET_REF: ${{ vars.CABINET_REF || 'fb5c78b1bc07df078453aab484b2c8ce6fabb481' }}
+          MS_COMPRESS_REF: ${{ vars.MS_COMPRESS_REF || '325015ce8c039287b42266f88157a7ec430867dd' }}
+          WIM_RS_REF: ${{ vars.WIM_RS_REF || '541921ebda00790766ddb4b7fb8888fc1f3c1fbe' }}
+          MKISO_RS_REF: ${{ vars.MKISO_RS_REF || '2ba7aa5ff6240040defe51447e09edb68b34ab59' }}
+          WINDOWS_UUP_REF: ${{ vars.WINDOWS_UUP_REF || '67800fdf50d55cd7859715f477b4f858de2e3ae7' }}
+        run: python3 scripts/check-release-refs.py
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.ARCHIVE_RS_REPOSITORY || format('{0}/archive-rs', github.repository_owner) }}
+          ref: ${{ vars.ARCHIVE_RS_REF || 'df3cb823c343f60b0a2a1ce70bac21a0f517fb14' }}
+          path: archive-rs
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.CABINET_REPOSITORY || format('{0}/cabinet', github.repository_owner) }}
+          ref: ${{ vars.CABINET_REF || 'fb5c78b1bc07df078453aab484b2c8ce6fabb481' }}
+          path: cabinet
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.MS_COMPRESS_REPOSITORY || format('{0}/ms-compress', github.repository_owner) }}
+          ref: ${{ vars.MS_COMPRESS_REF || '325015ce8c039287b42266f88157a7ec430867dd' }}
+          path: ms-compress
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.WIM_RS_REPOSITORY || format('{0}/wim-rs', github.repository_owner) }}
+          ref: ${{ vars.WIM_RS_REF || '541921ebda00790766ddb4b7fb8888fc1f3c1fbe' }}
+          path: wim-rs
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.MKISO_RS_REPOSITORY || format('{0}/mkiso-rs', github.repository_owner) }}
+          ref: ${{ vars.MKISO_RS_REF || '2ba7aa5ff6240040defe51447e09edb68b34ab59' }}
+          path: mkiso-rs
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.WINDOWS_UUP_REPOSITORY || format('{0}/windows-uup', github.repository_owner) }}
+          ref: ${{ vars.WINDOWS_UUP_REF || '67800fdf50d55cd7859715f477b4f858de2e3ae7' }}
+          path: windows-uup
+      - uses: dtolnay/rust-toolchain@1.99.0
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - run: cargo install wasm-bindgen-cli --version 0.2.129 --locked
+      - name: Reconcile sibling workspace dependencies
+        working-directory: archive-rs
+        # The pinned sibling lockfile predates the current ms-package manifest.
+        run: cargo update --workspace
+      - name: Build browser bindings and parity fixtures
+        working-directory: archive-rs
+        run: |
+          cargo build -p archive-wasm --features packages,crypto,sevenz,bzip2,brotli --target wasm32-unknown-unknown --locked
+          wasm-bindgen target/wasm32-unknown-unknown/debug/archive_wasm.wasm --target web --out-dir /tmp/archive-browser/pkg
+          cargo run --manifest-path ../ms-package/Cargo.toml --example browser_fixtures --locked -- /tmp/archive-browser/pkg/fixtures
+      - name: Run Chromium Worker checks
+        working-directory: archive-rs
+        env:
+          ARCHIVE_BROWSER: google-chrome
+        run: |
+          node scripts/archive-browser-server.mjs &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          node scripts/check-archive-browser.mjs
