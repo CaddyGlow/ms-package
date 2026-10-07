@@ -103,3 +103,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+
+## Publication
+
+`ms-package` is published on crates.io after `caddy-archive-core` and `ms-cabinet`.
+Its dependency aliases preserve the `archive_core` and `cabinet` imports.
+Version tags validate the library and browser bindings, verify the offline source
+bundle, publish the crate, and create the GitHub Release.

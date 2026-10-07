@@ -11,7 +11,7 @@ import subprocess
 import tarfile
 import tempfile
 
-REPOS = ('ms-package', 'archive-rs', 'cabinet', 'ms-compress', 'wim-rs', 'mkiso-rs', 'windows-uup')
+REPOS = ('ms-package', 'archive-rs', 'cabinet', 'ms-compress', 'wim-rs', 'mkiso-rs')
 TOOLCHAIN = '1.99.0'
 
 

@@ -18,21 +18,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "archive-core"
-version = "0.1.0"
-dependencies = [
- "cabinet",
- "crc64fast",
- "libmkiso",
- "ms-compress",
- "serde",
- "sha2",
- "tar",
- "thiserror",
- "zip 4.6.1",
-]
-
-[[package]]
 name = "base64"
 version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -60,12 +45,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
-name = "cabinet"
+name = "caddy-archive-core"
 version = "0.1.0"
 dependencies = [
- "flate2",
+ "crc64fast",
+ "libmkiso",
+ "ms-cabinet",
  "ms-compress",
  "serde",
+ "sha2",
+ "tar",
+ "thiserror",
+ "zip 4.6.1",
 ]
 
 [[package]]
@@ -318,8 +309,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "ms-compress"
+name = "ms-cabinet"
 version = "0.1.0"
+dependencies = [
+ "flate2",
+ "ms-compress",
+ "serde",
+]
+
+[[package]]
+name = "ms-compress"
+version = "0.1.1"
 dependencies = [
  "ms-compress-ruzstd",
 ]
@@ -334,11 +334,11 @@ checksum = "e3713af486ad3232ebd7bf988bbece755be1dd6848cef701038ada611b88a532"
 name = "ms-package"
 version = "0.1.0"
 dependencies = [
- "archive-core",
  "base64",
- "cabinet",
+ "caddy-archive-core",
  "caddy-msi",
  "cfb",
+ "ms-cabinet",
  "quick-xml",
  "serde_json",
  "sha2",

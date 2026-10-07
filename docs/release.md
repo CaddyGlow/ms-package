@@ -1,14 +1,14 @@
 # Source release procedure
 
 Version 0.1.0 is a preview of read-only APPX/MSIX and MSI inspection. It is a
-GitHub source release; crates.io publication is disabled until the registry
-dependency chain and patched MSI release are available.
+crates.io and GitHub release. The archive foundation crates must be published
+first; the patched MSI dependency is available as `caddy-msi` 0.10.0.
 
 ## Reproduce the source artifact
 
 Install Rust 1.99.0, Python 3.12 or newer, and a native C/C++ build toolchain.
-Keep ms-package, archive-rs, cabinet, ms-compress, wim-rs, mkiso-rs and
-windows-uup in adjacent directories. Preserve their licenses and fixtures.
+Keep ms-package, archive-rs, cabinet, ms-compress, wim-rs and mkiso-rs
+in adjacent directories. Preserve their licenses and fixtures.
 
 ```sh
 python3 scripts/source-release.py --output /tmp/ms-package-0.1.0-source.tar.gz
@@ -28,10 +28,11 @@ not sibling checkouts or a populated Cargo cache.
 ## GitHub release
 
 Commit and push the reviewed sources. The checked-in `.github/release-dependencies.json` records the frozen dependency
-commits used as workflow defaults. Publish those commits before the package tag.
+commits used for the first release. Set the repository variables to those
+commits before pushing the package tag.
 To override them, configure repository variables
 `ARCHIVE_RS_REF`, `CABINET_REF`, `MS_COMPRESS_REF`, `WIM_RS_REF`, `MKISO_RS_REF`
-and `WINDOWS_UUP_REF` to exact 40-character commit hashes. These revisions must
+to exact 40-character commit hashes. These revisions must
 contain the compatible sources validated with ms-package. Repository URLs may
 be overridden using the corresponding `_REPOSITORY` variables. Release jobs
 reject moving branches, tags and empty revisions. Tag `v0.1.0` only after the
@@ -39,7 +40,8 @@ reviewed source and dependency commits are available to CI.
 
 The tag workflow runs native tests, strict Clippy, doctests, the pinned Rust
 minimum, WASM compilation, Windows tests and Chromium Worker checks. It then
-creates the source bundle, verifies an extracted copy offline, and publishes it
+creates the source bundle, verifies an extracted copy offline, publishes the
+crate on crates.io, and creates the GitHub Release
 with SHA-256 checksums and the checked-in changelog. Repositories and source
 artifacts are public only after an explicit publication decision.
 

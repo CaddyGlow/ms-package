@@ -1,8 +1,7 @@
 {
-  "archive-rs": "df3cb823c343f60b0a2a1ce70bac21a0f517fb14",
-  "cabinet": "fb5c78b1bc07df078453aab484b2c8ce6fabb481",
-  "ms-compress": "325015ce8c039287b42266f88157a7ec430867dd",
-  "wim-rs": "541921ebda00790766ddb4b7fb8888fc1f3c1fbe",
-  "mkiso-rs": "2ba7aa5ff6240040defe51447e09edb68b34ab59",
-  "windows-uup": "67800fdf50d55cd7859715f477b4f858de2e3ae7"
+  "archive-rs": "13274c4edb2c5d40b1eb4c32faf0df98382aea69",
+  "cabinet": "92c0c997e34758037460e8f9b4d94ac69d253be4",
+  "ms-compress": "767906dd7aa26a1a88e15a98bd77c3e42d15dee8",
+  "wim-rs": "6c038f22bfe1604474405603870a4507b2e2bc49",
+  "mkiso-rs": "301a6c3a485f86294fc48d79622e55363570f59b"
 }
