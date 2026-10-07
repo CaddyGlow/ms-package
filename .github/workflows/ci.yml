@@ -171,8 +171,8 @@ jobs:
       - name: Build browser bindings and parity fixtures
         working-directory: archive-rs
         run: |
-          cargo build -p caddy-archive-wasm --features packages,crypto,sevenz,bzip2,brotli --target wasm32-unknown-unknown --locked
-          wasm-bindgen target/wasm32-unknown-unknown/debug/archive_wasm.wasm --target web --out-dir /tmp/archive-browser/pkg
+          cargo build --release -p caddy-archive-wasm --features packages,crypto,sevenz,bzip2,brotli --target wasm32-unknown-unknown --locked
+          wasm-bindgen target/wasm32-unknown-unknown/release/archive_wasm.wasm --target web --out-dir /tmp/archive-browser/pkg
           cargo run --manifest-path ../ms-package/Cargo.toml --example browser_fixtures --locked -- /tmp/archive-browser/pkg/fixtures
       - name: Run Chromium Worker checks
         working-directory: archive-rs
