@@ -2,6 +2,16 @@ name: Microsoft packages Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing tag to finalize from verified artifacts
+        required: true
+        type: string
+      artifact_run_id:
+        description: Release workflow run containing verified artifacts
+        required: true
+        type: string
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
@@ -12,6 +22,7 @@ defaults:
     working-directory: ms-package
 jobs:
   validate:
+    if: github.event_name == 'push'
     uses: ./.github/workflows/ci.yml
 
   package:
@@ -150,6 +161,16 @@ jobs:
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
+          python3 - <<'PYFLAT'
+          import pathlib, shutil
+          root = pathlib.Path('.')
+          for path in sorted(root.rglob('*')):
+              if path.is_file() and (path.name.endswith('.crate') or path.name.endswith('.tar.gz')) and path.parent != root:
+                  destination = root / path.name
+                  if destination.exists():
+                      raise SystemExit(f'Duplicate release asset: {path.name}')
+                  shutil.move(path, destination)
+          PYFLAT
           shopt -s nullglob
           files=(*.crate *.tar.gz)
           test "${#files[@]}" -gt 0
@@ -158,3 +179,58 @@ jobs:
           if [[ "$RELEASE_TAG" == *-* ]]; then flags+=(--prerelease); fi
           gh release create "$RELEASE_TAG" --verify-tag --notes-file ../CHANGELOG.md \
             "${flags[@]}" "${files[@]}" SHA256SUMS
+
+  finalize-release:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.release_tag }}
+      - name: Verify artifacts belong to the requested tag
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ARTIFACT_RUN: ${{ inputs.artifact_run_id }}
+        run: |
+          test "$(gh api "repos/$GH_REPO/actions/runs/$ARTIFACT_RUN" --jq .head_sha)" = "$(git rev-parse HEAD)"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: dist
+          run-id: ${{ inputs.artifact_run_id }}
+          github-token: ${{ github.token }}
+      - name: Finalize verified release assets
+        working-directory: dist
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          python3 - <<'PYFLAT'
+          import pathlib, shutil
+          root = pathlib.Path('.')
+          for path in sorted(root.rglob('*')):
+              if path.is_file() and (path.name.endswith('.crate') or path.name.endswith('.tar.gz')) and path.parent != root:
+                  destination = root / path.name
+                  if destination.exists():
+                      raise SystemExit(f'Duplicate release asset: {path.name}')
+                  shutil.move(path, destination)
+          PYFLAT
+          shopt -s nullglob
+          files=(*.crate *.tar.gz)
+          test "${#files[@]}" -gt 0
+          sha256sum "${files[@]}" > SHA256SUMS
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" --clobber "${files[@]}" SHA256SUMS
+          else
+            flags=()
+            if [[ "$RELEASE_TAG" == *-* ]]; then flags+=(--prerelease); fi
+            gh release create "$RELEASE_TAG" --verify-tag --generate-notes "${flags[@]}" "${files[@]}" SHA256SUMS
+          fi
