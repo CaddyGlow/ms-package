@@ -169,3 +169,178 @@ pub fn verify_database(bytes: &[u8], payload: &[u8]) -> Result<(), JsValue> {
     })();
     result.map_err(|error| JsValue::from_str(&error.to_string()))
 }
+
+pub fn compressed_native(
+    payload: &[u8],
+    bundle: bool,
+    edited: bool,
+) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    use ms_package::authoring::{AppxBundleBuilder, AppxBundleEditor, AppxCompression};
+    let mut package = AppxBuilder::new(MANIFEST, WriteOptions::default())?;
+    package.set_compression(AppxCompression::Deflate);
+    package.add_file("payload.txt", payload)?;
+    package.add_file("logo.png", &b"test logo"[..])?;
+    let mut bytes = Cursor::new(Vec::new());
+    package.write(&mut bytes)?;
+    if !bundle {
+        if edited {
+            let mut editor =
+                AppxEditor::open(Cursor::new(bytes.into_inner()), WriteOptions::default())?;
+            editor.set_compression(AppxCompression::Deflate);
+            editor.replace_file("payload.txt", payload)?;
+            let mut output = Cursor::new(Vec::new());
+            editor.write(&mut output)?;
+            return Ok(output.into_inner());
+        }
+        return Ok(bytes.into_inner());
+    }
+    let mut builder = AppxBundleBuilder::new(
+        "Authoring.Test",
+        "CN=Test",
+        "1.0.0.0",
+        WriteOptions::default(),
+    )?;
+    builder.add_package("nested.msix", Cursor::new(bytes.into_inner()))?;
+    let mut output = Cursor::new(Vec::new());
+    builder.write(&mut output)?;
+    if edited {
+        let mut editor =
+            AppxBundleEditor::open(Cursor::new(output.into_inner()), WriteOptions::default())?;
+        editor.edit_package("nested.msix", |package| {
+            package.set_compression(AppxCompression::Deflate);
+            package.replace_file("payload.txt", payload)
+        })?;
+        output = Cursor::new(Vec::new());
+        editor.write(&mut output)?;
+    }
+    Ok(output.into_inner())
+}
+
+#[wasm_bindgen]
+pub fn compressed_package(payload: &[u8], bundle: bool, edited: bool) -> Result<Vec<u8>, JsValue> {
+    compressed_native(payload, bundle, edited)
+        .map_err(|error| JsValue::from_str(&error.to_string()))
+}
+
+#[derive(Default)]
+struct MemoryMedia(std::collections::BTreeMap<String, Vec<u8>>);
+impl ms_package::authoring::InstallerMediaSink for MemoryMedia {
+    type Writer = Vec<u8>;
+    fn create(&mut self, _name: &str) -> std::io::Result<Self::Writer> {
+        Ok(Vec::new())
+    }
+    fn finish(&mut self, name: &str, writer: Self::Writer) -> std::io::Result<()> {
+        self.0.insert(name.into(), writer);
+        Ok(())
+    }
+}
+impl ms_package::MediaResolver for MemoryMedia {
+    fn resolve(&mut self, name: &str, maximum: u64) -> ms_package::Result<Vec<u8>> {
+        let bytes = self
+            .0
+            .get(name)
+            .ok_or_else(|| ms_package::Error::MissingMedia(name.into()))?;
+        if bytes.len() as u64 > maximum {
+            return Err(ms_package::Error::MissingMedia(
+                "media exceeds requested limit".into(),
+            ));
+        }
+        Ok(bytes.clone())
+    }
+}
+
+pub fn installer_media_native(
+    payload: &[u8],
+    profile: u8,
+) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    use ms_package::authoring::*;
+    let mut builder = InstallerBuilder::new(
+        InstallerIdentity {
+            product_code: "{ABE5397E-765C-4CEF-9DB0-203029DF0240}".into(),
+            package_code: "{FF219795-EE82-47A0-83F5-8611DF99B6F7}".into(),
+            upgrade_code: "{19D5683B-80A8-4A7A-A5FB-C34BC77032F1}".into(),
+            name: "Worker Fixture".into(),
+            manufacturer: "Test".into(),
+            version: "1.0.0".into(),
+            directory_name: "WorkerFixture".into(),
+            architecture: InstallerArchitecture::X64,
+            context: InstallationContext::PerUser,
+        },
+        WriteOptions::default(),
+    )?;
+    builder.add_file(
+        "Payload",
+        "payload.txt",
+        "{19D5683B-80A8-4A7A-A5FB-C34BC77032F2}",
+        payload,
+    )?;
+    builder.add_file(
+        "Second",
+        "second.txt",
+        "{19D5683B-80A8-4A7A-A5FB-C34BC77032F3}",
+        &b"second"[..],
+    )?;
+    let layout = match profile {
+        0 => InstallerMediaLayout::ExternalCabinet {
+            name: "external.cab".into(),
+        },
+        1 => InstallerMediaLayout::Loose,
+        2 => InstallerMediaLayout::Cabinets {
+            cabinets: vec![
+                InstallerCabinetSpec {
+                    name: "embedded.cab".into(),
+                    file_count: 1,
+                    embedded: true,
+                },
+                InstallerCabinetSpec {
+                    name: "external.cab".into(),
+                    file_count: 1,
+                    embedded: false,
+                },
+            ],
+        },
+        _ => return Err("unknown media profile".into()),
+    };
+    let mut media = MemoryMedia::default();
+    let mut bytes = Vec::new();
+    builder.write_with_media(layout, &mut media, &mut bytes)?;
+    let mut reader = ms_package::InstallerPackage::open(Cursor::new(&bytes), 1000)?;
+    for file in reader.files()? {
+        let expected = if file.id == "Payload" {
+            payload
+        } else {
+            &b"second"[..]
+        };
+        if reader.read_file(&file, &mut media, 1 << 20)? != expected {
+            return Err("resolved media payload mismatch".into());
+        }
+    }
+    drop(reader);
+    // Length-delimited artifact set: deterministic native/Worker parity includes every external artifact.
+    let mut result = Vec::new();
+    for (name, data) in std::iter::once(("fixture.msi".to_owned(), bytes)).chain(media.0) {
+        result.extend_from_slice(&(name.len() as u64).to_le_bytes());
+        result.extend_from_slice(name.as_bytes());
+        result.extend_from_slice(&(data.len() as u64).to_le_bytes());
+        result.extend_from_slice(&data);
+    }
+    Ok(result)
+}
+
+#[wasm_bindgen]
+pub fn installer_media(payload: &[u8], profile: u8) -> Result<Vec<u8>, JsValue> {
+    installer_media_native(payload, profile).map_err(|error| JsValue::from_str(&error.to_string()))
+}
+
+/// Deterministic mixed payload spanning three APPX hash blocks.
+pub fn compression_payload(edited: bool) -> Vec<u8> {
+    (0..131_073u32)
+        .map(|index| {
+            if index % 4096 < 2048 {
+                b'A' + u8::from(edited)
+            } else {
+                ((index.wrapping_mul(1664525).wrapping_add(index >> 5)) >> 11) as u8
+            }
+        })
+        .collect()
+}

@@ -202,7 +202,7 @@ impl<R: Read + Seek> AppxBundle<R> {
             .ok_or_else(|| Error::Malformed("missing bundle block map".into()))?
             .id;
         let data = self.archive.read_entry(id, self.max_metadata)?;
-        let blocks = parse_blocks(&data)?;
+        let (blocks, file_hashes) = parse_blocks(&data)?;
         let mut total = 0u64;
         let mut covered = BTreeSet::new();
         for block in &blocks {
@@ -223,7 +223,8 @@ impl<R: Read + Seek> AppxBundle<R> {
             if entry.size != block.size {
                 return Err(Error::Integrity("bundle block map size".into()));
             }
-            let mut verifier = BlockVerifier::new(block);
+            let mut verifier =
+                BlockVerifier::with_file_hash(block, file_hashes.get(&block.name).copied());
             self.archive.extract(entry.id, &mut verifier)?;
             verifier.finish()?;
             covered.insert(block.name.as_str());
@@ -297,6 +298,7 @@ pub struct AppxPackage<R: Read + Seek> {
     manifest: Vec<u8>,
     content_types: Vec<u8>,
     blocks: Vec<BlockMapFile>,
+    file_hashes: BTreeMap<String, [u8; 32]>,
 }
 
 impl<R: Read + Seek> AppxPackage<R> {
@@ -347,12 +349,13 @@ impl<R: Read + Seek> AppxPackage<R> {
             true,
         )?;
         validate_content_types(&content_types)?;
-        let blocks = parse_blocks(&metadata("AppxBlockMap.xml")?)?;
+        let (blocks, file_hashes) = parse_blocks(&metadata("AppxBlockMap.xml")?)?;
         Ok(Self {
             archive,
             manifest,
             content_types,
             blocks,
+            file_hashes,
         })
     }
     /// All ZIP entries, including package metadata.
@@ -397,7 +400,8 @@ impl<R: Read + Seek> AppxPackage<R> {
                 .iter()
                 .find(|e| e.name == file.name)
                 .ok_or_else(|| Error::Integrity(format!("missing {}", file.name)))?;
-            let mut verifier = BlockVerifier::new(file);
+            let mut verifier =
+                BlockVerifier::with_file_hash(file, self.file_hashes.get(&file.name).copied());
             let result = self.archive.extract(e.id, &mut verifier);
             if verifier.failed {
                 return Err(Error::Integrity(format!("block hash of {}", file.name)));
@@ -434,9 +438,15 @@ struct BlockVerifier<'a> {
     block_index: usize,
     total: u64,
     failed: bool,
+    file_hash: Sha256,
+    expected_file_hash: Option<[u8; 32]>,
 }
 impl<'a> BlockVerifier<'a> {
+    #[cfg(test)]
     fn new(file: &'a BlockMapFile) -> Self {
+        Self::with_file_hash(file, None)
+    }
+    fn with_file_hash(file: &'a BlockMapFile, expected_file_hash: Option<[u8; 32]>) -> Self {
         Self {
             file,
             hash: Sha256::new(),
@@ -444,6 +454,8 @@ impl<'a> BlockVerifier<'a> {
             block_index: 0,
             total: 0,
             failed: false,
+            file_hash: Sha256::new(),
+            expected_file_hash,
         }
     }
     fn verify_block(&mut self) -> std::io::Result<()> {
@@ -470,6 +482,12 @@ impl<'a> BlockVerifier<'a> {
                 self.file.name
             )));
         }
+        if self.expected_file_hash.is_some_and(|expected| {
+            let actual: [u8; 32] = self.file_hash.clone().finalize().into();
+            expected != actual
+        }) {
+            return Err(Error::Integrity(format!("file hash of {}", self.file.name)));
+        }
         Ok(())
     }
 }
@@ -487,6 +505,7 @@ impl Write for BlockVerifier<'_> {
                 "package file size mismatch",
             ));
         }
+        self.file_hash.update(bytes);
         while !bytes.is_empty() {
             let take = bytes.len().min(65536 - self.block_bytes);
             self.hash.update(&bytes[..take]);
@@ -650,17 +669,49 @@ fn validate_namespaces(
 ) -> Result<()> {
     let mut reader = NsReader::from_reader(data);
     let mut seen = false;
+    let mut ignorable_file_hash_prefixes = BTreeSet::new();
     loop {
         let (namespace, event) = reader
             .read_resolved_event()
             .map_err(|e| Error::Malformed(e.to_string()))?;
         match event {
             Event::Start(e) | Event::Empty(e) => {
+                if root == "BlockMap" && !seen {
+                    let a = attributes(&e)?;
+                    for prefix in a
+                        .get("IgnorableNamespaces")
+                        .into_iter()
+                        .flat_map(|value| value.split_whitespace())
+                    {
+                        if a.get(&format!("xmlns:{prefix}")).map(String::as_str)
+                            != Some("http://schemas.microsoft.com/appx/2021/blockmap")
+                        {
+                            return Err(Error::Unsupported("block-map ignorable namespace".into()));
+                        }
+                        ignorable_file_hash_prefixes.insert(prefix.to_owned());
+                    }
+                }
                 let enforce = all_elements || !seen || e.local_name().as_ref() == b"Identity";
                 if enforce {
                     match namespace {
                         ResolveResult::Bound(ns)
-                            if allowed.iter().any(|a| ns.as_ref() == a.as_bytes()) => {}
+                            if allowed.iter().any(|a| ns.as_ref() == a.as_bytes())
+                                && !(root == "BlockMap"
+                                    && e.local_name().as_ref() == b"FileHash") => {}
+                        ResolveResult::Bound(ns)
+                            if root == "BlockMap"
+                                && seen
+                                && e.local_name().as_ref() == b"FileHash"
+                                && ns.as_ref()
+                                    == b"http://schemas.microsoft.com/appx/2021/blockmap"
+                                && e.name()
+                                    .as_ref()
+                                    .split(|byte| *byte == b':')
+                                    .next()
+                                    .and_then(|prefix| std::str::from_utf8(prefix).ok())
+                                    .is_some_and(|prefix| {
+                                        ignorable_file_hash_prefixes.contains(prefix)
+                                    }) => {}
                         _ => {
                             return Err(Error::Malformed(format!(
                                 "unsupported or unbound {root} namespace"
@@ -707,7 +758,8 @@ fn validate_content_types(data: &[u8]) -> Result<()> {
     Ok(())
 }
 
-fn parse_blocks(data: &[u8]) -> Result<Vec<BlockMapFile>> {
+type ParsedBlocks = (Vec<BlockMapFile>, BTreeMap<String, [u8; 32]>);
+fn parse_blocks(data: &[u8]) -> Result<ParsedBlocks> {
     validate_xml(data, "BlockMap")?;
     validate_namespaces(
         data,
@@ -719,6 +771,7 @@ fn parse_blocks(data: &[u8]) -> Result<Vec<BlockMapFile>> {
     let mut files = Vec::new();
     let mut current: Option<BlockMapFile> = None;
     let mut names = BTreeSet::new();
+    let mut file_hashes = BTreeMap::new();
     loop {
         let event = reader
             .read_event()
@@ -770,6 +823,19 @@ fn parse_blocks(data: &[u8]) -> Result<Vec<BlockMapFile>> {
                                 .map_err(|_| Error::Malformed("SHA-256 digest length".into()))?,
                         );
                     }
+                    b"FileHash" => {
+                        let file = current
+                            .as_ref()
+                            .ok_or_else(|| Error::Malformed("FileHash outside File".into()))?;
+                        let hash: [u8; 32] = STANDARD
+                            .decode(required(&a, "Hash")?)
+                            .map_err(|e| Error::Malformed(e.to_string()))?
+                            .try_into()
+                            .map_err(|_| Error::Malformed("SHA-256 file digest length".into()))?;
+                        if file_hashes.insert(file.name.clone(), hash).is_some() {
+                            return Err(Error::Malformed("duplicate block-map FileHash".into()));
+                        }
+                    }
                     _ => return Err(Error::Unsupported("block-map element".into())),
                 }
             }
@@ -787,12 +853,37 @@ fn parse_blocks(data: &[u8]) -> Result<Vec<BlockMapFile>> {
             return Err(Error::Malformed(format!("block count of {}", file.name)));
         }
     }
-    Ok(files)
+    Ok((files, file_hashes))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn file_hash_extension_requires_declared_namespace_and_verified_digest() {
+        let hash = STANDARD.encode(Sha256::digest(b"payload"));
+        let xml = format!(
+            r#"<BlockMap xmlns="http://schemas.microsoft.com/appx/2010/blockmap" xmlns:b4="http://schemas.microsoft.com/appx/2021/blockmap" IgnorableNamespaces="b4" HashMethod="http://www.w3.org/2001/04/xmlenc#sha256"><File Name="payload" Size="7"><Block Hash="{hash}"/><b4:FileHash Hash="{hash}"/></File></BlockMap>"#
+        );
+        let (files, hashes) = parse_blocks(xml.as_bytes()).unwrap();
+        let mut verifier = BlockVerifier::with_file_hash(&files[0], hashes.get("payload").copied());
+        verifier.write_all(b"payload").unwrap();
+        verifier.finish().unwrap();
+        let mut invalid = BlockVerifier::with_file_hash(&files[0], Some([0; 32]));
+        invalid.write_all(b"payload").unwrap();
+        assert!(invalid.finish().is_err());
+        for changed in [
+            xml.replace(" IgnorableNamespaces=\"b4\"", ""),
+            xml.replace(
+                "http://schemas.microsoft.com/appx/2021/blockmap",
+                "urn:unknown",
+            ),
+            xml.replace("b4:FileHash", "FileHash"),
+            xml.replace("b4:FileHash", "b4:Block"),
+        ] {
+            assert!(parse_blocks(changed.as_bytes()).is_err());
+        }
+    }
     #[test]
     fn rejects_duplicate_block_map_files() {
         let xml = br#"<BlockMap xmlns="http://schemas.microsoft.com/appx/2010/blockmap" HashMethod="http://www.w3.org/2001/04/xmlenc#sha256"><File Name="x" Size="0"/><File Name="x" Size="0"/></BlockMap>"#;

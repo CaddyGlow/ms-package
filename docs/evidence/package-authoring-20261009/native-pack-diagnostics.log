@@ -1,0 +1,68 @@
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+Option /v specified, switching to verbose output.
+Option /o specified, existing files will be overwritten.
+Using default hash method: SHA256.
+The path (/p) parameter is: "\\?\C:\Users\deploy\resource-native-v2-20261009.msix"
+The content directory (/d) parameter is: "\\?\C:\Users\deploy\resource-v2-schema-input"
+Enumerating files from directory "\\?\C:\Users\deploy\resource-v2-schema-input"
+MakeAppx : warning: Ignoring footprint file "AppxBlockMap.xml".
+MakeAppx : warning: Ignoring footprint file "[Content_Types].xml".
+Packing 3 file(s) in "\\?\C:\Users\deploy\resource-v2-schema-input" (content directory) to "\\?\C:\Users\deploy\resource-native-v2-20261009.msix" (output file name).
+Memory limit defaulting to 3176017920 bytes.
+Using "\\?\C:\Users\deploy\resource-v2-schema-input\AppxManifest.xml" as the manifest for the package.
+MakeAppx : error: Failure at appxFactory->CreateManifestReader(manifestStream, &manifestReader) - 0x80080204 - The specified package format is not valid: The package manifest is not valid.
+MakeAppx : error: Error info: /*[local-name()="Package" and namespace-uri()="http://schemas.microsoft.com/appx/manifest/foundation/windows10"]
+Content for element '{http://schemas.microsoft.com/appx/manifest/foundation/windows10}Package' is incomplete according to the DTD/Schema.
+Expecting: {http://schemas.microsoft.com/appx/manifest/foundation/windows10}Dependencies.
+Cleaning up output file "\\?\C:\Users\deploy\resource-native-v2-20261009.msix".
+MakeAppx : error: Failure at (CreatePackage( overwrite, hashAlgorithm, fileList, outputPath, manifestStream.Get(), forceCompressionNone, performanceOptions, encryptPackage, encryptionOptions, cgmPath, mainPackagePathForResourceExemption, makepriExeFullPath, publisherBridgingList)) - 0x80080204 - The specified package format is not valid: The package manifest is not valid.
+MakeAppx : error: Package creation failed.
+MakeAppx : error: 0x80080204 - The specified package format is not valid: The package manifest is not valid.
+RESOURCE_PACK_EXIT=1
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+Option /v specified, switching to verbose output.
+Option /o specified, existing files will be overwritten.
+Using default hash method: SHA256.
+The path (/p) parameter is: "\\?\C:\Users\deploy\deflate-native-repacked-20261009.msix"
+The content directory (/d) parameter is: "\\?\C:\Users\deploy\deflate-original-20261009"
+Enumerating files from directory "\\?\C:\Users\deploy\deflate-original-20261009"
+MakeAppx : warning: Ignoring footprint file "AppxBlockMap.xml".
+Packing 16 file(s) in "\\?\C:\Users\deploy\deflate-original-20261009" (content directory) to "\\?\C:\Users\deploy\deflate-native-repacked-20261009.msix" (output file name).
+Memory limit defaulting to 3176017920 bytes.
+Using "\\?\C:\Users\deploy\deflate-original-20261009\AppxManifest.xml" as the manifest for the package.
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\incompressible-1.bin" as a payload file.  Its path in the package will be "incompressible-1.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\incompressible-0.bin" as a payload file.  Its path in the package will be "incompressible-0.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\incompressible-196609.bin" as a payload file.  Its path in the package will be "incompressible-196609.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\incompressible-65535.bin" as a payload file.  Its path in the package will be "incompressible-65535.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\incompressible-65536.bin" as a payload file.  Its path in the package will be "incompressible-65536.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\incompressible-131072.bin" as a payload file.  Its path in the package will be "incompressible-131072.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\incompressible-65537.bin" as a payload file.  Its path in the package will be "incompressible-65537.bin".
+Settings for extension png: Type = image/png, Compression = None.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\logo.png" as a payload file.  Its path in the package will be "logo.png".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\repetitive-0.bin" as a payload file.  Its path in the package will be "repetitive-0.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\repetitive-1.bin" as a payload file.  Its path in the package will be "repetitive-1.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\repetitive-131072.bin" as a payload file.  Its path in the package will be "repetitive-131072.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\repetitive-65535.bin" as a payload file.  Its path in the package will be "repetitive-65535.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\repetitive-65536.bin" as a payload file.  Its path in the package will be "repetitive-65536.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\repetitive-65537.bin" as a payload file.  Its path in the package will be "repetitive-65537.bin".
+Settings for extension bin: Type = application/octet-stream, Compression = Normal.
+Processing "\\?\C:\Users\deploy\deflate-original-20261009\repetitive-196609.bin" as a payload file.  Its path in the package will be "repetitive-196609.bin".
+Package creation succeeded.
+DEFLATE_PACK_EXIT=0

@@ -7,7 +7,7 @@
 //! keys are checked before emission; implicit/conditional references, servicing
 //! rules, and Windows lifecycle validation remain the caller's responsibility.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
 
 use super::{WriteError, WriteOptions, WriteReport};
@@ -23,6 +23,107 @@ pub struct InstallerWriteReport {
     pub changed_streams: Vec<String>,
     /// Whether summary properties were explicitly edited.
     pub summary_changed: bool,
+}
+
+/// Portable checks performed before emission; neither scope guarantees installation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum InstallerValidationScope {
+    /// Backend schemas/types/primary keys, declared foreign keys and resource bounds.
+    DatabaseOnly,
+    /// The canonical file-only table/action, identity and declared-media profile.
+    CanonicalFileOnly,
+}
+
+/// One explicit change to a known package/product/component identity or key path.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct InstallerIdentityChange {
+    /// Property name, PackageCode, or `Component.<identifier>.<field>`.
+    pub name: String,
+    /// Original value; absent for newly created identities.
+    pub old_value: Option<String>,
+    /// Emitted value; absent for removed identities.
+    pub new_value: Option<String>,
+}
+
+/// Completed database report with identity differences and an explicit validation scope.
+#[derive(Clone, Debug)]
+pub struct InstallerDetailedWriteReport {
+    /// Existing change and byte accounting report.
+    pub database: InstallerWriteReport,
+    /// Actual differences for known product, package and component identity fields.
+    pub identity_changes: Vec<InstallerIdentityChange>,
+    /// Portable validation performed; native lifecycle/trust are separate evidence.
+    pub validation_scope: InstallerValidationScope,
+    /// External media finalized before the database output.
+    pub external_media: super::installer_media::InstallerMediaReport,
+}
+
+pub(super) fn identity_changes(
+    before: &BTreeMap<String, String>,
+    after: &BTreeMap<String, String>,
+) -> Vec<InstallerIdentityChange> {
+    before
+        .keys()
+        .chain(after.keys())
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .filter_map(|name| {
+            let old_value = before.get(name).cloned();
+            let new_value = after.get(name).cloned();
+            (old_value != new_value).then(|| InstallerIdentityChange {
+                name: name.clone(),
+                old_value,
+                new_value,
+            })
+        })
+        .collect()
+}
+
+pub(super) fn identity_values<R: Read + Seek>(
+    package: &mut msi::Package<R>,
+) -> Result<BTreeMap<String, String>, WriteError> {
+    let mut values = BTreeMap::new();
+    if let Some(package_code) = package.summary_info().uuid() {
+        values.insert(
+            "PackageCode".into(),
+            package_code.braced().to_string().to_ascii_uppercase(),
+        );
+    }
+    if package
+        .get_table("Property")
+        .is_some_and(|table| table.has_column("Property") && table.has_column("Value"))
+    {
+        for row in package.select_rows(msi::Select::table("Property"))? {
+            if let (Some(name), Some(value)) = (row["Property"].as_str(), row["Value"].as_str())
+                && matches!(name, "ProductCode" | "UpgradeCode" | "ProductVersion")
+            {
+                values.insert(name.into(), value.into());
+            }
+        }
+    }
+    if package
+        .get_table("Component")
+        .is_some_and(|table| table.has_column("Component"))
+    {
+        let fields: Vec<_> = ["ComponentId", "KeyPath"]
+            .into_iter()
+            .filter(|field| {
+                package
+                    .get_table("Component")
+                    .is_some_and(|table| table.has_column(field))
+            })
+            .collect();
+        for row in package.select_rows(msi::Select::table("Component"))? {
+            if let Some(name) = row["Component"].as_str() {
+                for field in &fields {
+                    if let Some(value) = row[*field].as_str() {
+                        values.insert(format!("Component.{name}.{field}"), value.into());
+                    }
+                }
+            }
+        }
+    }
+    Ok(values)
 }
 
 pub(super) struct BoundedCursor {
@@ -81,6 +182,7 @@ pub struct InstallerDatabaseBuilder {
     streams: BTreeSet<String>,
     summary_changed: bool,
     failed: bool,
+    initial_identities: BTreeMap<String, String>,
 }
 
 impl InstallerDatabaseBuilder {
@@ -94,18 +196,23 @@ impl InstallerDatabaseBuilder {
                 .min(options.limits.max_scratch_bytes),
         };
         let package = msi::Package::create(msi::PackageType::Installer, inner)?;
-        Ok(Self::from_package(package, options))
+        Self::from_package(package, options)
     }
 
-    fn from_package(package: msi::Package<BoundedCursor>, options: WriteOptions) -> Self {
-        Self {
+    fn from_package(
+        mut package: msi::Package<BoundedCursor>,
+        options: WriteOptions,
+    ) -> Result<Self, WriteError> {
+        let initial_identities = identity_values(&mut package)?;
+        Ok(Self {
             package,
             options,
             tables: BTreeSet::new(),
             streams: BTreeSet::new(),
             summary_changed: false,
             failed: false,
-        }
+            initial_identities,
+        })
     }
 
     fn check_name(name: &str) -> Result<(), WriteError> {
@@ -403,10 +510,16 @@ impl InstallerDatabaseBuilder {
     }
 
     /// Explicitly finalizes and emits the database, then flushes the destination.
-    pub fn write(
+    pub fn write(self, destination: impl Write) -> Result<InstallerWriteReport, WriteError> {
+        self.write_detailed(destination)
+            .map(|report| report.database)
+    }
+
+    /// Emits the database with actual identity differences and database-only scope.
+    pub fn write_detailed(
         mut self,
         mut destination: impl Write,
-    ) -> Result<InstallerWriteReport, WriteError> {
+    ) -> Result<InstallerDetailedWriteReport, WriteError> {
         if self.failed {
             return Err(WriteError::InvalidInput(
                 "discard database after a failed operation".into(),
@@ -414,6 +527,8 @@ impl InstallerDatabaseBuilder {
         }
         let (entries, decoded_bytes) = self.validate()?;
         self.validate_foreign_keys()?;
+        let final_identities = identity_values(&mut self.package)?;
+        let identity_changes = identity_changes(&self.initial_identities, &final_identities);
         self.package.flush()?;
         let bytes = self.package.into_inner()?.inner.into_inner();
         let output_bytes = bytes.len() as u64;
@@ -431,16 +546,21 @@ impl InstallerDatabaseBuilder {
         drop(reopened);
         destination.write_all(&bytes)?;
         destination.flush()?;
-        Ok(InstallerWriteReport {
-            output: WriteReport {
-                entries,
-                decoded_bytes,
-                output_bytes,
-                signature_removed: false,
+        Ok(InstallerDetailedWriteReport {
+            identity_changes,
+            validation_scope: InstallerValidationScope::DatabaseOnly,
+            external_media: Default::default(),
+            database: InstallerWriteReport {
+                output: WriteReport {
+                    entries,
+                    decoded_bytes,
+                    output_bytes,
+                    signature_removed: false,
+                },
+                changed_tables: self.tables.into_iter().collect(),
+                changed_streams: self.streams.into_iter().collect(),
+                summary_changed: self.summary_changed,
             },
-            changed_tables: self.tables.into_iter().collect(),
-            changed_streams: self.streams.into_iter().collect(),
-            summary_changed: self.summary_changed,
         })
     }
 
@@ -448,18 +568,21 @@ impl InstallerDatabaseBuilder {
         if !self.package.has_table("_Validation") {
             return Ok(());
         }
-        let declarations: Vec<_> = self
+        let mut declarations = Vec::new();
+        for row in self
             .package
             .select_rows(msi::Select::table("_Validation"))?
-            .filter_map(|row| {
-                Some((
-                    row["Table"].as_str()?.to_owned(),
-                    row["Column"].as_str()?.to_owned(),
-                    row["KeyTable"].as_str()?.to_owned(),
-                    row["KeyColumn"].as_int()?,
-                ))
-            })
-            .collect();
+        {
+            match (row["KeyTable"].as_str(), row["KeyColumn"].as_int()) {
+                (None, None) => {},
+                (Some(target), Some(index)) if !target.is_empty() && index > 0 => {
+                    let table = row["Table"].as_str().ok_or_else(|| WriteError::InvalidInput("foreign-key table declaration is missing".into()))?;
+                    let column = row["Column"].as_str().ok_or_else(|| WriteError::InvalidInput("foreign-key column declaration is missing".into()))?;
+                    declarations.push((table.to_owned(), column.to_owned(), target.to_owned(), index));
+                },
+                _ => return Err(WriteError::InvalidInput("foreign-key declaration requires both a target table and a positive column index".into())),
+            }
+        }
         for (table, column, target, target_index) in declarations {
             if !self.package.has_table(&table) {
                 continue;
@@ -552,7 +675,7 @@ impl InstallerEditor {
         if package.package_type() != msi::PackageType::Installer {
             return Err(WriteError::Unsupported("MSI transforms and patches".into()));
         }
-        let mut builder = InstallerDatabaseBuilder::from_package(package, options);
+        let mut builder = InstallerDatabaseBuilder::from_package(package, options)?;
         builder.validate()?;
         Ok(builder)
     }

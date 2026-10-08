@@ -1,0 +1,1 @@
+{"ok": true, "profiles": ["zip", "tar", "tar.gz", "cab", "7z", "xz", "tar.xz", "gzip", "zlib", "deflate", "lzma", "bzip2", "brotli", "tar.bz2", "tar.br", "TGZ", "txz", "tbz"], "packages": ["msix", "msixbundle", "msi"], "encryption": ["zip-aes256", "7z-aes256-headers"], "incremental": "zip-blob-16MiB-cancellation", "worker": true}

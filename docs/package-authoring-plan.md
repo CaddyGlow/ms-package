@@ -1,6 +1,7 @@
 # Package creation and editing plan
 
-Status: initial authoring profiles implemented, 2026-10-08.
+Status: initial profiles and follow-up compression/media profiles implemented,
+2026-10-09. See [follow-up qualification](package-authoring-validation-20261009.md).
 
 Implementation work is recorded in [the backend audit](package-authoring-audit.md),
 [API/profile documentation](package-authoring.md) and

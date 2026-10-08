@@ -1,0 +1,19 @@
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+Option /v specified, switching to verbose output.
+Option /o specified, existing files will be overwritten.
+The path (/p) parameter is: "\\?\C:\Users\deploy\authoring-resource-bundle-v2-20261009.msixbundle"
+The output directory (/d) parameter is: "\\?\C:\Users\deploy\resource-original-v2-20261009"
+Extracting file AppxMetadata\AppxBundleManifest.xml to \\?\C:\Users\deploy\resource-original-v2-20261009\AppxMetadata\AppxBundleManifest.xml
+Extracting file AppxBlockMap.xml to \\?\C:\Users\deploy\resource-original-v2-20261009\AppxBlockMap.xml
+Extracting file authoring-fr.msix to \\?\C:\Users\deploy\resource-original-v2-20261009\authoring-fr.msix
+MakeAppx : error: /*[local-name()="Package" and namespace-uri()="http://schemas.microsoft.com/appx/manifest/foundation/windows10"]
+Content for element '{http://schemas.microsoft.com/appx/manifest/foundation/windows10}Package' is incomplete according to the DTD/Schema.
+Expecting: {http://schemas.microsoft.com/appx/manifest/foundation/windows10}Dependencies.
+MakeAppx : error: Failure at file->GetStream(&fileStream) - 0x80080204
+MakeAppx : error: Failure at ExtractFile(opcFactory.Get(), payloadPackageFile.Get(), outputPath, decryptIfEncrypted, messageHandler) - 0x80080204
+MakeAppx : error: Failure at (unbundle(bundlePath, longOutputDirectory, appendPfn, &messageHandler, 0)) - 0x80080204 - The specified package format is not valid: The package manifest is not valid.
+MakeAppx : error: Bundle extraction failed.
+MakeAppx : error: 0x80080204 - The specified package format is not valid: The package manifest is not valid.
+TOOL_EXIT=1

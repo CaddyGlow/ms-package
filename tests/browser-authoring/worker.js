@@ -1,4 +1,4 @@
-import initAuthoring, {create_package, edit_package, create_bundle, edit_bundle, verify_bundle, create_database, edit_database, verify_database} from './authoring/ms_package_authoring_worker_check.js';
+import initAuthoring, {compressed_package, installer_media, create_package, edit_package, create_bundle, edit_bundle, verify_bundle, create_database, edit_database, verify_database} from './authoring/ms_package_authoring_worker_check.js';
 import initArchive, {BytePackage, ByteBundle, ByteInstaller} from './pkg/archive_wasm.js';
 
 function assert(value, message) { if (!value) throw new Error(message); }
@@ -55,11 +55,23 @@ self.onmessage = async () => {
     await parity(editedDatabase, 'native-edited.msi');
     verify_database(editedDatabase, replacement);
     verifyDatabaseArchive(editedDatabase);
+    for (const bundle of [false, true]) {
+      for (const edited of [false, true]) {
+        const expected = Uint8Array.from({length:131073}, (_, index) => index % 4096 < 2048 ? 65 + Number(edited) : (((Math.imul(index, 1664525) + (index >>> 5)) >>> 11) & 255));
+        const result = compressed_package(expected, bundle, edited);
+        await parity(result, `deflate-${bundle}-${edited}.bin`);
+        if (bundle) {verify_bundle(result, expected); verifyBundleArchive(result, expected);}
+        else verify(result, expected);
+      }
+    }
+    for (let profile = 0; profile < 3; profile++) {
+      await parity(installer_media(payload, profile), `media-${profile}.bin`);
+    }
     for (const create of [create_package, create_bundle, create_database]) {
       let failed = false;
       try {create(payload, 1n);} catch (_) {failed = true;}
       assert(failed, 'actual payload limit enforcement');
     }
-    self.postMessage({ok:true,checks:['APPX native create/edit parity','archive-rs reopen and payload bytes','bundle native create/edit parity','outer and nested integrity and payload bytes','MSI database native create/edit parity','custom MSI table and stream preservation','APPX/bundle/MSI limit failures'], cancellation:'synchronous calls; Worker termination is caller-owned'});
+    self.postMessage({ok:true,checks:['Deflate APPX and nested bundle create/edit parity and reader validation','external/loose/multiple MSI media sink/resolver parity','APPX native create/edit parity','archive-rs reopen and payload bytes','bundle native create/edit parity','outer and nested integrity and payload bytes','MSI database native create/edit parity','custom MSI table and stream preservation','APPX/bundle/MSI limit failures'], cancellation:'synchronous calls; Worker termination is caller-owned'});
   } catch (error) {self.postMessage({ok:false,error:String(error)});}
 };

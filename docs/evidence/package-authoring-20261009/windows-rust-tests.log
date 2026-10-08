@@ -1,0 +1,195 @@
+Windows Rust tests 2026-10-09
+Build: nix develop --no-write-lock-file path:/home/rick/projects-caddy/nix-dev-shells/rust-xwin -c cargo xwin test --all-targets --all-features --target x86_64-pc-windows-msvc --locked --no-run --message-format=json
+Source artifacts:
+[
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/examples/author_installer-e0bbf1930655d3d1.exe",
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/examples/author_appx-acc53092a6110b44.exe",
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/examples/author_bundle-cf20e630f964f2c0.exe",
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/deps/ms_package-f116ea42a02b23fc.exe",
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/examples/author_appx_deflate-3ecccb503f167b96.exe",
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/deps/authoring_installer_media-26cb6d5b9786bd89.exe",
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/deps/msi_malformed_metadata-00897a68442721a4.exe",
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/deps/authoring_qualified_fixtures-ea706ac368114f11.exe",
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/deps/authoring_bundle-4895a4084e1a82d8.exe",
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/deps/authoring_appx-1bd9dae40126c7ad.exe",
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/examples/browser_fixtures-3a4a2017f6b92359.exe",
+  "/data/cache/rust/x86_64-pc-windows-msvc/debug/deps/authoring_installer-e7d7404418681681.exe"
+]
+
+Windows OS: 10.0.26200.0
+Registry backends: caddy-archive-core0.2.1, caddy-msi0.10.1, ms-compress0.1.2
+Executable: author_installer-e0bbf1930655d3d1.exe
+3CADDA97A0DDDA53B53D1F1A92B7CAEEE0E9201B403B8F7DE1EE8A9B59A2672A
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Exit code: 0
+Executable: author_appx-acc53092a6110b44.exe
+3B81771A9A6C856B662946DA2970A0EFD126A28A85A7F40B80B6E78C5ADCC622
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Exit code: 0
+Executable: author_bundle-cf20e630f964f2c0.exe
+0FD72130400BD16C7D2CFDD97CE08B0D95931A6E3A5BF75414EDA7DE1B264FA6
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Exit code: 0
+Executable: ms_package-f116ea42a02b23fc.exe
+9D0C073B80C945DB7919C69B61C7D591D082C9E90B120CDE57173A1D803BD2E2
+
+running 19 tests
+test appx::tests::rejects_malformed_manifest_and_document_type ... ok
+test appx::tests::rejects_traversing_block_map_names ... ok
+test appx::tests::file_hash_extension_requires_declared_namespace_and_verified_digest ... ok
+test appx::tests::rejects_duplicate_block_map_files ... ok
+test authoring::xml::tests::document_types_and_namespace_errors_fail_closed ... ok
+test authoring::xml::tests::escaped_attributes_round_trip_and_metadata_is_bounded ... ok
+test appx::tests::streaming_block_hashes_verify_arbitrary_chunks_without_buffering_files ... ok
+test installer::tests::directory_cycles_and_short_long_names_are_checked ... ok
+test appx::tests::validates_decoded_payload_and_detects_corruption ... ok
+test installer::tests::malformed_compound_storage_is_rejected ... ok
+test installer::tests::rejects_storage_larger_than_explicit_budget ... ok
+test installer_metadata::tests::cumulative_lengths_must_fit_the_data_stream ... ok
+test installer::tests::embedded_external_and_missing_cabinet_media ... ok
+test installer::tests::raw_stream_reads_enforce_actual_byte_limit ... ok
+test installer_metadata::tests::rejects_extended_string_length_before_allocating_it ... ok
+test installer_metadata::tests::package_opener_rejects_invalid_pool_before_the_msi_parser ... ok
+test installer_metadata::tests::metadata_budget_excludes_payload_but_includes_string_data ... ok
+test installer_metadata::tests::rejects_truncated_pool_record ... ok
+test installer::tests::table_relationships_map_multiple_cabinets_and_source_names ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+Exit code: 0
+Executable: author_appx_deflate-3ecccb503f167b96.exe
+6312E3A8495E83472E6920FA3318B93A37B61D73536FAB52876C7BA2996856E0
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Exit code: 0
+Executable: authoring_installer_media-26cb6d5b9786bd89.exe
+2BE2778EEBA1866415AD16D13FE521D1A1706C6C838A1CBF645595BE04C0DA13
+
+running 4 tests
+test caller_media_sink_reports_only_flushed_and_finalized_artifacts ... ok
+test loose_relative_names_are_explicit_and_exact_resource_boundary_succeeds ... ok
+test media_path_conflicts_and_limits_fail_before_opening_any_destination ... ok
+test partial_write_flush_and_finalization_errors_retain_completion_context ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Exit code: 0
+Executable: msi_malformed_metadata-00897a68442721a4.exe
+7CCB2E562202B7BB8F01884795391D1935AB6AF80F5E7251E584DE996B63A2BF
+
+running 1 test
+test null_required_column_type_is_rejected_without_panicking ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Exit code: 0
+Executable: authoring_qualified_fixtures-ea706ac368114f11.exe
+0AB61B9DE9E4E2316371245860F1BD6D60877890CEE323EAA63C3A2572B7AB69
+
+running 2 tests
+test independently_unpacked_stored_package_retains_payload_integrity ... ok
+test independently_unbundled_architecture_packages_validate_separately ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Exit code: 0
+Executable: authoring_bundle-4895a4084e1a82d8.exe
+7959AEF4EC03186C5C730B430E96F5E4FF8470B7EE84B6FC6D4C79A8ECA6EC6C
+
+running 15 tests
+test bundle_identity_checks_reject_non_schema_values ... ok
+test bundle_entry_limit_rejects_before_consuming_source ... ok
+test bundle_rejects_corrupted_nested_package_and_aggregate_limit ... ok
+test bundle_rejects_duplicate_identity_and_publisher_mismatch ... ok
+test bundle_editor_rejects_custom_outer_content_types_without_discarding_them ... ok
+test bundle_editor_replaces_and_removes_packages ... ok
+test bundles_bind_identities_and_verify_nested_contents ... ok
+test bundle_transfers_resource_qualifiers_and_rejects_unknown_attributes ... ok
+test invalid_nested_identity_and_resource_property_fail_during_add ... ok
+test failed_replacement_and_nested_edit_preserve_previous_packages ... ok
+test recorded_bundle_offsets_match_zip_payload_locations ... ok
+test deflate_nested_packages_round_trip_and_enforce_decoded_file_limits ... ok
+test nested_payload_edit_updates_nested_and_outer_metadata ... ok
+test resource_package_type_uses_property_and_preserves_resource_id ... ok
+test resource_semantic_rules_fail_before_bundle_emission ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+Exit code: 0
+Executable: authoring_appx-1bd9dae40126c7ad.exe
+BC4483295D2179A1529AE008A97E632EB41E7B25A95282DDE7D50E63E022EA5F
+
+running 19 tests
+test content_type_extensions_fail_instead_of_being_discarded ... ok
+test compressed_editor_rejects_wrong_physical_block_sizes ... ok
+test custom_mime_and_manifest_extensions_survive_rebuilding ... ok
+test deflate_workspace_limit_fails_before_destination_changes ... ok
+test destination_flush_errors_are_reported ... ok
+test deterministic_output_and_actual_source_limits ... ok
+test malformed_metadata_and_source_integrity_fail_before_output ... ok
+test manifest_storage_is_bounded_before_retention ... ok
+test manifest_references_block_payload_removal ... ok
+test boundary_hashes_and_edit_operations_round_trip ... ok
+test read_failures_and_exact_output_budget ... ok
+test reserved_metadata_files_cannot_be_used_as_payload_directories ... ok
+test replacement_charges_final_decoded_size_and_case_only_rename_preserves_payload ... ok
+test signed_sources_reject_or_strip_signature ... ok
+test source_payload_limit_is_checked_before_integrity_extraction ... ok
+test zip_headers_match_blockmap_and_part_names_are_uris ... ok
+test sparse_external_content_is_rejected_using_its_namespace_and_boolean_value ... ok
+test deflate_block_boundaries_and_metadata_layout_round_trip ... ok
+test short_reads_and_metadata_scratch_boundaries ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+Exit code: 0
+Executable: browser_fixtures-3a4a2017f6b92359.exe
+678CB199022A720BEF0401BD196F696D2528A099208DDF906C179E3403561E7C
+
+running 3 tests
+test tests::resource_bundle_uses_standard_neutral_architecture_and_type_defaults ... ok
+test tests::bundle_fixture_binding_integrity_and_explicit_selection_limits ... ok
+test tests::ordinary_external_installer_media_matches_embedded_payload ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+Exit code: 0
+Executable: authoring_installer-e7d7404418681681.exe
+ED70D14AC4A04BDE2AA4C0A9BFEAD53286EAF5117B7F27C8C717C2BE25F6048C
+
+running 16 tests
+test declared_foreign_keys_are_checked_before_destination_is_touched ... ok
+test copy_edit_preserves_custom_schema_summary_and_truncates_stream ... ok
+test destination_flush_failure_is_reported ... ok
+test incomplete_foreign_key_declarations_cannot_be_emitted ... ok
+test minimal_profile_coordinates_cabinet_and_explicit_identities ... ok
+test detailed_reports_distinguish_raw_validation_and_exact_identity_changes ... ok
+test payload_editor_rejects_noncanonical_property_schema_without_panicking ... ok
+test payload_editor_rejects_identity_collisions_and_retired_components ... ok
+test canonical_payload_edits_rebuild_all_related_metadata ... ok
+test row_edit_operations_preserve_primary_key_constraints ... ok
+test signed_sources_reject_both_signature_policies ... ok
+test source_rows_and_streams_are_bounded ... ok
+test payload_editor_rejects_unknown_preservation_and_reused_package_codes ... ok
+test unrepresentable_strings_are_rejected_and_failed_edits_cannot_emit ... ok
+test replacement_read_reserves_existing_payload_scratch ... ok
+test canonical_external_loose_and_partitioned_media_roundtrip ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+Exit code: 0

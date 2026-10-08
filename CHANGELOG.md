@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.1 — 2026-10-09
+
+- Update the published `caddy-archive-core` dependency to 0.2.1.
+- Add bounded APPX/MSIX Deflate output using `ms-compress`, with independently
+  restartable block-map boundaries and compressed-source validation.
+- Add caller-managed external cabinets, loose files and multiple nonspanning
+  cabinets to the canonical MSI builder and payload editor.
+- Add detailed MSI identity and media reports, transactional nested bundle edits,
+  and stricter source, identity, resource and allocation checks.
+- Expand native Microsoft-tool qualification and stateful authoring regression coverage.
+
 ## 0.2.0 — 2026-10-09
 
 - Use published `caddy-msi` 0.10.1 for correct physical MSI primary-key serialization.

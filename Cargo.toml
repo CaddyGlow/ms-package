@@ -1,6 +1,6 @@
 [package]
 name = "ms-package"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 rust-version = "1.99"
 repository = "https://github.com/CaddyGlow/ms-package"
@@ -19,8 +19,9 @@ cabinet = { version = "0.1.0", package = "ms-cabinet", optional = true }
 uuid = { version = "1", optional = true }
 roxmltree = { version = "0.21.1", default-features = false, optional = true }
 woxml = { version = "0.6.0", default-features = false, optional = true }
+ms-compress = { version = "0.1.2", default-features = false, features = ["std"], optional = true }
 cfb = "0.14"
-archive-core = { version = "0.1.0", package = "caddy-archive-core" }
+archive-core = { version = "0.2.1", package = "caddy-archive-core" }
 msi = { package = "caddy-msi", version = "=0.10.1" }
 quick-xml = "0.38"
 sha2 = "0.10"
@@ -29,7 +30,7 @@ thiserror = "2"
 
 [features]
 default = []
-write = ["dep:zip", "dep:cabinet", "dep:uuid", "dep:roxmltree", "dep:woxml"]
+write = ["dep:zip", "dep:cabinet", "dep:uuid", "dep:roxmltree", "dep:woxml", "dep:ms-compress"]
 
 [dev-dependencies]
 zip = { version = "2.4", default-features = false }

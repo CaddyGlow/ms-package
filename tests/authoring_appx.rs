@@ -326,3 +326,248 @@ fn content_type_extensions_fail_instead_of_being_discarded() {
     }
     assert!(AppxEditor::open(zip.finish().unwrap(), WriteOptions::default()).is_err());
 }
+
+#[test]
+fn reserved_metadata_files_cannot_be_used_as_payload_directories() {
+    let mut builder = AppxBuilder::new(MANIFEST, WriteOptions::default()).unwrap();
+    for name in [
+        "AppxManifest.xml/child",
+        "AppxBlockMap.xml/child",
+        "[Content_Types].xml/child",
+        "AppxSignature.p7x/child",
+        "appxblockmap.XML/child",
+        "AppxMetadata/child",
+    ] {
+        assert!(
+            builder.add_file(name, Cursor::new(b"payload")).is_err(),
+            "{name}"
+        );
+    }
+}
+
+#[test]
+fn replacement_charges_final_decoded_size_and_case_only_rename_preserves_payload() {
+    let mut builder = AppxBuilder::new(MANIFEST, WriteOptions::default()).unwrap();
+    builder
+        .add_file("PAYLOAD.bin", Cursor::new(vec![1; 10_000]))
+        .unwrap();
+    let mut source = Cursor::new(Vec::new());
+    builder.write(&mut source).unwrap();
+    let mut options = WriteOptions::default();
+    options.limits.max_total_bytes = 16_000;
+    let mut editor = AppxEditor::open(source, options).unwrap();
+    editor
+        .replace_file("PAYLOAD.bin", Cursor::new(vec![2; 10_000]))
+        .unwrap();
+    editor.rename_file("PAYLOAD.bin", "payload.bin").unwrap();
+    let mut output = Cursor::new(Vec::new());
+    editor.write(&mut output).unwrap();
+    let mut package = AppxPackage::open(output, Default::default(), 1 << 20).unwrap();
+    let id = package
+        .entries()
+        .iter()
+        .find(|entry| entry.name == "payload.bin")
+        .unwrap()
+        .id;
+    assert_eq!(package.read_entry(id, 16_000).unwrap(), vec![2; 10_000]);
+}
+
+#[test]
+fn manifest_storage_is_bounded_before_retention() {
+    for budget in ["entries", "decoded", "scratch"] {
+        let mut options = WriteOptions::default();
+        match budget {
+            "entries" => options.limits.max_entries = 2,
+            "decoded" => options.limits.max_total_bytes = MANIFEST.len() as u64 - 1,
+            "scratch" => options.limits.max_scratch_bytes = MANIFEST.len() as u64 - 1,
+            _ => unreachable!(),
+        }
+        assert!(AppxBuilder::new(MANIFEST, options).is_err(), "{budget}");
+    }
+}
+
+#[test]
+fn sparse_external_content_is_rejected_using_its_namespace_and_boolean_value() {
+    for (namespace, value, allowed) in [
+        (
+            "http://schemas.microsoft.com/appx/manifest/uap/windows10/10",
+            "true",
+            false,
+        ),
+        (
+            "http://schemas.microsoft.com/appx/manifest/uap/windows10/10",
+            " 1 ",
+            false,
+        ),
+        (
+            "http://schemas.microsoft.com/appx/manifest/uap/windows10/10",
+            " <!--split--> true ",
+            false,
+        ),
+        (
+            "http://schemas.microsoft.com/appx/manifest/uap/windows10/10",
+            "invalid",
+            false,
+        ),
+        (
+            "http://schemas.microsoft.com/appx/manifest/uap/windows10/10",
+            "false",
+            true,
+        ),
+        (
+            "http://schemas.microsoft.com/appx/manifest/uap/windows10/10",
+            "0",
+            true,
+        ),
+        ("urn:custom-extension", "true", true),
+    ] {
+        let manifest = format!(
+            "<Package xmlns=\"http://schemas.microsoft.com/appx/manifest/foundation/windows10\" xmlns:external=\"{namespace}\"><Identity Name=\"Example\" Publisher=\"CN=Example\" Version=\"1.0.0.0\"/><Properties><external:AllowExternalContent>{value}</external:AllowExternalContent></Properties></Package>"
+        );
+        let builder = AppxBuilder::new(manifest.into_bytes(), WriteOptions::default()).unwrap();
+        let mut output = Cursor::new(Vec::new());
+        assert_eq!(
+            builder.write(&mut output).is_ok(),
+            allowed,
+            "{namespace} {value}"
+        );
+        if !allowed {
+            assert!(output.into_inner().is_empty());
+        }
+    }
+}
+
+#[test]
+fn source_payload_limit_is_checked_before_integrity_extraction() {
+    use ms_package::authoring::WriteError;
+    let mut builder = AppxBuilder::new(MANIFEST, WriteOptions::default()).unwrap();
+    builder
+        .add_file("large.bin", Cursor::new(vec![1; 1024]))
+        .unwrap();
+    let mut output = Cursor::new(Vec::new());
+    builder.write(&mut output).unwrap();
+    let offset = {
+        let mut zip = zip::ZipArchive::new(Cursor::new(output.get_ref())).unwrap();
+        zip.by_name("large.bin").unwrap().data_start() as usize
+    };
+    output.get_mut()[offset] ^= 1;
+    let mut options = WriteOptions::default();
+    options.limits.max_file_bytes = 512;
+    assert!(matches!(
+        AppxEditor::open(output, options),
+        Err(WriteError::LimitExceeded("file bytes"))
+    ));
+}
+
+#[test]
+fn deflate_block_boundaries_and_metadata_layout_round_trip() {
+    use ms_package::authoring::AppxCompression;
+    let mut builder = AppxBuilder::new(MANIFEST, WriteOptions::default()).unwrap();
+    builder.set_compression(AppxCompression::Deflate);
+    for size in [0, 1, 65535, 65536, 65537, 131072] {
+        builder
+            .add_file(&format!("payload-{size}.bin"), Cursor::new(vec![42; size]))
+            .unwrap();
+    }
+    let mut output = Cursor::new(Vec::new());
+    builder.write(&mut output).unwrap();
+    let mut package =
+        AppxPackage::open(Cursor::new(output.get_ref()), Default::default(), 1 << 20).unwrap();
+    package.validate(1 << 20).unwrap();
+    let mut zip = zip::ZipArchive::new(Cursor::new(output.get_ref())).unwrap();
+    for name in [
+        "AppxManifest.xml",
+        "AppxBlockMap.xml",
+        "[Content_Types].xml",
+    ] {
+        assert_eq!(
+            zip.by_name(name).unwrap().compression(),
+            zip::CompressionMethod::Stored
+        );
+    }
+    for size in [0, 1, 65535, 65536, 65537, 131072] {
+        let name = format!("payload-{size}.bin");
+        let index = zip.file_names().position(|entry| entry == name).unwrap();
+        let file = zip.by_index_raw(index).unwrap();
+        assert_eq!(file.compression(), zip::CompressionMethod::DEFLATE);
+        assert_eq!(
+            file.data_start() - file.header_start(),
+            30 + name.len() as u64
+        );
+        let id = package
+            .entries()
+            .iter()
+            .find(|entry| entry.name == name)
+            .unwrap()
+            .id;
+        assert_eq!(package.read_entry(id, 1 << 20).unwrap(), vec![42; size]);
+    }
+    let mut editor =
+        AppxEditor::open(Cursor::new(output.into_inner()), WriteOptions::default()).unwrap();
+    editor.set_compression(AppxCompression::Deflate);
+    editor
+        .replace_file("payload-65537.bin", Cursor::new(vec![11; 65537]))
+        .unwrap();
+    let mut result = Cursor::new(Vec::new());
+    editor.write(&mut result).unwrap();
+    let mut package = AppxPackage::open(result, Default::default(), 1 << 20).unwrap();
+    package.validate(1 << 20).unwrap();
+    let id = package
+        .entries()
+        .iter()
+        .find(|entry| entry.name == "payload-65537.bin")
+        .unwrap()
+        .id;
+    assert_eq!(package.read_entry(id, 1 << 20).unwrap(), vec![11; 65537]);
+}
+
+#[test]
+fn compressed_editor_rejects_wrong_physical_block_sizes() {
+    use ms_package::authoring::AppxCompression;
+    let mut builder = AppxBuilder::new(MANIFEST, WriteOptions::default()).unwrap();
+    builder.set_compression(AppxCompression::Deflate);
+    builder
+        .add_file("payload.bin", Cursor::new(vec![7; 65537]))
+        .unwrap();
+    let mut output = Cursor::new(Vec::new());
+    builder.write(&mut output).unwrap();
+    let mut source = zip::ZipArchive::new(output).unwrap();
+    let mut changed = zip::ZipWriter::new(Cursor::new(Vec::new()));
+    for index in 0..source.len() {
+        let mut file = source.by_index_raw(index).unwrap();
+        if file.name() == "AppxBlockMap.xml" {
+            use std::io::Read;
+            let mut bytes = String::new();
+            file.read_to_string(&mut bytes).unwrap();
+            let hash = bytes.find("<Block Hash=").unwrap();
+            // The manifest's stored blocks have no Size. Find the first
+            // compressed block and perturb its physical length only.
+            let block = bytes[hash..].find(" Size=\"").unwrap() + hash + 7;
+            let end = bytes[block..].find('"').unwrap() + block;
+            let size: u64 = bytes[block..end].parse().unwrap();
+            bytes.replace_range(block..end, &(size + 1).to_string());
+            changed
+                .start_file("AppxBlockMap.xml", zip::write::SimpleFileOptions::default())
+                .unwrap();
+            changed.write_all(bytes.as_bytes()).unwrap();
+        } else {
+            changed.raw_copy_file(file).unwrap();
+        }
+    }
+    assert!(AppxEditor::open(changed.finish().unwrap(), WriteOptions::default()).is_err());
+}
+
+#[test]
+fn deflate_workspace_limit_fails_before_destination_changes() {
+    use ms_package::authoring::AppxCompression;
+    let mut options = WriteOptions::default();
+    options.limits.max_scratch_bytes = 65536;
+    let mut builder = AppxBuilder::new(MANIFEST, options).unwrap();
+    builder.set_compression(AppxCompression::Deflate);
+    builder
+        .add_file("small.bin", Cursor::new(b"small"))
+        .unwrap();
+    let mut destination = Cursor::new(b"unchanged".to_vec());
+    assert!(builder.write(&mut destination).is_err());
+    assert_eq!(destination.into_inner(), b"unchanged");
+}

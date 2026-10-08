@@ -2,12 +2,13 @@
 #[cfg(feature = "write")]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     use base64::Engine;
-    use ms_package::authoring::{AppxBuilder, AppxBundleBuilder, WriteOptions};
+    use ms_package::authoring::{AppxBuilder, AppxBundleBuilder, AppxBundleEditor, WriteOptions};
     use std::{fs::File, io::Cursor};
 
     let path = std::env::args_os()
         .nth(1)
-        .ok_or("usage: author_bundle OUTPUT.msixbundle")?;
+        .ok_or("usage: author_bundle OUTPUT.msixbundle [EDITED.msixbundle]")?;
+    let edited_path = std::env::args_os().nth(2);
     let options = WriteOptions::default();
     let mut bundle = AppxBundleBuilder::new("Authoring.Test", "CN=Test", "1.0.0.0", options)?;
     for architecture in ["x86", "x64"] {
@@ -33,8 +34,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Cursor::new(bytes.into_inner()),
         )?;
     }
-    let report = bundle.write(File::create(path)?)?;
+    let resource_manifest = br#"<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"><Identity Name="Authoring.Test" Publisher="CN=Test" Version="1.0.0.0" ResourceId="language-fr"/><Properties><DisplayName>Authoring Test resources</DisplayName><PublisherDisplayName>Test</PublisherDisplayName><Logo>logo.png</Logo><ResourcePackage>true</ResourcePackage></Properties><Dependencies><TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0"/></Dependencies><Resources><Resource Language="fr-fr"/></Resources></Package>"#;
+    let mut resource = AppxBuilder::new(resource_manifest.as_slice(), options)?;
+    resource.add_file("localized.txt", &b"French resource fixture"[..])?;
+    let logo = base64::engine::general_purpose::STANDARD.decode("iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAIElEQVR4nO3BAQEAAACCIP+vbkhAAQAAAAAAAAAAwKMBJ0IAAdXu39oAAAAASUVORK5CYII=")?;
+    resource.add_file("logo.png", &logo[..])?;
+    let mut bytes = Cursor::new(Vec::new());
+    resource.write(&mut bytes)?;
+    bundle.add_package("authoring-fr.msix", Cursor::new(bytes.into_inner()))?;
+    let report = bundle.write(File::create(&path)?)?;
     println!("{report:?}");
+    if let Some(edited_path) = edited_path {
+        let mut editor = AppxBundleEditor::open(File::open(path)?, options)?;
+        editor.edit_package("authoring-fr.msix", |resource| {
+            resource.replace_file("localized.txt", &b"Edited French resource fixture"[..])
+        })?;
+        println!("{:?}", editor.write(File::create(edited_path)?)?);
+    }
     Ok(())
 }
 

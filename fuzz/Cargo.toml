@@ -9,8 +9,8 @@ publish = false
 
 [dependencies]
 honggfuzz = "=0.5.62"
-ms-package = { path = ".." }
-archive-core = { package = "caddy-archive-core", version = "0.1.0" }
+ms-package = { path = "..", features = ["write"] }
+archive-core = { package = "caddy-archive-core", version = "0.2.1" }
 
 zip = { version = "2.4", default-features = false }
 msi = { package = "caddy-msi", version = "=0.10.1" }

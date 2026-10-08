@@ -1,0 +1,24 @@
+    Updating crates.io index
+     Locking 3 packages to highest Rust 1.99 compatible versions
+    Updating caddy-archive-core v0.1.0 -> v0.2.1
+    Updating caddy-msi v0.10.0 -> v0.10.1
+      Adding ms-package v0.2.0 (/tmp/nix-shell.zZmtuM/ms-package-sources-opq6izhu/ms-package-0.2.0-source/ms-package)
+    Removing ms-package v0.1.0
+note: pass `--verbose` to see 12 unchanged dependencies behind latest
+Traceback (most recent call last):
+  File "/home/rick/projects-caddy/ms-package/scripts/source-release.py", line 144, in <module>
+    main()
+    ~~~~^^
+  File "/home/rick/projects-caddy/ms-package/scripts/source-release.py", line 108, in main
+    vendor = run(['cargo', f'+{TOOLCHAIN}', 'vendor', '--locked', '--versioned-dirs',
+                  '--manifest-path', str(root / 'ms-package/Cargo.toml'),
+    ...<3 lines>...
+                  '--sync', str(root / 'archive-rs/fuzz/Cargo.toml'), str(root / 'vendor')],
+                 capture_output=True)
+  File "/home/rick/projects-caddy/ms-package/scripts/source-release.py", line 20, in run
+    return subprocess.run(args, check=True, text=True, **kwargs)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/lb41b0anx1f98y9y5s9mdv97gjgsq740-python3-3.14.7/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['cargo', '+1.99.0', 'vendor', '--locked', '--versioned-dirs', '--manifest-path', '/tmp/nix-shell.zZmtuM/ms-package-sources-opq6izhu/ms-package-0.2.0-source/ms-package/Cargo.toml', '--sync', '/tmp/nix-shell.zZmtuM/ms-package-sources-opq6izhu/ms-package-0.2.0-source/archive-rs/Cargo.toml', '--sync', '/tmp/nix-shell.zZmtuM/ms-package-sources-opq6izhu/ms-package-0.2.0-source/ms-package/tests/browser-authoring/Cargo.toml', '--sync', '/tmp/nix-shell.zZmtuM/ms-package-sources-opq6izhu/ms-package-0.2.0-source/ms-package/fuzz/Cargo.toml', '--sync', '/tmp/nix-shell.zZmtuM/ms-package-sources-opq6izhu/ms-package-0.2.0-source/archive-rs/fuzz/Cargo.toml', '/tmp/nix-shell.zZmtuM/ms-package-sources-opq6izhu/ms-package-0.2.0-source/vendor']' returned non-zero exit status 101.

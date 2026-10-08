@@ -1,0 +1,20 @@
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+Option /v specified, switching to verbose output.
+Option /o specified, existing files will be overwritten.
+Using default hash method: SHA256.
+The path (/p) parameter is: "\\?\C:\Users\deploy\resource-native-v3-20261009.msix"
+The content directory (/d) parameter is: "\\?\C:\Users\deploy\resource-v2-schema-input"
+Enumerating files from directory "\\?\C:\Users\deploy\resource-v2-schema-input"
+MakeAppx : warning: Ignoring footprint file "AppxBlockMap.xml".
+MakeAppx : warning: Ignoring footprint file "[Content_Types].xml".
+Packing 3 file(s) in "\\?\C:\Users\deploy\resource-v2-schema-input" (content directory) to "\\?\C:\Users\deploy\resource-native-v3-20261009.msix" (output file name).
+Memory limit defaulting to 3176017920 bytes.
+Using "\\?\C:\Users\deploy\resource-v2-schema-input\AppxManifest.xml" as the manifest for the package.
+Settings for extension txt: Type = text/plain, Compression = Normal.
+Processing "\\?\C:\Users\deploy\resource-v2-schema-input\localized.txt" as a payload file.  Its path in the package will be "localized.txt".
+Settings for extension png: Type = image/png, Compression = None.
+Processing "\\?\C:\Users\deploy\resource-v2-schema-input\logo.png" as a payload file.  Its path in the package will be "logo.png".
+Package creation succeeded.
+RESOURCE_PACK_EXIT=0

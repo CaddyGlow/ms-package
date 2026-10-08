@@ -22,5 +22,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         directory.join("native-edited.msi"),
         edit_database_native(&database, replacement)?,
     )?;
+    for bundle in [false, true] {
+        for edited in [false, true] {
+            let name = format!("deflate-{}-{}.bin", bundle, edited);
+            std::fs::write(
+                directory.join(name),
+                compressed_native(&compression_payload(edited), bundle, edited)?,
+            )?;
+        }
+    }
+    for profile in 0..3 {
+        std::fs::write(
+            directory.join(format!("media-{profile}.bin")),
+            installer_media_native(payload, profile)?,
+        )?;
+    }
     Ok(())
 }

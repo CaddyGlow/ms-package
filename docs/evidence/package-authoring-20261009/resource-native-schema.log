@@ -1,0 +1,28 @@
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+Option /v specified, switching to verbose output.
+Option /o specified, existing files will be overwritten.
+The path (/p) parameter is: "\\?\C:\Users\deploy\authoring-resource-fr-20261009.msix"
+The output directory (/d) parameter is: "\\?\C:\Users\deploy\resource-fr-unpacked-20261009"
+Unpacking "\\?\C:\Users\deploy\authoring-resource-fr-20261009.msix" (package name) to "\\?\C:\Users\deploy\resource-fr-unpacked-20261009" (output directory).
+MakeAppx : error: Failure at appxFactory->CreatePackageReader(packageStream.Get(), &reader) - 0x80080204 - The specified package format is not valid: The package manifest is not valid.
+MakeAppx : error: Package extraction failed.
+MakeAppx : error: 0x80080204 - The specified package format is not valid: The package manifest is not valid.
+UNPACK_EXIT=1
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+Option /v specified, switching to verbose output.
+Option /o specified, existing files will be overwritten.
+Using default hash method: SHA256.
+The path (/p) parameter is: "\\?\C:\Users\deploy\resource-native-fr-20261009.msix"
+The content directory (/d) parameter is: "\\?\C:\Users\deploy\resource-fr-unpacked-20261009"
+Enumerating files from directory "\\?\C:\Users\deploy\resource-fr-unpacked-20261009"
+MakeAppx : error: For file "\\?\C:\Users\deploy\resource-fr-unpacked-20261009" - Failure at walker->GetNext(&filePath) - 0x80070003 - The system cannot find the path specified.
+MakeAppx : error: Failure at (result->AddFilesInDirectory(normalizedContentDirectory, *includeMapping, excludePatterns, true, fileValidation)) - 0x80070003 - The system cannot find the path specified.
+MakeAppx : error: Failure at (FileList::CreateFromDirectoryWalker(contentDirectory, fileList, fileValidation)) - 0x80070003 - The system cannot find the path specified.
+MakeAppx : error: Failure at (ProcessOptionsForInputContent(parameters, outputPath, performanceOptions->fileValidation, fileList, manifestResourceInfo, nullptr, inputCgmPath, publisherBridgingList, parametersValid)) - 0x80070003 - The system cannot find the path specified.
+MakeAppx : error: Package creation failed.
+MakeAppx : error: 0x80070003 - The system cannot find the path specified.
+PACK_EXIT=1

@@ -117,9 +117,10 @@ jobs:
           node-version: '24'
       - run: cargo install wasm-bindgen-cli --version 0.2.129 --locked
       - name: Reconcile sibling workspace dependencies
-        working-directory: archive-rs
-        # The pinned sibling lockfile predates the current ms-package manifest.
-        run: cargo update --workspace
+        # Integration must use this checkout, including across pre-1.0 minor bumps.
+        run: |
+          python3 scripts/authoring_workspace.py ../archive-rs
+          cargo update --manifest-path ../archive-rs/Cargo.toml --workspace
       - name: Build browser bindings and parity fixtures
         working-directory: archive-rs
         run: |

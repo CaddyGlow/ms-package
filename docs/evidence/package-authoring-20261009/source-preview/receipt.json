@@ -1,0 +1,49 @@
+{
+  "artifact": "/data/cache/ms-package-authoring-core021-source-20261009.tar.gz",
+  "sha256": "62b8d504c41d32e60d7fd8caeb1a33db6eaabbc22480eb1b2fd75d65ab74b45e",
+  "bytes": 43474506,
+  "preview": true,
+  "toolchain": "1.99.0",
+  "repositories": {
+    "archive-rs": {
+      "commit": "cb2394c1bc5faf518a28b6edaa739c11e816cb2d",
+      "dirty": false
+    },
+    "cabinet": {
+      "commit": "6d8a511bd42ebaa4f57a19533584ba1bef2e9a91",
+      "dirty": false
+    },
+    "mkiso-rs": {
+      "commit": "b22b43e030fbcf073e9d98240465cc4afe43ccb7",
+      "dirty": false
+    },
+    "ms-compress": {
+      "commit": "2f07fb24a518d5887bcdf315cef824b37f1e20b0",
+      "dirty": false
+    },
+    "ms-package": {
+      "commit": "207d7d80e418098c437ecdf478e72e5ac43b6b57",
+      "dirty": true
+    },
+    "wim-rs": {
+      "commit": "54603df479e61e898ffaf8b731a3f8791acc708b",
+      "dirty": false
+    }
+  },
+  "integration_adjustments": [
+    "crates/archive-cli/Cargo.toml",
+    "crates/archive-wasm/Cargo.toml",
+    "fuzz/Cargo.toml"
+  ],
+  "verification_passed": true,
+  "verification_log_sha256": "4a4dc48df4cd020229e0f6aaded9d219914733759f151918e92a3406a64638be",
+  "verification_checks": [
+    "extracted source manifest hashes",
+    "fresh CARGO_HOME and target directories",
+    "offline frozen all-targets/all-features tests",
+    "offline frozen default doctests",
+    "offline frozen all-features doctests",
+    "offline frozen no-default-features check",
+    "offline frozen browser harness all-targets check"
+  ]
+}

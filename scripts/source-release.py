@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import tarfile
 import tempfile
+from authoring_workspace import reconcile
 
 REPOS = ('ms-package', 'archive-rs', 'cabinet', 'ms-compress', 'wim-rs', 'mkiso-rs')
 TOOLCHAIN = '1.99.0'
@@ -53,6 +54,8 @@ def main():
     parser.add_argument('--output', type=Path)
     parser.add_argument('--allow-dirty', action='store_true', help='Prepare a local preview, never an official release')
     parser.add_argument('--verify', type=Path, help='Verify an existing archive and build offline from its sources')
+    parser.add_argument('--source-parent', type=Path,
+                        help='Directory containing the six source checkouts (defaults to this checkout\'s parent)')
     args = parser.parse_args()
     if args.verify:
         with tempfile.TemporaryDirectory(prefix='ms-package-extracted-') as temporary:
@@ -69,7 +72,7 @@ def main():
     output.parent.mkdir(parents=True, exist_ok=True)
     if output.exists():
         raise SystemExit(f'Refusing to overwrite {output}')
-    parent = Path(__file__).resolve().parents[2]
+    parent = (args.source_parent or Path(__file__).resolve().parents[2]).resolve()
     import tomllib
     version = tomllib.loads((parent / 'ms-package/Cargo.toml').read_text())['package']['version']
     with tempfile.TemporaryDirectory(prefix='ms-package-sources-') as temporary:
@@ -98,10 +101,19 @@ def main():
                 target = root / name / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(item, target)
+        adjusted = reconcile(root / 'archive-rs', root / 'ms-package')
+        if adjusted:
+            run(['cargo', f'+{TOOLCHAIN}', 'update', '--manifest-path',
+                 str(root / 'archive-rs/Cargo.toml'), '--workspace'], cwd=root)
+            # The excluded fuzz workspace has its own lockfile and can also
+            # contain reconciled package dependencies.
+            run(['cargo', f'+{TOOLCHAIN}', 'update', '--manifest-path',
+                 str(root / 'archive-rs/fuzz/Cargo.toml'), '--workspace'], cwd=root)
         vendor = run(['cargo', f'+{TOOLCHAIN}', 'vendor', '--locked', '--versioned-dirs',
                       '--manifest-path', str(root / 'ms-package/Cargo.toml'),
                       '--sync', str(root / 'archive-rs/Cargo.toml'),
                       '--sync', str(root / 'ms-package/tests/browser-authoring/Cargo.toml'),
+                      '--sync', str(root / 'ms-package/fuzz/Cargo.toml'),
                       '--sync', str(root / 'archive-rs/fuzz/Cargo.toml'), str(root / 'vendor')],
                      capture_output=True)
         (root / '.cargo').mkdir()
@@ -116,7 +128,8 @@ def main():
         files = {str(p.relative_to(root)): digest(p) for p in root.rglob('*') if p.is_file()}
         (root / 'SOURCE-MANIFEST.json').write_text(json.dumps(
             {'version': version, 'toolchain': TOOLCHAIN, 'preview': args.allow_dirty,
-             'repositories': commits, 'files': files}, indent=2, sort_keys=True) + '\n')
+             'repositories': commits, 'integration_adjustments': adjusted,
+             'files': files}, indent=2, sort_keys=True) + '\n')
         def normalized(info):
             info.mtime = 0
             info.uid = info.gid = 0

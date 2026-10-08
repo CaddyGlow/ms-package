@@ -1,5 +1,7 @@
 use archive_core::Limits;
 use std::io::Cursor;
+mod authoring;
+pub use authoring::authoring;
 fn limits() -> Limits {
     Limits {
         max_entries: 128,
@@ -8,6 +10,7 @@ fn limits() -> Limits {
         max_total_bytes: 2 << 20,
         max_dictionary_bytes: 32 << 20,
         max_input_bytes: 1 << 20,
+        max_buffered_bytes: 2 << 20,
         max_active_workspace_bytes: 96 << 20,
         max_pending_output_bytes: 1 << 20,
         max_password_iterations: 1024,
@@ -44,13 +47,26 @@ pub fn run(target: &str, data: &[u8]) -> Result<(), &'static str> {
     match target {
         "appx" => appx(data),
         "msi" => msi(data),
+        "authoring" => authoring(data),
         _ => return Err("unknown fuzz target"),
     }
     Ok(())
 }
 
-pub const TARGETS: &[&str] = &["appx", "msi"];
+pub const TARGETS: &[&str] = &["appx", "msi", "authoring"];
 pub fn seeds(target: &str) -> Vec<Vec<u8>> {
+    if target == "authoring" {
+        let operations: Vec<u8> = (0..32)
+            .flat_map(|n| [n % 4, n % 8, (n + 1) % 8, 4, n, 0, 1, 2])
+            .collect();
+        let mut seeds = vec![Vec::new(), vec![255; 256]];
+        for mode in 0..8 {
+            let mut seed = operations.clone();
+            seed[0] = mode;
+            seeds.push(seed);
+        }
+        return seeds;
+    }
     use base64::{Engine, engine::general_purpose::STANDARD};
     use sha2::{Digest, Sha256};
     use std::io::Write;

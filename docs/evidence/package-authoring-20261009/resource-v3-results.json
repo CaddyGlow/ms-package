@@ -1,0 +1,12 @@
+[
+  {
+    "artifact": "authoring-resource-bundle-v3-20261009.msixbundle",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "artifact": "authoring-resource-edited-bundle-v3-20261009.msixbundle",
+    "exit_code": 0,
+    "passed": true
+  }
+]

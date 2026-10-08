@@ -1,0 +1,270 @@
+[
+  {
+    "artifact": "/data/cache/ms-package-deflate-native-20261009.msix",
+    "sha256": "7d462e11fb778869fdaa52077340ab6d39a4f2e3108971e67a0df82c745ec44b",
+    "files": [
+      {
+        "name": "AppxManifest.xml",
+        "decoded": 508,
+        "compressed": 508,
+        "blocks": 1,
+        "mapped_compressed": 0,
+        "method": 0
+      },
+      {
+        "name": "incompressible-0.bin",
+        "decoded": 0,
+        "compressed": 2,
+        "blocks": 0,
+        "mapped_compressed": 0,
+        "method": 8
+      },
+      {
+        "name": "incompressible-1.bin",
+        "decoded": 1,
+        "compressed": 9,
+        "blocks": 1,
+        "mapped_compressed": 7,
+        "method": 8
+      },
+      {
+        "name": "incompressible-131072.bin",
+        "decoded": 131072,
+        "compressed": 131126,
+        "blocks": 2,
+        "mapped_compressed": 131124,
+        "method": 8
+      },
+      {
+        "name": "incompressible-196609.bin",
+        "decoded": 196609,
+        "compressed": 196695,
+        "blocks": 4,
+        "mapped_compressed": 196693,
+        "method": 8
+      },
+      {
+        "name": "incompressible-65535.bin",
+        "decoded": 65535,
+        "compressed": 65563,
+        "blocks": 1,
+        "mapped_compressed": 65561,
+        "method": 8
+      },
+      {
+        "name": "incompressible-65536.bin",
+        "decoded": 65536,
+        "compressed": 65564,
+        "blocks": 1,
+        "mapped_compressed": 65562,
+        "method": 8
+      },
+      {
+        "name": "incompressible-65537.bin",
+        "decoded": 65537,
+        "compressed": 65571,
+        "blocks": 2,
+        "mapped_compressed": 65569,
+        "method": 8
+      },
+      {
+        "name": "logo.png",
+        "decoded": 9,
+        "compressed": 17,
+        "blocks": 1,
+        "mapped_compressed": 15,
+        "method": 8
+      },
+      {
+        "name": "repetitive-0.bin",
+        "decoded": 0,
+        "compressed": 2,
+        "blocks": 0,
+        "mapped_compressed": 0,
+        "method": 8
+      },
+      {
+        "name": "repetitive-1.bin",
+        "decoded": 1,
+        "compressed": 9,
+        "blocks": 1,
+        "mapped_compressed": 7,
+        "method": 8
+      },
+      {
+        "name": "repetitive-131072.bin",
+        "decoded": 131072,
+        "compressed": 170,
+        "blocks": 2,
+        "mapped_compressed": 168,
+        "method": 8
+      },
+      {
+        "name": "repetitive-196609.bin",
+        "decoded": 196609,
+        "compressed": 261,
+        "blocks": 4,
+        "mapped_compressed": 259,
+        "method": 8
+      },
+      {
+        "name": "repetitive-65535.bin",
+        "decoded": 65535,
+        "compressed": 85,
+        "blocks": 1,
+        "mapped_compressed": 83,
+        "method": 8
+      },
+      {
+        "name": "repetitive-65536.bin",
+        "decoded": 65536,
+        "compressed": 86,
+        "blocks": 1,
+        "mapped_compressed": 84,
+        "method": 8
+      },
+      {
+        "name": "repetitive-65537.bin",
+        "decoded": 65537,
+        "compressed": 93,
+        "blocks": 2,
+        "mapped_compressed": 91,
+        "method": 8
+      }
+    ]
+  },
+  {
+    "artifact": "/data/cache/ms-package-deflate-native-20261009.msix.edited.msix",
+    "sha256": "f1d26de319f6d506e4c436d1b28a599a139342eedeffd12f9cc4e974860de4ce",
+    "files": [
+      {
+        "name": "AppxManifest.xml",
+        "decoded": 508,
+        "compressed": 508,
+        "blocks": 1,
+        "mapped_compressed": 0,
+        "method": 0
+      },
+      {
+        "name": "incompressible-0.bin",
+        "decoded": 0,
+        "compressed": 2,
+        "blocks": 0,
+        "mapped_compressed": 0,
+        "method": 8
+      },
+      {
+        "name": "incompressible-1.bin",
+        "decoded": 1,
+        "compressed": 9,
+        "blocks": 1,
+        "mapped_compressed": 7,
+        "method": 8
+      },
+      {
+        "name": "incompressible-196609.bin",
+        "decoded": 196609,
+        "compressed": 196695,
+        "blocks": 4,
+        "mapped_compressed": 196693,
+        "method": 8
+      },
+      {
+        "name": "incompressible-65535.bin",
+        "decoded": 65535,
+        "compressed": 65563,
+        "blocks": 1,
+        "mapped_compressed": 65561,
+        "method": 8
+      },
+      {
+        "name": "incompressible-65536.bin",
+        "decoded": 65536,
+        "compressed": 65564,
+        "blocks": 1,
+        "mapped_compressed": 65562,
+        "method": 8
+      },
+      {
+        "name": "incompressible-65537.bin",
+        "decoded": 65537,
+        "compressed": 65571,
+        "blocks": 2,
+        "mapped_compressed": 65569,
+        "method": 8
+      },
+      {
+        "name": "logo.png",
+        "decoded": 9,
+        "compressed": 17,
+        "blocks": 1,
+        "mapped_compressed": 15,
+        "method": 8
+      },
+      {
+        "name": "renamed-131072.bin",
+        "decoded": 131072,
+        "compressed": 131126,
+        "blocks": 2,
+        "mapped_compressed": 131124,
+        "method": 8
+      },
+      {
+        "name": "repetitive-0.bin",
+        "decoded": 0,
+        "compressed": 2,
+        "blocks": 0,
+        "mapped_compressed": 0,
+        "method": 8
+      },
+      {
+        "name": "repetitive-1.bin",
+        "decoded": 1,
+        "compressed": 9,
+        "blocks": 1,
+        "mapped_compressed": 7,
+        "method": 8
+      },
+      {
+        "name": "repetitive-131072.bin",
+        "decoded": 131072,
+        "compressed": 170,
+        "blocks": 2,
+        "mapped_compressed": 168,
+        "method": 8
+      },
+      {
+        "name": "repetitive-196609.bin",
+        "decoded": 196609,
+        "compressed": 261,
+        "blocks": 4,
+        "mapped_compressed": 259,
+        "method": 8
+      },
+      {
+        "name": "repetitive-65535.bin",
+        "decoded": 65535,
+        "compressed": 85,
+        "blocks": 1,
+        "mapped_compressed": 83,
+        "method": 8
+      },
+      {
+        "name": "repetitive-65536.bin",
+        "decoded": 65536,
+        "compressed": 86,
+        "blocks": 1,
+        "mapped_compressed": 84,
+        "method": 8
+      },
+      {
+        "name": "repetitive-65537.bin",
+        "decoded": 65537,
+        "compressed": 93,
+        "blocks": 2,
+        "mapped_compressed": 91,
+        "method": 8
+      }
+    ]
+  }
+]

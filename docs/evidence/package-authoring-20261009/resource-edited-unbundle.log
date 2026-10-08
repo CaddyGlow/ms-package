@@ -1,0 +1,10 @@
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+The path (/p) parameter is: "\\?\C:\Users\deploy\authoring-resource-edited-bundle-20261009.msixbundle"
+The output directory (/d) parameter is: "\\?\C:\Users\deploy\resource-edited-20261009"
+Extracting file AppxMetadata\AppxBundleManifest.xml to \\?\C:\Users\deploy\resource-edited-20261009\AppxMetadata\AppxBundleManifest.xml
+Extracting file AppxBlockMap.xml to \\?\C:\Users\deploy\resource-edited-20261009\AppxBlockMap.xml
+Extracting file authoring-fr.msix to \\?\C:\Users\deploy\resource-edited-20261009\authoring-fr.msix
+MakeAppx : error: Bundle extraction failed.
+MakeAppx : error: 0x80080204 - The specified package format is not valid: The package manifest is not valid.

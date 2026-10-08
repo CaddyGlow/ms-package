@@ -16,9 +16,15 @@ Payload-only edits preserve original manifest bytes and effective MIME mappings.
 Renaming or removing a manifest-referenced file requires an explicit corresponding
 manifest replacement. See [the creation/editing example](../examples/author_appx.rs).
 
-The initial ZIP profile uses stored entries, fixed DOS timestamps, deterministic
+The ZIP profile uses stored or Deflate entries, fixed DOS timestamps, deterministic
 ordering, UTF-8 filenames, and ZIP32 output. Bounded stored ZIP64 sources may
-be decoded and rebuilt as ZIP32. ZIP64 output, compression, directory members,
+be decoded and rebuilt as ZIP32. `set_compression(AppxCompression::Deflate)` opts
+into raw Deflate encoding through `ms-compress` 0.1.2. Each decoded 64 KiB block
+ends at an independently restartable full-flush boundary; block-map sizes exclude
+the final stream terminator. Metadata remains stored. The editor accepts this
+compressed profile after checking physical boundaries, sizes and decoded hashes;
+arbitrary Deflate streams are outside its supported input profile.
+ZIP64 output, directory members,
 unsupported reserved metadata, and ambiguous path structures fail explicitly.
 Paths use forward slashes; rooted paths, traversal, Windows reserved characters,
 reserved device names, case collisions and file/directory collisions are rejected.
@@ -28,13 +34,14 @@ meet the deployment schema: portable structural/reference checks are not full XS
 validation. Manifest extension bytes are retained when not explicitly replaced.
 
 `AppxBundleBuilder` takes explicit bundle name, publisher, version and options.
-Each nested package must be an unsigned stored package with verified integrity
+Each nested package must be an unsigned stored or supported Deflate package with verified integrity
 and matching name/publisher. Architecture and resource identities cannot collide.
 Bundle offsets and sizes describe emitted bytes. Known Language, Scale and
 DXFeatureLevel resource qualifiers are transferred into bundle declarations;
 unknown qualifiers fail explicitly. The editor accepts canonical manifests from
 this writer so it cannot silently discard bundle extensions. Nested edits use
-`AppxEditor` followed by explicit nested-package replacement in the bundle editor.
+`AppxEditor` followed by explicit nested-package replacement in the bundle editor,
+or transactional `AppxBundleEditor::edit_package` operations.
 
 `InstallerDatabaseBuilder` exposes typed table, row, stream, code-page and summary
 operations. `InstallerEditor` copies the input into private scratch storage and
@@ -47,7 +54,7 @@ signature policies until MSI signature removal is audited. A failed backend
 mutation poisons the writer, preventing accidental emission of partial changes.
 
 `InstallerBuilder` coordinates a flat unversioned ASCII data-file profile, one
-feature, one file per component, one stored embedded cabinet, and execute actions.
+feature, one file per component, stored cabinets, and execute actions.
 Choose architecture and per-user/per-machine context explicitly. Supply distinct
 canonical product/package/upgrade GUIDs and stable component GUIDs. PE payloads
 are rejected until portable version/language inspection is qualified. Database
@@ -57,6 +64,18 @@ consult the [qualification record](package-authoring-validation.md) before use.
 comparison of every CFB stream rejects custom data it cannot preserve. Payload
 replacement retains component identity and key paths; renaming requires a new
 component GUID. Every payload edit requires an explicit distinct PackageCode.
+
+Existing `write` methods use one embedded cabinet. `write_with_media` additionally
+accepts `InstallerMediaLayout::ExternalCabinet`, `Loose`, or `Cabinets` with explicit
+file counts and embedded/external placement. Cabinet spanning is unsupported.
+The caller supplies an `InstallerMediaSink` to create and finalize named sidecars;
+no filesystem paths are opened implicitly. `open_with_media` takes a bounded caller
+resolver and admits only canonical output, including exact external media bytes.
+After adding or removing files, choose a new partition whose counts cover every file.
+Detailed reports identify validation scope, identity changes and completed media.
+Sidecars are finalized before the MSI destination is written. A `WriteError::Media`
+identifies completed artifacts and the failing artifact's partial byte count;
+publishing or cleaning up those artifacts remains caller-owned.
 
 All writers use caller-owned destinations and optional bounded memory, with no
 implicit filesystem scratch. APPX output requires `Write + Seek`; MSI final

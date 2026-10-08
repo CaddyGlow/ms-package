@@ -1,5 +1,10 @@
 # Package authoring backend audit
 
+This initial audit is retained as historical evidence. The follow-up uses
+`caddy-archive-core` 0.2.1, `ms-compress` 0.1.2 raw Deflate, and caller-managed
+stored MSI media. Current contracts are in [the API documentation](package-authoring.md),
+with [separate follow-up qualification](package-authoring-validation-20261009.md).
+
 Implementation snapshot: 2026-10-08. This records the experimental `write`
 feature introduced for [the authoring plan](package-authoring-plan.md); it does
 not establish Microsoft deployment or Windows Installer qualification.

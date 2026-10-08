@@ -1,0 +1,68 @@
+   Compiling ms-package-fuzz v0.1.0 (/home/rick/projects-caddy/ms-package/fuzz)
+    Finished `release` profile [optimized + debuginfo] target(s) in 0.83s
+Persistent signature found in '/home/rick/projects-caddy/ms-package/target/honggfuzz/x86_64-unknown-linux-gnu/release/msi'. Enabling persistent fuzzing mode
+Start time:'2026-10-09.00.36.41' bin:'/home/rick/projects-caddy/ms-package/target/honggfuzz/x86_64-unknown-linux-gnu/release/msi', input:'/home/rick/projects-caddy/ms-package/fuzz/corpus/msi', output:'/home/rick/projects-caddy/ms-package/fuzz/corpus/msi', persistent:true, stdin:false, mutation_rate:5, timeout:5, max_runs:128, threads:1, minimize:false, git_commit:01713bdad7307acea887517f2468b4a9961f9806
+[2J[500BParsed /home/rick/projects-caddy/ms-package/target/honggfuzz/x86_64-unknown-linux-gnu/release/msi: found 37739 32-bit and 21914 64-bit interesting values
+[2026-10-09T00:36:41+0200][W][3860997] sanitizers_AddFlag():67 The 'ASAN_OPTIONS' envar is already set. Not overriding it!
+Entering phase 1/3: Dry Run
+Launched new fuzzing thread, no. #0
+Persistent mode: Launched new persistent pid=3861308
+Sz:4 Tm:2,055us (i/b/h/e/p/c) New:0/0/0/35/1/1520, Cur:0/0/0/35/1/1520
+Sz:8 Tm:33us (i/b/h/e/p/c) New:0/0/0/0/0/30, Cur:0/0/0/35/1/1550
+Sz:16 Tm:23us (i/b/h/e/p/c) New:0/0/0/0/0/26, Cur:0/0/0/35/1/1576
+Sz:32 Tm:22us (i/b/h/e/p/c) New:0/0/0/0/0/23, Cur:0/0/0/35/1/1599
+Sz:64 Tm:21us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/35/1/1601
+Sz:128 Tm:20us (i/b/h/e/p/c) New:0/0/0/0/0/24, Cur:0/0/0/35/1/1625
+Sz:512 Tm:88us (i/b/h/e/p/c) New:0/0/0/16/0/1653, Cur:0/0/0/51/1/3278
+Sz:1024 Tm:24us (i/b/h/e/p/c) New:0/0/0/0/0/17, Cur:0/0/0/51/1/3295
+Sz:2048 Tm:24us (i/b/h/e/p/c) New:0/0/0/0/0/15, Cur:0/0/0/51/1/3310
+Sz:2048 Tm:25us (i/b/h/e/p/c) New:0/0/0/0/0/32, Cur:0/0/0/51/1/3342
+Sz:32 Tm:22us (i/b/h/e/p/c) New:0/0/0/0/0/1, Cur:0/0/0/51/1/3343
+Sz:128 Tm:21us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/51/1/3345
+Sz:1024 Tm:24us (i/b/h/e/p/c) New:0/0/0/0/0/11, Cur:0/0/0/51/1/3356
+Sz:2048 Tm:24us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/51/1/3358
+Sz:4096 Tm:99us (i/b/h/e/p/c) New:0/0/0/30/0/2393, Cur:0/0/0/81/1/5751
+Sz:8192 Tm:352us (i/b/h/e/p/c) New:0/0/0/41/0/2781, Cur:0/0/0/122/1/8532
+Sz:16384 Tm:236us (i/b/h/e/p/c) New:0/0/0/0/0/51, Cur:0/0/0/122/1/8583
+Sz:20488 Tm:1,466us (i/b/h/e/p/c) New:0/0/0/239/0/18071, Cur:0/0/0/361/1/26654
+Sz:256 Tm:19us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/361/1/26656
+Sz:512 Tm:26us (i/b/h/e/p/c) New:0/0/0/0/0/22, Cur:0/0/0/361/1/26678
+Sz:1024 Tm:20us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/361/1/26680
+Sz:2048 Tm:21us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/361/1/26682
+Sz:4096 Tm:25us (i/b/h/e/p/c) New:0/0/0/0/0/8, Cur:0/0/0/361/1/26690
+Sz:8192 Tm:255us (i/b/h/e/p/c) New:0/0/0/0/0/37, Cur:0/0/0/361/1/26727
+Sz:16384 Tm:251us (i/b/h/e/p/c) New:0/0/0/0/0/10, Cur:0/0/0/361/1/26737
+Sz:16384 Tm:239us (i/b/h/e/p/c) New:0/0/0/0/0/8, Cur:0/0/0/361/1/26745
+Sz:512 Tm:18us (i/b/h/e/p/c) New:0/0/0/0/0/1, Cur:0/0/0/361/1/26746
+Sz:4096 Tm:22us (i/b/h/e/p/c) New:0/0/0/0/0/7, Cur:0/0/0/361/1/26753
+Sz:8192 Tm:251us (i/b/h/e/p/c) New:0/0/0/0/0/13, Cur:0/0/0/361/1/26766
+Sz:16384 Tm:239us (i/b/h/e/p/c) New:0/0/0/0/0/21, Cur:0/0/0/361/1/26787
+Sz:20480 Tm:4,747us (i/b/h/e/p/c) New:0/0/0/1420/2/94079, Cur:0/0/0/1781/3/120866
+Sz:64 Tm:17us (i/b/h/e/p/c) New:0/0/0/0/0/1, Cur:0/0/0/1781/3/120867
+Sz:16 Tm:17us (i/b/h/e/p/c) New:0/0/0/0/0/3, Cur:0/0/0/1781/3/120870
+Sz:32 Tm:17us (i/b/h/e/p/c) New:0/0/0/0/0/16, Cur:0/0/0/1781/3/120886
+Sz:64 Tm:17us (i/b/h/e/p/c) New:0/0/0/0/0/3, Cur:0/0/0/1781/3/120889
+Sz:4096 Tm:23us (i/b/h/e/p/c) New:0/0/0/0/0/6, Cur:0/0/0/1781/3/120895
+Sz:8192 Tm:195us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/1781/3/120897
+Sz:16384 Tm:198us (i/b/h/e/p/c) New:0/0/0/0/0/6, Cur:0/0/0/1781/3/120903
+Sz:20485 Tm:193us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/1781/3/120905
+Sz:512 Tm:32us (i/b/h/e/p/c) New:0/0/0/0/0/5, Cur:0/0/0/1781/3/120910
+Sz:8192 Tm:214us (i/b/h/e/p/c) New:0/0/0/1/0/38, Cur:0/0/0/1782/3/120948
+Sz:16384 Tm:217us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/1782/3/120950
+Sz:20481 Tm:241us (i/b/h/e/p/c) New:0/0/0/0/0/3, Cur:0/0/0/1782/3/120953
+Sz:512 Tm:22us (i/b/h/e/p/c) New:0/0/0/4/0/67, Cur:0/0/0/1786/3/121020
+Sz:1024 Tm:18us (i/b/h/e/p/c) New:0/0/0/0/0/4, Cur:0/0/0/1786/3/121024
+Sz:2048 Tm:17us (i/b/h/e/p/c) New:0/0/0/0/0/4, Cur:0/0/0/1786/3/121028
+Sz:4096 Tm:17us (i/b/h/e/p/c) New:0/0/0/0/0/4, Cur:0/0/0/1786/3/121032
+Sz:16384 Tm:23us (i/b/h/e/p/c) New:0/0/0/0/0/4, Cur:0/0/0/1786/3/121036
+Sz:512 Tm:32us (i/b/h/e/p/c) New:0/0/0/8/0/140, Cur:0/0/0/1794/3/121176
+Sz:1024 Tm:19us (i/b/h/e/p/c) New:0/0/0/0/0/8, Cur:0/0/0/1794/3/121184
+Sz:2048 Tm:17us (i/b/h/e/p/c) New:0/0/0/0/0/5, Cur:0/0/0/1794/3/121189
+Sz:4096 Tm:18us (i/b/h/e/p/c) New:0/0/0/0/0/6, Cur:0/0/0/1794/3/121195
+Sz:8192 Tm:23us (i/b/h/e/p/c) New:0/0/0/0/0/3, Cur:0/0/0/1794/3/121198
+Sz:16384 Tm:31us (i/b/h/e/p/c) New:0/0/0/0/0/5, Cur:0/0/0/1794/3/121203
+Sz:4 Tm:29us (i/b/h/e/p/c) New:0/0/0/0/0/1, Cur:0/0/0/1794/3/121204
+Sz:4096 Tm:21us (i/b/h/e/p/c) New:0/0/0/0/0/5, Cur:0/0/0/1794/3/121209
+Terminating thread no. #0, left: 0
+Summary iterations:129 time:1 speed:129 crashes_count:0 timeout_count:0 new_units_added:0 slowest_unit_ms:4 guard_nb:12141 branch_coverage_percent:14 peak_rss_mb:114
+[r[500B

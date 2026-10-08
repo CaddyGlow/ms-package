@@ -1,5 +1,6 @@
 //! XML backends use alloc-compatible no_std libraries; package I/O remains std.
 use super::WriteError;
+use std::{cell::Cell, rc::Rc};
 
 pub(super) fn parse(data: &[u8], max_bytes: u64) -> Result<roxmltree::Document<'_>, WriteError> {
     if data.len() as u64 > max_bytes {
@@ -24,17 +25,20 @@ pub(super) fn parse(data: &[u8], max_bytes: u64) -> Result<roxmltree::Document<'
 struct BoundedXml {
     bytes: Vec<u8>,
     limit: u64,
+    length: Rc<Cell<u64>>,
+    dynamic_limit: Rc<Cell<u64>>,
 }
 
 impl woxml::Write for BoundedXml {
     fn write(&mut self, bytes: &[u8]) -> Result<usize, woxml::Error> {
         if (self.bytes.len() as u64)
             .checked_add(bytes.len() as u64)
-            .is_none_or(|size| size > self.limit)
+            .is_none_or(|size| size > self.limit.min(self.dynamic_limit.get()))
         {
             return Err(woxml::Error::WriteAllEof);
         }
         self.bytes.extend_from_slice(bytes);
+        self.length.set(self.bytes.len() as u64);
         Ok(bytes.len())
     }
 
@@ -53,15 +57,31 @@ fn writer_error(error: woxml::Error) -> WriteError {
 
 pub(super) struct MetadataWriter {
     writer: woxml::XmlWriter<'static, BoundedXml>,
+    length: Rc<Cell<u64>>,
+    dynamic_limit: Rc<Cell<u64>>,
 }
 
 impl MetadataWriter {
+    pub(super) fn len(&self) -> u64 {
+        self.length.get()
+    }
+
+    pub(super) fn set_limit(&mut self, limit: u64) {
+        self.dynamic_limit.set(limit);
+    }
+
     pub(super) fn new(limit: u64) -> Self {
+        let length = Rc::new(Cell::new(0));
+        let dynamic_limit = Rc::new(Cell::new(limit));
         Self {
             writer: woxml::XmlWriter::compact_mode(BoundedXml {
                 bytes: Vec::new(),
                 limit,
+                length: Rc::clone(&length),
+                dynamic_limit: Rc::clone(&dynamic_limit),
             }),
+            length,
+            dynamic_limit,
         }
     }
 

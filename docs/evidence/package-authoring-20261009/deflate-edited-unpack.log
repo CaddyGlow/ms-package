@@ -1,0 +1,27 @@
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+Option /v specified, switching to verbose output.
+Option /o specified, existing files will be overwritten.
+The path (/p) parameter is: "\\?\C:\Users\deploy\ms-package-deflate-native-20261009.msix.edited.msix"
+The output directory (/d) parameter is: "\\?\C:\Users\deploy\deflate-edited-20261009"
+Unpacking "\\?\C:\Users\deploy\ms-package-deflate-native-20261009.msix.edited.msix" (package name) to "\\?\C:\Users\deploy\deflate-edited-20261009" (output directory).
+Extracting file AppxManifest.xml to \\?\C:\Users\deploy\deflate-edited-20261009\AppxManifest.xml
+Extracting file AppxBlockMap.xml to \\?\C:\Users\deploy\deflate-edited-20261009\AppxBlockMap.xml
+Extracting file incompressible-0.bin to \\?\C:\Users\deploy\deflate-edited-20261009\incompressible-0.bin
+Extracting file incompressible-1.bin to \\?\C:\Users\deploy\deflate-edited-20261009\incompressible-1.bin
+Extracting file incompressible-196609.bin to \\?\C:\Users\deploy\deflate-edited-20261009\incompressible-196609.bin
+Extracting file incompressible-65535.bin to \\?\C:\Users\deploy\deflate-edited-20261009\incompressible-65535.bin
+Extracting file incompressible-65536.bin to \\?\C:\Users\deploy\deflate-edited-20261009\incompressible-65536.bin
+Extracting file incompressible-65537.bin to \\?\C:\Users\deploy\deflate-edited-20261009\incompressible-65537.bin
+Extracting file logo.png to \\?\C:\Users\deploy\deflate-edited-20261009\logo.png
+Extracting file renamed-131072.bin to \\?\C:\Users\deploy\deflate-edited-20261009\renamed-131072.bin
+Extracting file repetitive-0.bin to \\?\C:\Users\deploy\deflate-edited-20261009\repetitive-0.bin
+Extracting file repetitive-1.bin to \\?\C:\Users\deploy\deflate-edited-20261009\repetitive-1.bin
+Extracting file repetitive-131072.bin to \\?\C:\Users\deploy\deflate-edited-20261009\repetitive-131072.bin
+Extracting file repetitive-196609.bin to \\?\C:\Users\deploy\deflate-edited-20261009\repetitive-196609.bin
+Extracting file repetitive-65535.bin to \\?\C:\Users\deploy\deflate-edited-20261009\repetitive-65535.bin
+Extracting file repetitive-65536.bin to \\?\C:\Users\deploy\deflate-edited-20261009\repetitive-65536.bin
+Extracting file repetitive-65537.bin to \\?\C:\Users\deploy\deflate-edited-20261009\repetitive-65537.bin
+Package extraction succeeded.
+TOOL_EXIT=0

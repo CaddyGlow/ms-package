@@ -1,0 +1,117 @@
+   Compiling ms-package-fuzz v0.1.0 (/home/rick/projects-caddy/ms-package/fuzz)
+    Finished `release` profile [optimized + debuginfo] target(s) in 0.83s
+Persistent signature found in '/home/rick/projects-caddy/ms-package/target/honggfuzz/x86_64-unknown-linux-gnu/release/authoring'. Enabling persistent fuzzing mode
+Start time:'2026-10-09.00.36.43' bin:'/home/rick/projects-caddy/ms-package/target/honggfuzz/x86_64-unknown-linux-gnu/release/authoring', input:'/home/rick/projects-caddy/ms-package/fuzz/corpus/authoring', output:'/home/rick/projects-caddy/ms-package/fuzz/corpus/authoring', persistent:true, stdin:false, mutation_rate:5, timeout:5, max_runs:128, threads:1, minimize:false, git_commit:01713bdad7307acea887517f2468b4a9961f9806
+[2J[500BParsed /home/rick/projects-caddy/ms-package/target/honggfuzz/x86_64-unknown-linux-gnu/release/authoring: found 56953 32-bit and 40642 64-bit interesting values
+[2026-10-09T00:36:43+0200][W][3861369] sanitizers_AddFlag():67 The 'ASAN_OPTIONS' envar is already set. Not overriding it!
+Entering phase 1/3: Dry Run
+Launched new fuzzing thread, no. #0
+Persistent mode: Launched new persistent pid=3861680
+Sz:4 Tm:73,955us (i/b/h/e/p/c) New:0/0/0/7144/39/571469, Cur:0/0/0/7144/39/571469
+Sz:8 Tm:89,668us (i/b/h/e/p/c) New:0/0/0/2645/3/221776, Cur:0/0/0/9789/42/793245
+Sz:8 Tm:86,361us (i/b/h/e/p/c) New:0/0/0/16/0/7705, Cur:0/0/0/9805/42/800950
+Sz:4 Tm:26,673us (i/b/h/e/p/c) New:0/0/0/2/0/1053, Cur:0/0/0/9807/42/802003
+Sz:8 Tm:86,991us (i/b/h/e/p/c) New:0/0/0/11/0/4077, Cur:0/0/0/9818/42/806080
+Sz:8 Tm:85,418us (i/b/h/e/p/c) New:0/0/0/8/0/2325, Cur:0/0/0/9826/42/808405
+Sz:4 Tm:24,666us (i/b/h/e/p/c) New:0/0/0/44/0/3174, Cur:0/0/0/9870/42/811579
+Sz:8 Tm:88,019us (i/b/h/e/p/c) New:0/0/0/106/0/12627, Cur:0/0/0/9976/42/824206
+Sz:10 Tm:85,928us (i/b/h/e/p/c) New:0/0/0/3/0/1733, Cur:0/0/0/9979/42/825939
+Sz:4 Tm:24,885us (i/b/h/e/p/c) New:0/0/0/0/0/56, Cur:0/0/0/9979/42/825995
+Sz:5 Tm:24,501us (i/b/h/e/p/c) New:0/0/0/0/0/263, Cur:0/0/0/9979/42/826258
+Sz:4 Tm:24,459us (i/b/h/e/p/c) New:0/0/0/0/0/26, Cur:0/0/0/9979/42/826284
+Sz:8 Tm:83,543us (i/b/h/e/p/c) New:0/0/0/11/0/687, Cur:0/0/0/9990/42/826971
+Sz:10 Tm:82,547us (i/b/h/e/p/c) New:0/0/0/1/0/480, Cur:0/0/0/9991/42/827451
+Sz:4 Tm:25,177us (i/b/h/e/p/c) New:0/0/0/0/0/24, Cur:0/0/0/9991/42/827475
+Sz:8 Tm:83,336us (i/b/h/e/p/c) New:0/0/0/38/0/3513, Cur:0/0/0/10029/42/830988
+Sz:16 Tm:141,285us (i/b/h/e/p/c) New:0/0/0/35/0/4987, Cur:0/0/0/10064/42/835975
+Sz:32 Tm:250,515us (i/b/h/e/p/c) New:0/0/0/103/0/7262, Cur:0/0/0/10167/42/843237
+Sz:64 Tm:479,286us (i/b/h/e/p/c) New:0/0/0/20/0/2184, Cur:0/0/0/10187/42/845421
+Sz:128 Tm:943,604us (i/b/h/e/p/c) New:0/0/0/7/0/1845, Cur:0/0/0/10194/42/847266
+Sz:256 Tm:2,111,373us (i/b/h/e/p/c) New:0/0/0/0/0/1365, Cur:0/0/0/10194/42/848631
+Sz:4 Tm:24,459us (i/b/h/e/p/c) New:0/0/0/0/0/6, Cur:0/0/0/10194/42/848637
+Sz:8 Tm:80,421us (i/b/h/e/p/c) New:0/0/0/0/0/22, Cur:0/0/0/10194/42/848659
+Sz:16 Tm:137,012us (i/b/h/e/p/c) New:0/0/0/0/0/45, Cur:0/0/0/10194/42/848704
+Sz:32 Tm:242,348us (i/b/h/e/p/c) New:0/0/0/0/0/96, Cur:0/0/0/10194/42/848800
+Sz:64 Tm:465,664us (i/b/h/e/p/c) New:0/0/0/0/0/193, Cur:0/0/0/10194/42/848993
+Sz:64 Tm:467,118us (i/b/h/e/p/c) New:0/0/0/0/0/110, Cur:0/0/0/10194/42/849103
+Sz:8 Tm:80,752us (i/b/h/e/p/c) New:0/0/0/0/0/5, Cur:0/0/0/10194/42/849108
+Sz:16 Tm:137,072us (i/b/h/e/p/c) New:0/0/0/1/0/146, Cur:0/0/0/10195/42/849254
+Sz:30 Tm:195,500us (i/b/h/e/p/c) New:0/0/0/3/0/259, Cur:0/0/0/10198/42/849513
+Sz:4 Tm:23,852us (i/b/h/e/p/c) New:0/0/0/20/0/2030, Cur:0/0/0/10218/42/851543
+Sz:8 Tm:76,044us (i/b/h/e/p/c) New:0/0/0/29/0/2723, Cur:0/0/0/10247/42/854266
+Sz:8 Tm:75,911us (i/b/h/e/p/c) New:0/0/0/1/0/182, Cur:0/0/0/10248/42/854448
+Sz:4 Tm:25,370us (i/b/h/e/p/c) New:0/0/0/0/0/74, Cur:0/0/0/10248/42/854522
+Sz:4 Tm:25,475us (i/b/h/e/p/c) New:0/0/0/0/0/230, Cur:0/0/0/10248/42/854752
+Sz:4 Tm:24,150us (i/b/h/e/p/c) New:0/0/0/0/0/1, Cur:0/0/0/10248/42/854753
+Sz:8 Tm:82,901us (i/b/h/e/p/c) New:0/0/0/3/0/398, Cur:0/0/0/10251/42/855151
+Sz:14 Tm:82,965us (i/b/h/e/p/c) New:0/0/0/0/0/7, Cur:0/0/0/10251/42/855158
+Sz:8 Tm:83,814us (i/b/h/e/p/c) New:0/0/0/1/0/90, Cur:0/0/0/10252/42/855248
+Sz:8 Tm:84,168us (i/b/h/e/p/c) New:0/0/0/0/0/12, Cur:0/0/0/10252/42/855260
+Sz:8 Tm:84,024us (i/b/h/e/p/c) New:0/0/0/3/0/264, Cur:0/0/0/10255/42/855524
+Sz:8 Tm:83,856us (i/b/h/e/p/c) New:0/0/0/0/0/39, Cur:0/0/0/10255/42/855563
+Sz:8 Tm:80,413us (i/b/h/e/p/c) New:0/0/0/0/0/6, Cur:0/0/0/10255/42/855569
+Sz:16 Tm:136,518us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/10255/42/855571
+Sz:32 Tm:241,717us (i/b/h/e/p/c) New:0/0/0/0/0/150, Cur:0/0/0/10255/42/855721
+Sz:64 Tm:463,857us (i/b/h/e/p/c) New:0/0/0/0/0/123, Cur:0/0/0/10255/42/855844
+Sz:128 Tm:912,824us (i/b/h/e/p/c) New:0/0/0/0/0/48, Cur:0/0/0/10255/42/855892
+Sz:256 Tm:1,809,762us (i/b/h/e/p/c) New:0/0/0/0/0/77, Cur:0/0/0/10255/42/855969
+Sz:8 Tm:84,262us (i/b/h/e/p/c) New:0/0/0/0/0/142, Cur:0/0/0/10255/42/856111
+Sz:16 Tm:142,346us (i/b/h/e/p/c) New:0/0/0/3/0/357, Cur:0/0/0/10258/42/856468
+Sz:30 Tm:197,566us (i/b/h/e/p/c) New:0/0/0/0/0/11, Cur:0/0/0/10258/42/856479
+Sz:16 Tm:136,668us (i/b/h/e/p/c) New:0/0/0/0/0/5, Cur:0/0/0/10258/42/856484
+Sz:32 Tm:249,171us (i/b/h/e/p/c) New:0/0/0/0/0/11, Cur:0/0/0/10258/42/856495
+Sz:64 Tm:474,753us (i/b/h/e/p/c) New:0/0/0/0/0/4, Cur:0/0/0/10258/42/856499
+Sz:85 Tm:585,623us (i/b/h/e/p/c) New:0/0/0/0/0/48, Cur:0/0/0/10258/42/856547
+Sz:4 Tm:23,703us (i/b/h/e/p/c) New:0/0/0/5/0/399, Cur:0/0/0/10263/42/856946
+Sz:8 Tm:78,754us (i/b/h/e/p/c) New:0/0/0/9/0/612, Cur:0/0/0/10272/42/857558
+Sz:10 Tm:78,664us (i/b/h/e/p/c) New:0/0/0/0/0/129, Cur:0/0/0/10272/42/857687
+Sz:4 Tm:27,460us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/10272/42/857689
+Sz:8 Tm:86,986us (i/b/h/e/p/c) New:0/0/0/0/0/9, Cur:0/0/0/10272/42/857698
+Sz:14 Tm:83,918us (i/b/h/e/p/c) New:0/0/0/0/0/3, Cur:0/0/0/10272/42/857701
+Sz:4 Tm:23,695us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/10272/42/857703
+Sz:8 Tm:78,566us (i/b/h/e/p/c) New:0/0/0/1/0/141, Cur:0/0/0/10273/42/857844
+Sz:12 Tm:78,605us (i/b/h/e/p/c) New:0/0/0/0/0/7, Cur:0/0/0/10273/42/857851
+Sz:8 Tm:82,927us (i/b/h/e/p/c) New:0/0/0/0/0/19, Cur:0/0/0/10273/42/857870
+Sz:16 Tm:144,019us (i/b/h/e/p/c) New:0/0/0/1/0/379, Cur:0/0/0/10274/42/858249
+Sz:32 Tm:269,676us (i/b/h/e/p/c) New:0/0/0/1/0/263, Cur:0/0/0/10275/42/858512
+Sz:64 Tm:534,683us (i/b/h/e/p/c) New:0/0/0/7/0/804, Cur:0/0/0/10282/42/859316
+Sz:72 Tm:580,948us (i/b/h/e/p/c) New:0/0/0/0/0/49, Cur:0/0/0/10282/42/859365
+Sz:4 Tm:23,537us (i/b/h/e/p/c) New:0/0/0/0/0/6, Cur:0/0/0/10282/42/859371
+Sz:8 Tm:75,415us (i/b/h/e/p/c) New:0/0/0/0/0/26, Cur:0/0/0/10282/42/859397
+Sz:8 Tm:76,312us (i/b/h/e/p/c) New:0/0/0/0/0/22, Cur:0/0/0/10282/42/859419
+Sz:16 Tm:138,062us (i/b/h/e/p/c) New:0/0/0/0/0/3, Cur:0/0/0/10282/42/859422
+Sz:32 Tm:243,031us (i/b/h/e/p/c) New:0/0/0/0/0/27, Cur:0/0/0/10282/42/859449
+Sz:64 Tm:469,565us (i/b/h/e/p/c) New:0/0/0/0/0/93, Cur:0/0/0/10282/42/859542
+Sz:128 Tm:932,038us (i/b/h/e/p/c) New:0/0/0/0/0/22, Cur:0/0/0/10282/42/859564
+Sz:256 Tm:1,811,762us (i/b/h/e/p/c) New:0/0/0/0/0/37, Cur:0/0/0/10282/42/859601
+Sz:8 Tm:84,299us (i/b/h/e/p/c) New:0/0/0/0/0/6, Cur:0/0/0/10282/42/859607
+Sz:16 Tm:142,830us (i/b/h/e/p/c) New:0/0/0/0/0/5, Cur:0/0/0/10282/42/859612
+Sz:19 Tm:142,814us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/10282/42/859614
+Sz:4 Tm:23,838us (i/b/h/e/p/c) New:0/0/0/0/0/1, Cur:0/0/0/10282/42/859615
+Sz:8 Tm:78,591us (i/b/h/e/p/c) New:0/0/0/0/0/1, Cur:0/0/0/10282/42/859616
+Sz:8 Tm:78,671us (i/b/h/e/p/c) New:0/0/0/0/0/10, Cur:0/0/0/10282/42/859626
+Sz:8 Tm:87,643us (i/b/h/e/p/c) New:0/0/0/0/0/37, Cur:0/0/0/10282/42/859663
+Sz:8 Tm:88,463us (i/b/h/e/p/c) New:0/0/0/0/0/4, Cur:0/0/0/10282/42/859667
+Sz:4 Tm:25,486us (i/b/h/e/p/c) New:0/0/0/0/0/3, Cur:0/0/0/10282/42/859670
+Sz:8 Tm:77,487us (i/b/h/e/p/c) New:0/0/0/0/0/24, Cur:0/0/0/10282/42/859694
+Sz:16 Tm:125,742us (i/b/h/e/p/c) New:0/0/0/0/0/71, Cur:0/0/0/10282/42/859765
+Sz:32 Tm:217,644us (i/b/h/e/p/c) New:0/0/0/0/0/109, Cur:0/0/0/10282/42/859874
+Sz:64 Tm:412,035us (i/b/h/e/p/c) New:0/0/0/0/0/24, Cur:0/0/0/10282/42/859898
+Sz:128 Tm:853,579us (i/b/h/e/p/c) New:0/0/0/15/0/1765, Cur:0/0/0/10297/42/861663
+Sz:256 Tm:1,711,626us (i/b/h/e/p/c) New:0/0/0/0/0/54, Cur:0/0/0/10297/42/861717
+Sz:4 Tm:26,313us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/10297/42/861719
+Sz:8 Tm:84,588us (i/b/h/e/p/c) New:0/0/0/0/0/3, Cur:0/0/0/10297/42/861722
+Sz:13 Tm:84,578us (i/b/h/e/p/c) New:0/0/0/0/0/4, Cur:0/0/0/10297/42/861726
+Sz:8 Tm:84,443us (i/b/h/e/p/c) New:0/0/0/0/0/7, Cur:0/0/0/10297/42/861733
+Sz:16 Tm:142,377us (i/b/h/e/p/c) New:0/0/0/0/0/1, Cur:0/0/0/10297/42/861734
+Sz:32 Tm:259,661us (i/b/h/e/p/c) New:0/0/0/0/0/61, Cur:0/0/0/10297/42/861795
+Sz:64 Tm:493,909us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/10297/42/861797
+Sz:128 Tm:960,605us (i/b/h/e/p/c) New:0/0/0/0/0/10, Cur:0/0/0/10297/42/861807
+Sz:256 Tm:1,896,235us (i/b/h/e/p/c) New:0/0/0/0/0/16, Cur:0/0/0/10297/42/861823
+Sz:8 Tm:81,297us (i/b/h/e/p/c) New:0/0/0/0/0/4, Cur:0/0/0/10297/42/861827
+Sz:0 Tm:24,407us (i/b/h/e/p/c) New:0/0/0/2/0/64, Cur:0/0/0/10299/42/861891
+Sz:8 Tm:79,766us (i/b/h/e/p/c) New:0/0/0/0/0/1, Cur:0/0/0/10299/42/861892
+Sz:8 Tm:79,800us (i/b/h/e/p/c) New:0/0/0/0/0/2, Cur:0/0/0/10299/42/861894
+Terminating thread no. #0, left: 0
+Summary iterations:129 time:28 speed:4 crashes_count:0 timeout_count:0 new_units_added:0 slowest_unit_ms:2111 guard_nb:75182 branch_coverage_percent:13 peak_rss_mb:127
+[r[500B

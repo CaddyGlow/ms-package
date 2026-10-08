@@ -1,6 +1,6 @@
 # Independent ms-package fuzzing
 
-Owned targets: appx, msi. Harnesses have input/read/output budgets and do not depend on another project’s fuzz package. Malformed input is expected; panics and oracle mismatches are findings. Seeds include structural inputs and regression fixtures where available. Production defaults remain unchanged.
+Owned targets: appx, msi, authoring. Stateful authoring oracles compare expected payloads after every save across Stored/Deflate APPX edits and embedded/external/loose/multiple MSI media layouts; all media uses bounded memory sinks and resolvers. Harnesses have input/read/output budgets and do not depend on another project’s fuzz package. Malformed input is expected; panics and oracle mismatches are findings. Seeds include structural inputs and regression fixtures where available. Production defaults remain unchanged.
 
 Run `cargo test --manifest-path fuzz/Cargo.toml --locked` and `cargo clippy --manifest-path fuzz/Cargo.toml --all-targets --locked -- -D warnings`. Install honggfuzz 0.5.62 plus GCC/binutils/libunwind/liblzma development libraries, then run `python3 scripts/fuzz-campaign.py --iterations 10000`. Replay with `cargo run --manifest-path fuzz/Cargo.toml --locked --bin replay -- TARGET FILE`.
 

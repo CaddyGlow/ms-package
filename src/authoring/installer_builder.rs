@@ -1,7 +1,14 @@
-//! Experimental file-only MSI coordination. Windows lifecycle qualification is pending.
+//! Narrow file-only MSI coordination with explicit identities and media.
 
+use std::collections::{BTreeMap, BTreeSet};
 use std::io::{Cursor, Read, Write};
 
+use super::installer::{
+    InstallerDetailedWriteReport, InstallerValidationScope, identity_changes, identity_values,
+};
+use super::installer_media::{
+    InstallerCabinetSpec, InstallerMediaLayout, InstallerMediaSink, prepare, write_installer_media,
+};
 use super::{InstallerDatabaseBuilder, InstallerWriteReport, WriteError, WriteOptions};
 
 /// Explicit target architecture for the narrow file-only profile.
@@ -65,6 +72,7 @@ pub struct InstallerBuilder {
     options: WriteOptions,
     files: Vec<File>,
     total: u64,
+    original_identities: Option<BTreeMap<String, String>>,
 }
 
 fn invalid(message: &str) -> WriteError {
@@ -154,6 +162,7 @@ impl InstallerBuilder {
             options,
             files: Vec::new(),
             total: 0,
+            original_identities: None,
         })
     }
 
@@ -226,37 +235,73 @@ impl InstallerBuilder {
     /// Builds tables, sequence actions, and an embedded cabinet, then explicitly
     /// finalizes all backends. Requires independent Windows validation before use.
     pub fn write(self, destination: impl Write) -> Result<InstallerWriteReport, WriteError> {
+        self.write_detailed(destination)
+            .map(|report| report.database)
+    }
+
+    /// Emits the canonical profile with identity changes and explicit validation scope.
+    pub fn write_detailed(
+        self,
+        destination: impl Write,
+    ) -> Result<InstallerDetailedWriteReport, WriteError> {
+        self.write_with_media(
+            InstallerMediaLayout::Embedded,
+            &mut super::installer_media::RejectMediaSink,
+            destination,
+        )
+    }
+
+    /// Finalizes all artifacts before emitting external media, then the MSI.
+    /// A sink or destination failure can leave partial caller-owned artifacts.
+    pub fn write_with_media<S: InstallerMediaSink>(
+        self,
+        layout: InstallerMediaLayout,
+        sink: &mut S,
+        mut destination: impl Write,
+    ) -> Result<InstallerDetailedWriteReport, WriteError> {
         if self.files.is_empty() {
             return Err(invalid(
                 "the file-only MSI profile requires at least one file",
             ));
         }
-        let mut cabinet = cabinet::CabinetBuilder::new(cabinet::WriteCompression::None);
-        for file in &self.files {
-            cabinet.add_file(&file.id, &file.bytes)?;
-        }
-        let scratch_limit = self
-            .options
-            .limits
-            .max_scratch_bytes
-            .checked_sub(self.total)
-            .ok_or(WriteError::LimitExceeded("MSI cabinet scratch"))?;
-        let mut cabinet_output = super::installer::BoundedCursor {
-            inner: Cursor::new(Vec::new()),
-            limit: scratch_limit
-                .min(self.options.limits.max_file_bytes)
-                .min(self.options.limits.max_output_bytes),
-        };
-        cabinet.write(&mut cabinet_output)?;
-        cabinet_output.flush()?;
-        let cabinet_bytes = cabinet_output.inner.into_inner();
+        let files: Vec<_> = self
+            .files
+            .iter()
+            .map(|file| (file.id.as_str(), file.name.as_str(), file.bytes.as_slice()))
+            .collect();
+        let media = prepare(
+            &files,
+            &layout,
+            &self.identity.directory_name,
+            &self.options.limits,
+        )?;
+        let media_bytes = media
+            .embedded
+            .iter()
+            .chain(&media.external)
+            .try_fold(0u64, |total, (_, bytes)| {
+                total.checked_add(bytes.len() as u64)
+            })
+            .ok_or(WriteError::LimitExceeded("MSI media scratch"))?;
         let mut options = self.options;
         options.limits.max_scratch_bytes = options
             .limits
             .max_scratch_bytes
             .checked_sub(self.total)
-            .and_then(|left| left.checked_sub(cabinet_bytes.len() as u64))
+            .and_then(|left| left.checked_sub(media_bytes))
             .ok_or(WriteError::LimitExceeded("MSI database scratch"))?;
+        let external_bytes = media
+            .external
+            .iter()
+            .try_fold(0u64, |total, (_, bytes)| {
+                total.checked_add(bytes.len() as u64)
+            })
+            .ok_or(WriteError::LimitExceeded("MSI external output"))?;
+        options.limits.max_output_bytes = options
+            .limits
+            .max_output_bytes
+            .checked_sub(external_bytes)
+            .ok_or(WriteError::LimitExceeded("MSI aggregate output"))?;
         let mut database = InstallerDatabaseBuilder::new(options)?;
         database.set_database_codepage(msi::CodePage::Windows1252)?;
         let package_code = guid(&self.identity.package_code)?;
@@ -271,11 +316,13 @@ impl InstallerBuilder {
             summary.set_author(&self.identity.manufacturer);
             summary.set_subject(&self.identity.name);
             summary.set_creating_application("ms-package experimental file-only authoring");
-            summary.set_word_count(if self.identity.context == InstallationContext::PerUser {
-                10
-            } else {
-                2
-            });
+            summary.set_word_count(
+                (if self.identity.context == InstallationContext::PerUser {
+                    8
+                } else {
+                    0
+                }) | if media.compressed { 2 } else { 0 },
+            );
             summary.set_page_count(400);
         })?;
         create_schema(&mut database)?;
@@ -354,14 +401,21 @@ impl InstallerBuilder {
         }
         database.insert_rows(
             "Media",
-            vec![vec![
-                i(1),
-                i(self.files.len() as i32),
-                n(),
-                s("#payload.cab"),
-                n(),
-                n(),
-            ]],
+            media
+                .rows
+                .iter()
+                .enumerate()
+                .map(|(index, (last, cabinet))| {
+                    vec![
+                        i(index as i32 + 1),
+                        i(*last),
+                        n(),
+                        cabinet.as_deref().map(s).unwrap_or_else(n),
+                        n(),
+                        n(),
+                    ]
+                })
+                .collect(),
         )?;
         let actions = [
             ("ValidateProductID", 700),
@@ -389,8 +443,54 @@ impl InstallerBuilder {
                 .map(|(action, sequence)| vec![s(action), n(), i(sequence)])
                 .collect(),
         )?;
-        database.write_stream("payload.cab", Cursor::new(cabinet_bytes))?;
-        database.write(destination)
+        for (name, bytes) in media.embedded {
+            database.write_stream(&name, Cursor::new(bytes))?;
+        }
+        let mut output = Vec::new();
+        let mut report = database.write_detailed(&mut output)?;
+        report.external_media = write_installer_media(&media.external, sink, &self.options.limits)?;
+        let mut written = 0usize;
+        let result = (|| -> std::io::Result<()> {
+            while written < output.len() {
+                match destination.write(&output[written..]) {
+                    Ok(0) => return Err(std::io::ErrorKind::WriteZero.into()),
+                    Ok(count) => written += count,
+                    Err(error) if error.kind() == std::io::ErrorKind::Interrupted => continue,
+                    Err(error) => return Err(error),
+                }
+            }
+            destination.flush()
+        })();
+        if let Err(error) = result {
+            if media.external.is_empty() {
+                return Err(error.into());
+            }
+            return Err(WriteError::Media {
+                completed: media
+                    .external
+                    .iter()
+                    .map(|(name, _)| name.clone())
+                    .collect(),
+                incomplete: "<MSI>".into(),
+                bytes_written: written as u64,
+                source: Box::new(error.into()),
+            });
+        }
+        report.validation_scope = InstallerValidationScope::CanonicalFileOnly;
+        if let Some(original) = self.original_identities {
+            let final_values = report
+                .identity_changes
+                .iter()
+                .filter_map(|change| {
+                    change
+                        .new_value
+                        .as_ref()
+                        .map(|value| (change.name.clone(), value.clone()))
+                })
+                .collect();
+            report.identity_changes = identity_changes(&original, &final_values);
+        }
+        Ok(report)
     }
 }
 
@@ -519,14 +619,26 @@ fn create_schema(database: &mut InstallerDatabaseBuilder) -> Result<(), WriteErr
 /// change servicing behavior; these experimental operations have no upgrade claim.
 pub struct InstallerPayloadEditor {
     builder: InstallerBuilder,
+    used_component_guids: BTreeSet<String>,
+    layout: InstallerMediaLayout,
 }
 
 impl InstallerPayloadEditor {
     /// Opens the narrow canonical profile, requiring a distinct new PackageCode.
     pub fn open(
+        source: impl Read,
+        new_package_code: &str,
+        options: WriteOptions,
+    ) -> Result<Self, WriteError> {
+        Self::open_with_media(source, new_package_code, options, &mut NoMedia)
+    }
+
+    /// Opens a canonical media profile using a caller-owned bounded resolver.
+    pub fn open_with_media(
         mut source: impl Read,
         new_package_code: &str,
         options: WriteOptions,
+        resolver: &mut impl crate::MediaResolver,
     ) -> Result<Self, WriteError> {
         guid(new_package_code)?;
         let mut bytes = Vec::new();
@@ -547,6 +659,65 @@ impl InstallerPayloadEditor {
             validation_options,
         )?);
         let mut package = msi::Package::open(Cursor::new(&bytes))?;
+        for (table, columns) in [
+            ("Property", &["Property", "Value"][..]),
+            (
+                "Media",
+                &[
+                    "DiskId",
+                    "LastSequence",
+                    "DiskPrompt",
+                    "Cabinet",
+                    "VolumeLabel",
+                    "Source",
+                ][..],
+            ),
+            (
+                "Directory",
+                &["Directory", "Directory_Parent", "DefaultDir"][..],
+            ),
+            (
+                "Component",
+                &[
+                    "Component",
+                    "ComponentId",
+                    "Directory_",
+                    "Attributes",
+                    "Condition",
+                    "KeyPath",
+                ][..],
+            ),
+            (
+                "File",
+                &[
+                    "File",
+                    "Component_",
+                    "FileName",
+                    "FileSize",
+                    "Version",
+                    "Language",
+                    "Attributes",
+                    "Sequence",
+                ][..],
+            ),
+        ] {
+            let Some(schema) = package.get_table(table) else {
+                return Err(WriteError::Unsupported(format!(
+                    "canonical table {table} is missing"
+                )));
+            };
+            if schema
+                .columns()
+                .iter()
+                .map(|column| column.name())
+                .ne(columns.iter().copied())
+            {
+                return Err(WriteError::Unsupported(format!(
+                    "noncanonical {table} columns"
+                )));
+            }
+        }
+        let original_identities = identity_values(&mut package)?;
         let mut properties = std::collections::BTreeMap::new();
         for row in package.select_rows(msi::Select::table("Property"))? {
             let key = row["Property"]
@@ -605,6 +776,11 @@ impl InstallerPayloadEditor {
             architecture,
             context,
         };
+        if new_package_code == identity.product_code || new_package_code == identity.upgrade_code {
+            return Err(invalid(
+                "PackageCode must remain distinct from ProductCode and UpgradeCode",
+            ));
+        }
         let mut builder = InstallerBuilder::new(identity, options)?;
         let mut components = std::collections::BTreeMap::new();
         for row in package.select_rows(msi::Select::table("Component"))? {
@@ -621,6 +797,42 @@ impl InstallerPayloadEditor {
         }
         let mut file_rows: Vec<_> = package.select_rows(msi::Select::table("File"))?.collect();
         file_rows.sort_by_key(|row| row["Sequence"].as_int());
+        let mut media_rows: Vec<_> = package.select_rows(msi::Select::table("Media"))?.collect();
+        media_rows.sort_by_key(|row| row["DiskId"].as_int());
+        let mut previous = 0;
+        let mut cabinets = Vec::new();
+        for row in &media_rows {
+            let last = row["LastSequence"]
+                .as_int()
+                .ok_or_else(|| invalid("canonical media sequence"))?;
+            if last <= previous {
+                return Err(invalid("canonical media sequences must increase"));
+            }
+            if let Some(name) = row["Cabinet"].as_str() {
+                cabinets.push(InstallerCabinetSpec {
+                    name: name.trim_start_matches('#').into(),
+                    file_count: (last - previous) as u64,
+                    embedded: name.starts_with('#'),
+                });
+            } else if media_rows.len() != 1 {
+                return Err(invalid("loose media requires one disk"));
+            }
+            previous = last;
+        }
+        if previous as usize != file_rows.len() {
+            return Err(invalid("media sequence must cover every file"));
+        }
+        let layout = if cabinets.is_empty() {
+            InstallerMediaLayout::Loose
+        } else if cabinets.len() == 1 && cabinets[0].embedded && cabinets[0].name == "payload.cab" {
+            InstallerMediaLayout::Embedded
+        } else if cabinets.len() == 1 && !cabinets[0].embedded {
+            InstallerMediaLayout::ExternalCabinet {
+                name: cabinets[0].name.clone(),
+            }
+        } else {
+            InstallerMediaLayout::Cabinets { cabinets }
+        };
         drop(package);
         let mut reader = crate::InstallerPackage::open_with_metadata_limit(
             Cursor::new(&bytes),
@@ -630,12 +842,6 @@ impl InstallerPayloadEditor {
             options.limits.max_metadata_bytes,
         )?;
         let declared_files = reader.files()?;
-        struct NoMedia;
-        impl crate::MediaResolver for NoMedia {
-            fn resolve(&mut self, name: &str, _: u64) -> crate::Result<Vec<u8>> {
-                Err(crate::Error::MissingMedia(name.into()))
-            }
-        }
         for row in file_rows {
             let id = row["File"]
                 .as_str()
@@ -668,7 +874,7 @@ impl InstallerPayloadEditor {
             }
             let decoded = reader.read_file(
                 file,
-                &mut NoMedia,
+                resolver,
                 options.limits.max_file_bytes.min(scratch_available),
             )?;
             let live = (bytes.len() as u64)
@@ -696,17 +902,41 @@ impl InstallerPayloadEditor {
             ));
         }
         let mut canonical_builder = builder.clone();
-        canonical_builder.options.limits.max_scratch_bytes = canonical_scratch;
-        canonical_builder.options.limits.max_output_bytes = canonical_builder
-            .options
-            .limits
-            .max_output_bytes
-            .min(bytes.len() as u64);
+        canonical_builder.options.limits.max_scratch_bytes =
+            if matches!(layout, InstallerMediaLayout::Embedded) {
+                canonical_scratch
+            } else {
+                canonical_scratch / 2
+            };
+        if matches!(layout, InstallerMediaLayout::Embedded) {
+            canonical_builder.options.limits.max_output_bytes = canonical_builder
+                .options
+                .limits
+                .max_output_bytes
+                .min(bytes.len() as u64);
+        }
         let mut canonical = Vec::new();
-        canonical_builder.write(&mut canonical)?;
+        canonical_builder.write_with_media(
+            layout.clone(),
+            &mut VerifyMedia {
+                resolver,
+                limit: canonical_scratch / 2,
+            },
+            &mut canonical,
+        )?;
         compare_streams(&bytes, &canonical)?;
         builder.identity.package_code = new_package_code.into();
-        Ok(Self { builder })
+        builder.original_identities = Some(original_identities);
+        let used_component_guids = builder
+            .files
+            .iter()
+            .map(|file| file.component_guid.clone())
+            .collect();
+        Ok(Self {
+            builder,
+            used_component_guids,
+            layout,
+        })
     }
 
     /// Adds a new component with its own explicit GUID.
@@ -717,7 +947,14 @@ impl InstallerPayloadEditor {
         component_guid: &str,
         source: impl Read,
     ) -> Result<(), WriteError> {
-        self.builder.add_file(id, name, component_guid, source)
+        if self.used_component_guids.contains(component_guid) {
+            return Err(invalid(
+                "component GUID has already identified a key path in this edit session",
+            ));
+        }
+        self.builder.add_file(id, name, component_guid, source)?;
+        self.used_component_guids.insert(component_guid.into());
+        Ok(())
     }
 
     /// Replaces an existing unversioned file, retaining its component and key path.
@@ -735,9 +972,16 @@ impl InstallerPayloadEditor {
             .options
             .limits
             .max_total_bytes
-            .min(self.builder.options.limits.max_scratch_bytes)
             .checked_sub(remaining)
             .ok_or(WriteError::LimitExceeded("MSI payload bytes"))?
+            .min(
+                self.builder
+                    .options
+                    .limits
+                    .max_scratch_bytes
+                    .checked_sub(self.builder.total)
+                    .ok_or(WriteError::LimitExceeded("MSI replacement scratch"))?,
+            )
             .min(self.builder.options.limits.max_file_bytes)
             .min(i32::MAX as u64);
         let mut bytes = Vec::new();
@@ -793,19 +1037,48 @@ impl InstallerPayloadEditor {
             .iter()
             .position(|file| file.id == id)
             .ok_or_else(|| invalid("file to rename does not exist"))?;
-        if self.builder.files.iter().any(|file| {
-            file.name.eq_ignore_ascii_case(new_name) || file.component_guid == new_component_guid
-        }) {
+        if self.used_component_guids.contains(new_component_guid)
+            || self
+                .builder
+                .files
+                .iter()
+                .any(|file| file.name.eq_ignore_ascii_case(new_name))
+        {
             return Err(invalid("rename target or component GUID conflicts"));
         }
         self.builder.files[index].name = new_name.into();
         self.builder.files[index].component_guid = new_component_guid.into();
+        self.used_component_guids.insert(new_component_guid.into());
         Ok(())
     }
 
     /// Rebuilds tables, sequences, and cabinet under the explicit new PackageCode.
     pub fn write(self, destination: impl Write) -> Result<InstallerWriteReport, WriteError> {
-        self.builder.write(destination)
+        self.write_detailed(destination)
+            .map(|report| report.database)
+    }
+
+    /// Emits the canonical edited profile with actual source-to-output identity changes.
+    pub fn write_detailed(
+        self,
+        destination: impl Write,
+    ) -> Result<InstallerDetailedWriteReport, WriteError> {
+        self.builder.write_with_media(
+            self.layout,
+            &mut super::installer_media::RejectMediaSink,
+            destination,
+        )
+    }
+
+    /// Emits edited files using an explicit complete media partition and sink.
+    /// Supply new partition counts after adding or removing files.
+    pub fn write_with_media<S: InstallerMediaSink>(
+        self,
+        layout: InstallerMediaLayout,
+        sink: &mut S,
+        destination: impl Write,
+    ) -> Result<InstallerDetailedWriteReport, WriteError> {
+        self.builder.write_with_media(layout, sink, destination)
     }
 }
 
@@ -847,4 +1120,58 @@ fn compare_streams(source: &[u8], canonical: &[u8]) -> Result<(), WriteError> {
         }
     }
     Ok(())
+}
+
+struct NoMedia;
+impl crate::MediaResolver for NoMedia {
+    fn resolve(&mut self, name: &str, _: u64) -> crate::Result<Vec<u8>> {
+        Err(crate::Error::MissingMedia(name.into()))
+    }
+}
+struct VerifyMedia<'a, R> {
+    resolver: &'a mut R,
+    limit: u64,
+}
+struct VerifyWriter {
+    bytes: Vec<u8>,
+    position: usize,
+}
+impl Write for VerifyWriter {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        let end = self
+            .position
+            .checked_add(bytes.len())
+            .ok_or_else(|| std::io::Error::other("canonical media size overflow"))?;
+        if self.bytes.get(self.position..end) != Some(bytes) {
+            return Err(std::io::Error::other("noncanonical external media bytes"));
+        }
+        self.position = end;
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+impl<R: crate::MediaResolver> InstallerMediaSink for VerifyMedia<'_, R> {
+    type Writer = VerifyWriter;
+    fn create(&mut self, name: &str) -> std::io::Result<Self::Writer> {
+        let bytes = self
+            .resolver
+            .resolve(name, self.limit)
+            .map_err(std::io::Error::other)?;
+        if bytes.len() as u64 > self.limit {
+            return Err(std::io::Error::other(
+                "canonical media resolver exceeded bound",
+            ));
+        }
+        Ok(VerifyWriter { bytes, position: 0 })
+    }
+    fn finish(&mut self, _: &str, writer: Self::Writer) -> std::io::Result<()> {
+        if writer.position != writer.bytes.len() {
+            return Err(std::io::Error::other(
+                "noncanonical trailing external media bytes",
+            ));
+        }
+        Ok(())
+    }
 }

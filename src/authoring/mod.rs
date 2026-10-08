@@ -8,14 +8,22 @@ mod appx;
 mod bundle;
 mod installer;
 mod installer_builder;
+mod installer_media;
 mod xml;
 
-pub use appx::{AppxBuilder, AppxEditor};
+pub use appx::{AppxBuilder, AppxCompression, AppxEditor};
 pub use bundle::{AppxBundleBuilder, AppxBundleEditor};
-pub use installer::{InstallerDatabaseBuilder, InstallerEditor, InstallerWriteReport};
+pub use installer::{
+    InstallerDatabaseBuilder, InstallerDetailedWriteReport, InstallerEditor,
+    InstallerIdentityChange, InstallerValidationScope, InstallerWriteReport,
+};
 pub use installer_builder::{
     InstallationContext, InstallerArchitecture, InstallerBuilder, InstallerIdentity,
     InstallerPayloadEditor,
+};
+pub use installer_media::{
+    InstallerCabinetSpec, InstallerMediaArtifact, InstallerMediaLayout, InstallerMediaReport,
+    InstallerMediaSink, write_installer_media,
 };
 
 /// Authoring failures, separate from the existing reader error contract.
@@ -40,6 +48,19 @@ pub enum WriteError {
     /// An explicit resource bound was exceeded.
     #[error("authoring resource limit exceeded: {0}")]
     LimitExceeded(&'static str),
+    /// A multi-artifact write failed after zero or more media were finalized.
+    #[error("media write failed for {incomplete} after {bytes_written} bytes: {source}")]
+    Media {
+        /// Media finalized before the failure.
+        completed: Vec<String>,
+        /// Artifact whose creation, writing or finalization failed.
+        incomplete: String,
+        /// Bytes successfully accepted for the incomplete artifact.
+        bytes_written: u64,
+        /// The underlying failure.
+        #[source]
+        source: Box<WriteError>,
+    },
 }
 
 /// Authoring operation result.

@@ -1,0 +1,28 @@
+{
+  "iterations_requested": 128,
+  "targets": {
+    "appx": {
+      "seeds": {
+        "seed-0": "451d0162be1a7817a500e9e1946a2f8eeff22899d286e6833f5313f9caf92f81",
+        "seed-1": "f2e7fdd74ef460e2f5a18f7746d8c345183efdcfc186db433305e90c064b5bf6",
+        "seed-2": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "seed-3": "076a27c79e5ace2a3d47f9dd2e83e4ff6ea8872b3c2218f66c92b89b55f36560"
+      },
+      "exit_code": 101,
+      "arguments": "-n 1 -t 5 -N 128 -F 1048576 --exit_upon_crash",
+      "passed": false
+    }
+  },
+  "scope": "bounded coverage-guided smoke; not security qualification",
+  "rustc --version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "cargo hfuzz version": "cargo-hfuzz 0.5.62",
+  "source_sha256": {
+    "fuzz/src/authoring.rs": "b9db4737bb2d97e1a7592752b167963fb1e3e5ef269a2a56d5f74663d8cc4b0d",
+    "fuzz/src/bin/appx.rs": "fd38650ba93d769ed3137a09879d062e261f46c3630e72d21526da014e0f9d0c",
+    "fuzz/src/bin/authoring.rs": "0488aed6ff7ea26f9be48468b8b4c73d5052396d99feb8a992c50758ce66ec4e",
+    "fuzz/src/bin/msi.rs": "954766f5e0e42886941fa569d7ac67f774ade36d86564dd05dcdf059ad95fc21",
+    "fuzz/src/bin/replay.rs": "285905190eea5954a67da201690005f67c219adeb0a69c37f966e8abb4c3ac28",
+    "fuzz/src/bin/seed.rs": "ea6620d1b302db7b7debbd676db606801f8b5dc936bc67301916f7d97dffc04f",
+    "fuzz/src/lib.rs": "44779dd546f90676415bd61a36302ca79d0df53b5382f0f3bc7c3d1ff5b0ad19"
+  }
+}

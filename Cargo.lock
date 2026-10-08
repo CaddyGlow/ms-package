@@ -55,9 +55,9 @@ dependencies = [
 
 [[package]]
 name = "caddy-archive-core"
-version = "0.1.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75e1b98febaa9521589f141b706fa21b42a64a2b30bad3312231093f1cacd416"
+checksum = "b6eaa0c3506e268fc41b8dfa34a1c6011369ff07a60c6a66287d850b84540f65"
 dependencies = [
  "crc64fast",
  "libmkiso",
@@ -323,9 +323,9 @@ dependencies = [
 
 [[package]]
 name = "ms-cabinet"
-version = "0.1.2"
+version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17cfbe537ecc5b9642100014b72880f5a2942b8718bea46d758ff9348355272d"
+checksum = "8d1e19e1a3f2fa2621ca60922c1a7eea12df0ce98d26a7a26e2d7b6e38205c6f"
 dependencies = [
  "flate2",
  "ms-compress",
@@ -349,13 +349,14 @@ checksum = "e3713af486ad3232ebd7bf988bbece755be1dd6848cef701038ada611b88a532"
 
 [[package]]
 name = "ms-package"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "base64",
  "caddy-archive-core",
  "caddy-msi",
  "cfb",
  "ms-cabinet",
+ "ms-compress",
  "quick-xml",
  "roxmltree",
  "serde_json",

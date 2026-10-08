@@ -16,11 +16,14 @@ Keep ms-package, archive-rs, cabinet, ms-compress, wim-rs and mkiso-rs
 in adjacent directories. Preserve their licenses and fixtures.
 
 ```sh
-python3 scripts/source-release.py --output /tmp/ms-package-0.2.0-source.tar.gz
-python3 scripts/source-release.py --verify /tmp/ms-package-0.2.0-source.tar.gz
+python3 scripts/source-release.py --output /tmp/ms-package-0.2.1-source.tar.gz
+python3 scripts/source-release.py --verify /tmp/ms-package-0.2.1-source.tar.gz
 ```
 
 Official packaging requires every source checkout to be clean and committed.
+Use `--source-parent /path/to/checkouts` to select isolated compatible sources.
+Integration dependency adjustments occur in the staged archive checkout and
+are recorded in `SOURCE-MANIFEST.json`; the supplied checkouts are preserved.
 `--allow-dirty` creates an explicitly marked local preview whose manifest records
 file hashes and dirty/uncommitted repositories. Never publish that as an official
 release. Archive timestamps, ownership and modes are normalized so identical source inputs
@@ -33,14 +36,14 @@ not sibling checkouts or a populated Cargo cache.
 ## GitHub release
 
 Commit and push the reviewed sources. The checked-in `.github/release-dependencies.json` records the frozen dependency
-commits used for the first release. Set the repository variables to those
+commits used for the current release. Set the repository variables to those
 commits before pushing the package tag.
 To override them, configure repository variables
 `ARCHIVE_RS_REF`, `CABINET_REF`, `MS_COMPRESS_REF`, `WIM_RS_REF`, `MKISO_RS_REF`
 to exact 40-character commit hashes. These revisions must
 contain the compatible sources validated with ms-package. Repository URLs may
 be overridden using the corresponding `_REPOSITORY` variables. Release jobs
-reject moving branches, tags and empty revisions. Tag `v0.2.0` only after the
+reject moving branches, tags and empty revisions. Tag `v0.2.1` only after the
 reviewed source and dependency commits are available to CI.
 
 The tag workflow runs native tests, strict Clippy, doctests, the pinned Rust

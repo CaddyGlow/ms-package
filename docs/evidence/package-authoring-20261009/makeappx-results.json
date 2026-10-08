@@ -1,0 +1,22 @@
+[
+  {
+    "name": "deflate-unpack",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "name": "deflate-edited-unpack",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "name": "resource-v2-unbundle",
+    "exit_code": 1,
+    "passed": false
+  },
+  {
+    "name": "resource-v2-edited-unbundle",
+    "exit_code": 1,
+    "passed": false
+  }
+]

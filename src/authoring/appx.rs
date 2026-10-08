@@ -1,4 +1,4 @@
-//! Bounded unsigned stored-entry APPX creation and rebuilding.
+//! Bounded unsigned APPX creation and rebuilding.
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::{Cursor, Read, Seek, Write};
 
@@ -9,9 +9,23 @@ use zip::write::SimpleFileOptions;
 use super::xml::{MetadataWriter, parse};
 use super::{SignaturePolicy, WriteError, WriteLimits, WriteOptions, WriteReport};
 
+#[path = "appx_deflate.rs"]
+mod deflate;
+
+/// Compression for single-package payloads; package metadata remains stored.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum AppxCompression {
+    /// Store decoded bytes unchanged (the default).
+    #[default]
+    Stored,
+    /// Raw DEFLATE, independently flushed at each 64-KiB decoded block.
+    Deflate,
+}
+
 /// Creates unsigned packages from caller-authored manifest bytes.
 /// Payloads are buffered within the explicit scratch budget. Output uses fixed
-/// DOS timestamps, sorted UTF-8 names, stored compression, and no ZIP64.
+/// DOS timestamps, sorted UTF-8 names, and no ZIP64. Payloads are stored by
+/// default; [`AppxCompression::Deflate`] enables independent compressed blocks.
 ///
 /// ```
 /// # #[cfg(feature = "write")]
@@ -33,14 +47,24 @@ pub struct AppxBuilder {
     entries: BTreeMap<String, Vec<u8>>,
     options: WriteOptions,
     content_types: Option<BTreeMap<String, String>>,
+    compression: AppxCompression,
 }
 
 impl AppxBuilder {
     /// Begin a package. Manifest schema/deployment qualification is caller owned.
     pub fn new(manifest: impl Into<Vec<u8>>, options: WriteOptions) -> Result<Self, WriteError> {
+        if options.limits.max_entries < 3 {
+            return Err(WriteError::LimitExceeded("entry count"));
+        }
         let manifest = manifest.into();
         if manifest.len() as u64 > options.limits.max_metadata_bytes {
             return Err(WriteError::LimitExceeded("manifest bytes"));
+        }
+        if manifest.len() as u64 > options.limits.max_total_bytes {
+            return Err(WriteError::LimitExceeded("decoded bytes"));
+        }
+        if manifest.len() as u64 > options.limits.max_scratch_bytes {
+            return Err(WriteError::LimitExceeded("scratch bytes"));
         }
         let mut entries = BTreeMap::new();
         entries.insert("AppxManifest.xml".into(), manifest);
@@ -48,7 +72,13 @@ impl AppxBuilder {
             entries,
             options,
             content_types: None,
+            compression: AppxCompression::Stored,
         })
+    }
+
+    /// Choose compression for all payloads. Manifest and integrity metadata stay stored.
+    pub fn set_compression(&mut self, compression: AppxCompression) {
+        self.compression = compression;
     }
 
     /// Consume an explicitly opened source, rejecting duplicate package paths.
@@ -73,6 +103,7 @@ impl AppxBuilder {
             &self.options,
             &mut scratch,
             self.content_types,
+            self.compression,
         )?;
         let mut package = crate::AppxPackage::open(
             Cursor::new(scratch.get_ref()),
@@ -95,12 +126,14 @@ pub struct AppxEditor {
 impl AppxEditor {
     /// Validate source integrity before any destination bytes are emitted.
     /// Signed sources fail by default; `Remove` strips the signature footprint.
-    pub fn open<R: Read + Seek>(source: R, options: WriteOptions) -> Result<Self, WriteError> {
+    pub fn open<R: Read + Seek>(mut source: R, options: WriteOptions) -> Result<Self, WriteError> {
+        deflate::preflight(&mut source, &options)?;
         let mut package = crate::AppxPackage::open(
             source,
             reader_limits(&options.limits),
             options.limits.max_metadata_bytes,
         )?;
+        validate_manifest_profile(package.manifest(), options.limits.max_metadata_bytes)?;
         if package
             .entries()
             .iter()
@@ -109,6 +142,44 @@ impl AppxEditor {
             return Err(WriteError::Unsupported(
                 "APPX editor requires regular file entries".into(),
             ));
+        }
+        let source_entries = package.entries().to_vec();
+        for entry in &source_entries {
+            let metadata = package.entry_metadata(entry.id)?;
+            if !matches!(
+                metadata.format,
+                Some(archive_core::EntryFormatMetadata::Zip {
+                    compression_method: 0 | 8,
+                    ..
+                })
+            ) {
+                return Err(WriteError::Unsupported(format!(
+                    "source compression {}",
+                    entry.compression
+                )));
+            }
+            let metadata = matches!(
+                entry.name.as_str(),
+                "AppxManifest.xml"
+                    | "AppxBlockMap.xml"
+                    | "[Content_Types].xml"
+                    | "AppxSignature.p7x"
+            );
+            let maximum = if metadata {
+                options.limits.max_metadata_bytes
+            } else {
+                options.limits.max_file_bytes
+            };
+            if entry.size > maximum {
+                return Err(WriteError::LimitExceeded(if metadata {
+                    "metadata bytes"
+                } else {
+                    "file bytes"
+                }));
+            }
+            if !metadata {
+                validate_payload_path(&entry.name)?;
+            }
         }
         package.validate(options.limits.max_total_bytes)?;
         let signed = package
@@ -126,14 +197,9 @@ impl AppxEditor {
         let entries: Vec<_> = package
             .entries()
             .iter()
-            .map(|e| (e.id, e.name.clone(), e.compression.clone()))
+            .map(|e| (e.id, e.name.clone()))
             .collect();
-        for (id, name, compression) in entries {
-            if compression != "Stored" && compression != "stored" && compression != "0" {
-                return Err(WriteError::Unsupported(format!(
-                    "source compression {compression}"
-                )));
-            }
+        for (id, name) in entries {
             if matches!(
                 name.as_str(),
                 "AppxManifest.xml"
@@ -143,7 +209,6 @@ impl AppxEditor {
             ) {
                 continue;
             }
-            validate_payload_path(&name)?;
             check_collision(&builder.entries, &name)?;
             let remaining = remaining_budget(&builder.entries, &builder.options.limits)?;
             let data =
@@ -155,6 +220,11 @@ impl AppxEditor {
             signature_removed: signed,
         })
     }
+    /// Choose output payload compression independently of the source layout.
+    pub fn set_compression(&mut self, compression: AppxCompression) {
+        self.builder.set_compression(compression);
+    }
+
     /// Add a new payload.
     pub fn add_file(&mut self, name: &str, source: impl Read) -> Result<(), WriteError> {
         self.builder.add_file(name, source)
@@ -162,11 +232,25 @@ impl AppxEditor {
     /// Replace an existing payload; failed reads preserve the old entry.
     pub fn replace_file(&mut self, name: &str, source: impl Read) -> Result<(), WriteError> {
         validate_payload_path(name)?;
-        self.builder
+        let old_size = self
+            .builder
             .entries
             .get(name)
-            .ok_or_else(|| WriteError::InvalidInput(format!("missing {name}")))?;
-        let remaining = remaining_budget(&self.builder.entries, &self.builder.options.limits)?;
+            .ok_or_else(|| WriteError::InvalidInput(format!("missing {name}")))?
+            .len() as u64;
+        let retained = decoded_size(&self.builder.entries)?;
+        let limits = &self.builder.options.limits;
+        // The old bytes remain live until the read succeeds, but no longer count
+        // toward the final decoded package size.
+        let scratch_remaining = limits
+            .max_scratch_bytes
+            .checked_sub(retained)
+            .ok_or(WriteError::LimitExceeded("scratch bytes"))?;
+        let decoded_remaining = limits
+            .max_total_bytes
+            .checked_sub(retained - old_size)
+            .ok_or(WriteError::LimitExceeded("decoded bytes"))?;
+        let remaining = scratch_remaining.min(decoded_remaining);
         let data = read_bounded(
             source,
             self.builder.options.limits.max_file_bytes.min(remaining),
@@ -198,7 +282,7 @@ impl AppxEditor {
                 Err(WriteError::InvalidInput(format!("missing {old}")))
             };
         }
-        check_collision(&self.builder.entries, new)?;
+        check_collision_except(&self.builder.entries, new, Some(old))?;
         let data = self
             .builder
             .entries
@@ -217,6 +301,26 @@ impl AppxEditor {
         let manifest = manifest.into();
         if manifest.len() as u64 > self.builder.options.limits.max_metadata_bytes {
             return Err(WriteError::LimitExceeded("manifest bytes"));
+        }
+        let retained = decoded_size(&self.builder.entries)?;
+        let old_size = self
+            .builder
+            .entries
+            .get("AppxManifest.xml")
+            .ok_or_else(|| WriteError::InvalidInput("missing AppxManifest.xml".into()))?
+            .len() as u64;
+        let replacement_size = manifest.len() as u64;
+        if retained
+            .checked_add(replacement_size)
+            .is_none_or(|bytes| bytes > self.builder.options.limits.max_scratch_bytes)
+        {
+            return Err(WriteError::LimitExceeded("scratch bytes"));
+        }
+        if (retained - old_size)
+            .checked_add(replacement_size)
+            .is_none_or(|bytes| bytes > self.builder.options.limits.max_total_bytes)
+        {
+            return Err(WriteError::LimitExceeded("decoded bytes"));
         }
         self.builder
             .entries
@@ -293,14 +397,13 @@ fn validate_payload_path(name: &str) -> Result<(), WriteError> {
     validate_path(name)?;
     let lower = name.to_ascii_lowercase();
     if matches!(
-        lower.as_str(),
+        lower.split('/').next().unwrap_or_default(),
         "appxmanifest.xml"
             | "appxblockmap.xml"
             | "appxsignature.p7x"
             | "[content_types].xml"
             | "appxmetadata"
-    ) || lower.starts_with("appxmetadata/")
-    {
+    ) {
         return Err(WriteError::Unsupported(format!(
             "reserved package metadata {name}"
         )));
@@ -309,8 +412,19 @@ fn validate_payload_path(name: &str) -> Result<(), WriteError> {
 }
 
 fn check_collision(entries: &BTreeMap<String, Vec<u8>>, name: &str) -> Result<(), WriteError> {
+    check_collision_except(entries, name, None)
+}
+
+fn check_collision_except(
+    entries: &BTreeMap<String, Vec<u8>>,
+    name: &str,
+    excluded: Option<&str>,
+) -> Result<(), WriteError> {
     let lower = name.to_lowercase();
     if entries.keys().any(|key| {
+        if excluded == Some(key.as_str()) {
+            return false;
+        }
         let key = key.to_lowercase();
         key == lower
             || key.starts_with(&format!("{lower}/"))
@@ -327,15 +441,19 @@ fn remaining_budget(
     entries: &BTreeMap<String, Vec<u8>>,
     limits: &WriteLimits,
 ) -> Result<u64, WriteError> {
-    let total = entries.values().try_fold(0u64, |n, v| {
-        n.checked_add(v.len() as u64)
-            .ok_or(WriteError::LimitExceeded("decoded bytes"))
-    })?;
+    let total = decoded_size(entries)?;
     limits
         .max_scratch_bytes
         .min(limits.max_total_bytes)
         .checked_sub(total)
         .ok_or(WriteError::LimitExceeded("scratch bytes"))
+}
+
+fn decoded_size(entries: &BTreeMap<String, Vec<u8>>) -> Result<u64, WriteError> {
+    entries.values().try_fold(0u64, |n, v| {
+        n.checked_add(v.len() as u64)
+            .ok_or(WriteError::LimitExceeded("decoded bytes"))
+    })
 }
 
 fn uri_path(name: &str) -> String {
@@ -355,7 +473,7 @@ pub(crate) fn emit_zip<W: Write + Seek>(
     options: &WriteOptions,
     output: W,
 ) -> Result<WriteReport, WriteError> {
-    emit_zip_with_types(entries, options, output, None)
+    emit_zip_with_types(entries, options, output, None, AppxCompression::Stored)
 }
 
 fn emit_zip_with_types<W: Write + Seek>(
@@ -363,6 +481,7 @@ fn emit_zip_with_types<W: Write + Seek>(
     options: &WriteOptions,
     mut output: W,
     content_types: Option<BTreeMap<String, String>>,
+    compression: AppxCompression,
 ) -> Result<WriteReport, WriteError> {
     let limits = &options.limits;
     remaining_budget(&entries, limits)?;
@@ -372,11 +491,36 @@ fn emit_zip_with_types<W: Write + Seek>(
     let bundle = entries.contains_key("AppxMetadata/AppxBundleManifest.xml");
     let mut seen = BTreeSet::new();
     let mut decoded = 0u64;
-    let mut blockmap = MetadataWriter::new(limits.max_metadata_bytes);
+    let retained = decoded_size(&entries)?;
+    let mut encoded_entries = BTreeMap::new();
+    let mut encoded_total = 0u64;
+    let mut largest_carrier = 0u64;
+    let metadata_budget = |encoded: u64, other: u64| {
+        limits
+            .max_scratch_bytes
+            .checked_sub(retained)
+            .and_then(|n| n.checked_sub(encoded))
+            .and_then(|n| n.checked_sub(other))
+            .and_then(|n| {
+                n.checked_sub(if compression == AppxCompression::Deflate {
+                    deflate::WORKSPACE
+                } else {
+                    0
+                })
+            })
+            .ok_or(WriteError::LimitExceeded(
+                "generated metadata scratch bytes",
+            ))
+    };
+    let mut blockmap = MetadataWriter::new(limits.max_metadata_bytes.min(metadata_budget(0, 0)?));
     blockmap.start("BlockMap")?;
     blockmap.attribute("xmlns", "http://schemas.microsoft.com/appx/2010/blockmap")?;
     blockmap.attribute("HashMethod", "http://www.w3.org/2001/04/xmlenc#sha256")?;
-    let mut types = MetadataWriter::new(limits.max_metadata_bytes);
+    let mut types = MetadataWriter::new(
+        limits
+            .max_metadata_bytes
+            .min(metadata_budget(0, blockmap.len())?),
+    );
     types.start("Types")?;
     types.attribute(
         "xmlns",
@@ -401,17 +545,40 @@ fn emit_zip_with_types<W: Write + Seek>(
         decoded = decoded
             .checked_add(data.len() as u64)
             .ok_or(WriteError::LimitExceeded("decoded bytes"))?;
+        let encoded = if compression == AppxCompression::Deflate && name != "AppxManifest.xml" {
+            let remaining = limits
+                .max_scratch_bytes
+                .checked_sub(retained)
+                .and_then(|n| n.checked_sub(encoded_total))
+                .and_then(|n| n.checked_sub(blockmap.len()))
+                .and_then(|n| n.checked_sub(types.len()))
+                .and_then(|n| n.checked_sub(deflate::WORKSPACE))
+                .ok_or(WriteError::LimitExceeded("codec scratch bytes"))?;
+            let encoded = deflate::encode(data, remaining.min(limits.max_output_bytes))?;
+            encoded_total = encoded_total
+                .checked_add(encoded.bytes.len() as u64)
+                .ok_or(WriteError::LimitExceeded("compressed bytes"))?;
+            largest_carrier =
+                largest_carrier.max(encoded.bytes.len() as u64 + 98 + 2 * name.len() as u64);
+            Some(encoded)
+        } else {
+            None
+        };
+        blockmap.set_limit(metadata_budget(encoded_total, types.len())?);
         if !(bundle && (name.ends_with(".appx") || name.ends_with(".msix"))) {
             blockmap.start("File")?;
             blockmap.attribute("Name", &name.replace('/', "\\"))?;
             blockmap.attribute("Size", &data.len().to_string())?;
             blockmap.attribute("LfhSize", &(30 + name.len()).to_string())?;
-            for block in data.chunks(65536) {
+            for (index, block) in data.chunks(65536).enumerate() {
                 blockmap.start("Block")?;
                 blockmap.attribute(
                     "Hash",
                     &base64::engine::general_purpose::STANDARD.encode(Sha256::digest(block)),
                 )?;
+                if let Some(encoded) = &encoded {
+                    blockmap.attribute("Size", &encoded.blocks[index].to_string())?;
+                }
                 blockmap.end()?;
             }
             blockmap.end()?;
@@ -426,12 +593,18 @@ fn emit_zip_with_types<W: Write + Seek>(
             } else {
                 "application/octet-stream"
             };
+        types.set_limit(metadata_budget(encoded_total, blockmap.len())?);
         types.start("Override")?;
         types.attribute("PartName", &format!("/{}", uri_path(name)))?;
         types.attribute("ContentType", content_type)?;
         types.end()?;
+        if let Some(encoded) = encoded {
+            encoded_entries.insert(name.clone(), encoded);
+        }
     }
+    blockmap.set_limit(metadata_budget(encoded_total, types.len())?);
     blockmap.end()?;
+    types.set_limit(metadata_budget(encoded_total, blockmap.len())?);
     types.start("Override")?;
     types.attribute("PartName", "/AppxBlockMap.xml")?;
     types.attribute("ContentType", "application/vnd.ms-appx.blockmap+xml")?;
@@ -440,13 +613,25 @@ fn emit_zip_with_types<W: Write + Seek>(
     entries.insert("AppxBlockMap.xml".into(), blockmap.finish()?);
     entries.insert("[Content_Types].xml".into(), types.finish()?);
     let estimated = entries.iter().try_fold(22u64, |n, (name, data)| {
-        n.checked_add(76 + 2 * name.len() as u64 + data.len() as u64)
+        let size = encoded_entries
+            .get(name)
+            .map_or(data.len(), |entry| entry.bytes.len());
+        n.checked_add(76 + 2 * name.len() as u64 + size as u64)
             .ok_or(WriteError::LimitExceeded("output bytes"))
     })?;
+    let compression_scratch = if compression == AppxCompression::Deflate {
+        encoded_total
+            .checked_add(largest_carrier)
+            .and_then(|n| n.checked_add(deflate::WORKSPACE))
+            .ok_or(WriteError::LimitExceeded("codec scratch bytes"))?
+    } else {
+        0
+    };
     if estimated > limits.max_output_bytes
         || estimated
             .checked_mul(2)
             .and_then(|n| n.checked_add(decoded))
+            .and_then(|n| n.checked_add(compression_scratch))
             .is_none_or(|n| n > limits.max_scratch_bytes)
         || estimated >= u32::MAX as u64
     {
@@ -467,8 +652,12 @@ fn emit_zip_with_types<W: Write + Seek>(
         });
     }
     for (name, data) in ordered {
-        zip.start_file(name, file_options)?;
-        zip.write_all(&data)?;
+        if let Some(encoded) = encoded_entries.remove(&name) {
+            deflate::copy_into(&mut zip, &name, &data, &encoded.bytes)?;
+        } else {
+            zip.start_file(name, file_options)?;
+            zip.write_all(&data)?;
+        }
     }
     let bytes = zip.finish()?.into_inner();
     if bytes.len() as u64 > limits.max_output_bytes || bytes.len() as u64 > limits.max_scratch_bytes
@@ -493,6 +682,7 @@ fn validate_manifest_references(
         .get("AppxManifest.xml")
         .ok_or_else(|| WriteError::InvalidInput("missing AppxManifest.xml".into()))?;
     let document = parse(manifest, max_bytes)?;
+    reject_sparse(&document)?;
     let root = document.root_element();
     if root.tag_name().name() != "Package"
         || !matches!(
@@ -555,7 +745,42 @@ fn validate_manifest_references(
     Ok(())
 }
 
-fn resolve_content_types(
+pub(crate) fn validate_manifest_profile(manifest: &[u8], max_bytes: u64) -> Result<(), WriteError> {
+    reject_sparse(&parse(manifest, max_bytes)?)
+}
+
+fn reject_sparse(document: &roxmltree::Document<'_>) -> Result<(), WriteError> {
+    // Microsoft documents this property as a boolean under Package/Properties:
+    // https://learn.microsoft.com/en-us/uwp/schemas/appxpackage/uapmanifestschema/element-uap10-allowexternalcontent
+    for element in document.descendants().filter(|node| {
+        node.has_tag_name((
+            "http://schemas.microsoft.com/appx/manifest/uap/windows10/10",
+            "AllowExternalContent",
+        ))
+    }) {
+        let value: String = element
+            .children()
+            .filter(|node| node.is_text())
+            .filter_map(|node| node.text())
+            .collect();
+        match value.trim() {
+            "false" | "0" => {}
+            "true" | "1" => {
+                return Err(WriteError::Unsupported(
+                    "sparse APPX external content".into(),
+                ));
+            }
+            _ => {
+                return Err(WriteError::InvalidInput(
+                    "invalid AllowExternalContent boolean".into(),
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
+pub(crate) fn resolve_content_types(
     xml: &[u8],
     entries: &[archive_core::Entry],
 ) -> Result<BTreeMap<String, String>, WriteError> {

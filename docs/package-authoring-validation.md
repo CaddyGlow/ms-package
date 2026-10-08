@@ -1,5 +1,9 @@
 # Authoring qualification, 2026-10-08
 
+This dated record preserves the initial qualification boundary. Subsequent
+compression, media and dependency checks are recorded in
+[the 2026-10-09 follow-up](package-authoring-validation-20261009.md).
+
 This is new authoring evidence. Historical inspection-only release records and
 fixtures remain unchanged. The implementation is experimental until each
 declared profile passes its independent gates.

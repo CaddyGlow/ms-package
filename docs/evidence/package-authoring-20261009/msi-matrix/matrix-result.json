@@ -1,0 +1,66 @@
+[
+    {
+        "ok":  true,
+        "name":  "x64-machine-embedded"
+    },
+    {
+        "ok":  true,
+        "name":  "x64-machine-external"
+    },
+    {
+        "ok":  true,
+        "name":  "x64-machine-loose"
+    },
+    {
+        "ok":  true,
+        "name":  "x64-machine-split"
+    },
+    {
+        "ok":  true,
+        "name":  "x64-user-embedded"
+    },
+    {
+        "ok":  true,
+        "name":  "x64-user-external"
+    },
+    {
+        "ok":  true,
+        "name":  "x64-user-loose"
+    },
+    {
+        "ok":  true,
+        "name":  "x64-user-split"
+    },
+    {
+        "ok":  true,
+        "name":  "x86-machine-embedded"
+    },
+    {
+        "ok":  true,
+        "name":  "x86-machine-external"
+    },
+    {
+        "ok":  true,
+        "name":  "x86-machine-loose"
+    },
+    {
+        "ok":  true,
+        "name":  "x86-machine-split"
+    },
+    {
+        "ok":  true,
+        "name":  "x86-user-embedded"
+    },
+    {
+        "ok":  true,
+        "name":  "x86-user-external"
+    },
+    {
+        "ok":  true,
+        "name":  "x86-user-loose"
+    },
+    {
+        "ok":  true,
+        "name":  "x86-user-split"
+    }
+]

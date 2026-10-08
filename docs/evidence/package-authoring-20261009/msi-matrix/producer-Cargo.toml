@@ -1,0 +1,6 @@
+[package]
+name="ms-package-msi-matrix-producer"
+version="0.0.0"
+edition="2024"
+[dependencies]
+ms-package={path="/home/rick/projects-caddy/ms-package",features=["write"]}

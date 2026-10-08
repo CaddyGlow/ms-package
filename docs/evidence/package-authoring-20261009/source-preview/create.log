@@ -1,0 +1,15 @@
+    Updating crates.io index
+     Locking 3 packages to highest Rust 1.99 compatible versions
+    Updating caddy-archive-core v0.1.0 -> v0.2.1
+    Updating caddy-msi v0.10.0 -> v0.10.1
+      Adding ms-package v0.2.0 (/tmp/nix-shell.g5oTD6/ms-package-sources-pu2pqqra/ms-package-0.2.0-source/ms-package)
+    Removing ms-package v0.1.0
+note: pass `--verbose` to see 12 unchanged dependencies behind latest
+    Updating crates.io index
+     Locking 3 packages to highest Rust 1.99 compatible versions
+    Updating caddy-archive-core v0.1.0 -> v0.2.1
+    Updating caddy-msi v0.10.0 -> v0.10.1
+      Adding ms-package v0.2.0 (/tmp/nix-shell.g5oTD6/ms-package-sources-pu2pqqra/ms-package-0.2.0-source/ms-package)
+    Removing ms-package v0.1.0
+note: pass `--verbose` to see 4 unchanged dependencies behind latest
+62b8d504c41d32e60d7fd8caeb1a33db6eaabbc22480eb1b2fd75d65ab74b45e  ms-package-authoring-core021-source-20261009.tar.gz

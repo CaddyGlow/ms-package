@@ -1,0 +1,30 @@
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+Option /v specified, switching to verbose output.
+Option /o specified, existing files will be overwritten.
+The path (/p) parameter is: "\\?\C:\Users\deploy\resource-original-20261009\authoring-fr.msix"
+The output directory (/d) parameter is: "\\?\C:\Users\deploy\resource-fr-unpacked-20261009"
+Unpacking "\\?\C:\Users\deploy\resource-original-20261009\authoring-fr.msix" (package name) to "\\?\C:\Users\deploy\resource-fr-unpacked-20261009" (output directory).
+MakeAppx : error: Failure at appxFactory->CreatePackageReader(packageStream.Get(), &reader) - 0x8051100f - The specified package format is not valid: The zip archive is missing the end of central directory marker.
+MakeAppx : error: Package extraction failed.
+MakeAppx : error: 0x8051100f - The specified package format is not valid: The zip archive is missing the end of central directory marker.
+#< CLIXML
+UNPACK_EXIT=1
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+Option /v specified, switching to verbose output.
+Option /o specified, existing files will be overwritten.
+Using default hash method: SHA256.
+The path (/p) parameter is: "\\?\C:\Users\deploy\resource-native-fr-20261009.msix"
+The content directory (/d) parameter is: "\\?\C:\Users\deploy\resource-fr-unpacked-20261009"
+Enumerating files from directory "\\?\C:\Users\deploy\resource-fr-unpacked-20261009"
+MakeAppx : error: For file "\\?\C:\Users\deploy\resource-fr-unpacked-20261009" - Failure at walker->GetNext(&filePath) - 0x80070003 - The system cannot find the path specified.
+MakeAppx : error: Failure at (result->AddFilesInDirectory(normalizedContentDirectory, *includeMapping, excludePatterns, true, fileValidation)) - 0x80070003 - The system cannot find the path specified.
+MakeAppx : error: Failure at (FileList::CreateFromDirectoryWalker(contentDirectory, fileList, fileValidation)) - 0x80070003 - The system cannot find the path specified.
+MakeAppx : error: Failure at (ProcessOptionsForInputContent(parameters, outputPath, performanceOptions->fileValidation, fileList, manifestResourceInfo, nullptr, inputCgmPath, publisherBridgingList, parametersValid)) - 0x80070003 - The system cannot find the path specified.
+MakeAppx : error: Package creation failed.
+MakeAppx : error: 0x80070003 - The system cannot find the path specified.
+PACK_EXIT=1
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><TN RefId="0"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>

@@ -1,7 +1,10 @@
 //! Bounded, unsigned bundle rebuilding with independently verified nested packages.
-use super::appx::{emit_zip, read_bounded, reader_limits, validate_path};
+use super::appx::{
+    emit_zip, read_bounded, reader_limits, resolve_content_types, validate_manifest_profile,
+    validate_path,
+};
 use super::xml::{MetadataWriter, parse};
-use super::{WriteError, WriteOptions, WriteReport};
+use super::{AppxEditor, WriteError, WriteOptions, WriteReport};
 use crate::{AppxBundle, AppxPackage};
 use archive_core::{Archive, EntryKind};
 use std::{
@@ -10,6 +13,14 @@ use std::{
 };
 
 const MANIFEST: &str = "AppxMetadata/AppxBundleManifest.xml";
+
+struct NestedPackage {
+    bytes: Vec<u8>,
+    identity: BTreeMap<String, String>,
+    package_type: &'static str,
+    qualifiers: Vec<BTreeMap<String, String>>,
+    decoded_bytes: u64,
+}
 
 /// Creates an unsigned stored bundle from explicitly supplied, unsigned packages.
 /// Nested package bytes and their decoded contents both count toward resource limits.
@@ -30,7 +41,7 @@ const MANIFEST: &str = "AppxMetadata/AppxBundleManifest.xml";
 /// ```
 pub struct AppxBundleBuilder {
     identity: BTreeMap<String, String>,
-    packages: BTreeMap<String, Vec<u8>>,
+    packages: BTreeMap<String, NestedPackage>,
     options: WriteOptions,
 }
 
@@ -47,16 +58,7 @@ impl AppxBundleBuilder {
             ("Publisher".into(), publisher.into()),
             ("Version".into(), version.into()),
         ]);
-        for value in identity.values() {
-            if value.is_empty() || value.chars().any(char::is_control) {
-                return Err(WriteError::InvalidInput("invalid bundle identity".into()));
-            }
-        }
-        let version = &identity["Version"];
-        if version.split('.').count() != 4 || version.split('.').any(|v| v.parse::<u16>().is_err())
-        {
-            return Err(WriteError::InvalidInput("invalid bundle version".into()));
-        }
+        validate_identity(&identity)?;
         Ok(Self {
             identity,
             packages: BTreeMap::new(),
@@ -72,12 +74,19 @@ impl AppxBundleBuilder {
     ) -> Result<(), WriteError> {
         let name = name.into();
         validate_path(&name)?;
-        if name.contains('/') || !(name.ends_with(".appx") || name.ends_with(".msix")) {
+        if name.contains('/')
+            || name.encode_utf16().count() > 256
+            || !(name.ends_with(".appx") || name.ends_with(".msix"))
+        {
             return Err(WriteError::Unsupported(
                 "nested packages must have root APPX/MSIX names".into(),
             ));
         }
-        if self.packages.keys().any(|n| n.eq_ignore_ascii_case(&name)) {
+        if self
+            .packages
+            .keys()
+            .any(|n| n.to_lowercase() == name.to_lowercase())
+        {
             return Err(WriteError::InvalidInput(
                 "duplicate nested package name".into(),
             ));
@@ -89,7 +98,7 @@ impl AppxBundleBuilder {
             return Err(WriteError::LimitExceeded("bundle entry count"));
         }
         let used = self.packages.values().try_fold(0u64, |n, v| {
-            n.checked_add(v.len() as u64)
+            n.checked_add(v.bytes.len() as u64)
                 .ok_or(WriteError::LimitExceeded("bundle scratch"))
         })?;
         let remaining = (self.options.limits.max_scratch_bytes / 3)
@@ -97,8 +106,8 @@ impl AppxBundleBuilder {
             .checked_sub(used)
             .ok_or(WriteError::LimitExceeded("bundle scratch"))?;
         let bytes = read_bounded(source, self.options.limits.max_file_bytes.min(remaining))?;
-        self.validate_nested(&bytes)?;
-        self.packages.insert(name.clone(), bytes);
+        let nested = self.validate_nested(bytes)?;
+        self.packages.insert(name.clone(), nested);
         if let Err(error) = self.check_budget(&self.packages) {
             self.packages.remove(&name);
             return Err(error);
@@ -106,21 +115,21 @@ impl AppxBundleBuilder {
         Ok(())
     }
 
-    fn check_budget(&self, packages: &BTreeMap<String, Vec<u8>>) -> Result<(), WriteError> {
+    fn check_budget(&self, packages: &BTreeMap<String, NestedPackage>) -> Result<(), WriteError> {
         if packages.len() as u64 + 3 > self.options.limits.max_entries {
             return Err(WriteError::LimitExceeded("bundle entry count"));
         }
         let mut total = 0u64;
         let mut scratch = 0u64;
         let mut identities = BTreeSet::new();
-        for bytes in packages.values() {
+        for package in packages.values() {
             scratch = scratch
-                .checked_add(bytes.len() as u64)
+                .checked_add(package.bytes.len() as u64)
                 .ok_or(WriteError::LimitExceeded("bundle scratch"))?;
-            let (identity, decoded) = self.validate_nested(bytes)?;
+            let identity = &package.identity;
             total = total
-                .checked_add(decoded)
-                .and_then(|n| n.checked_add(bytes.len() as u64))
+                .checked_add(package.decoded_bytes)
+                .and_then(|n| n.checked_add(package.bytes.len() as u64))
                 .ok_or(WriteError::LimitExceeded("bundle decoded bytes"))?;
             if !identities.insert((
                 identity
@@ -142,17 +151,45 @@ impl AppxBundleBuilder {
         Ok(())
     }
 
-    fn validate_nested(&self, bytes: &[u8]) -> Result<(BTreeMap<String, String>, u64), WriteError> {
+    fn validate_nested(&self, bytes: Vec<u8>) -> Result<NestedPackage, WriteError> {
         let mut package = AppxPackage::open(
-            Cursor::new(bytes),
+            Cursor::new(&bytes),
             reader_limits(&self.options.limits),
             self.options.limits.max_metadata_bytes,
         )?;
-        for entry in package.entries() {
+        let mut names = BTreeSet::new();
+        let entries = package.entries().to_vec();
+        for entry in &entries {
             validate_path(&entry.name)?;
-            if entry.encrypted || entry.kind != EntryKind::File || entry.compression != "Stored" {
+            let limit = if matches!(
+                entry.name.as_str(),
+                "AppxManifest.xml" | "AppxBlockMap.xml" | "[Content_Types].xml"
+            ) {
+                self.options.limits.max_metadata_bytes
+            } else {
+                self.options.limits.max_file_bytes
+            };
+            if entry.size > limit {
+                return Err(WriteError::LimitExceeded("nested decoded file bytes"));
+            }
+            if !names.insert(entry.name.to_lowercase()) {
+                return Err(WriteError::InvalidInput(
+                    "colliding nested package paths".into(),
+                ));
+            }
+            let metadata = package.entry_metadata(entry.id)?;
+            if entry.encrypted
+                || entry.kind != EntryKind::File
+                || !matches!(
+                    metadata.format,
+                    Some(archive_core::EntryFormatMetadata::Zip {
+                        compression_method: 0 | 8,
+                        ..
+                    })
+                )
+            {
                 return Err(WriteError::Unsupported(
-                    "nested package must use unsigned stored file entries".into(),
+                    "nested package must use unsigned Stored or Deflate file entries".into(),
                 ));
             }
             if entry.name.eq_ignore_ascii_case("AppxSignature.p7x")
@@ -170,9 +207,28 @@ impl AppxBundleBuilder {
                 ));
             }
         }
+        for name in &names {
+            for (index, _) in name.match_indices('/') {
+                if names.contains(&name[..index]) {
+                    return Err(WriteError::InvalidInput(
+                        "nested package file/directory collision".into(),
+                    ));
+                }
+            }
+        }
         let identity = identity(package.manifest())?;
-        package_type(package.manifest())?;
-        resource_qualifiers(package.manifest())?;
+        validate_manifest_profile(package.manifest(), self.options.limits.max_metadata_bytes)?;
+        validate_identity(&identity)?;
+        let package_type = package_type(package.manifest())?;
+        let qualifiers = resource_qualifiers(package.manifest())?;
+        if package_type == "resource" {
+            validate_resource_package(package.manifest(), &identity, &qualifiers)?;
+        }
+        if package_type == "resource" && identity.get("ResourceId").is_none_or(String::is_empty) {
+            return Err(WriteError::InvalidInput(
+                "resource packages require an explicit ResourceId".into(),
+            ));
+        }
         if ["Name", "Publisher"]
             .iter()
             .any(|key| identity.get(*key) != self.identity.get(*key))
@@ -182,7 +238,13 @@ impl AppxBundleBuilder {
             ));
         }
         let verified = package.validate(self.options.limits.max_total_bytes)?;
-        Ok((identity, verified.bytes_verified))
+        Ok(NestedPackage {
+            bytes,
+            identity,
+            package_type,
+            qualifiers,
+            decoded_bytes: verified.bytes_verified,
+        })
     }
 
     fn manifest(&self) -> Result<Vec<u8>, WriteError> {
@@ -197,24 +259,15 @@ impl AppxBundleBuilder {
         xml.end()?;
         xml.start("Packages")?;
         let mut offset = 0u64;
-        for (name, bytes) in &self.packages {
-            let (id, _) = self.validate_nested(bytes)?;
+        for (name, package) in &self.packages {
+            let id = &package.identity;
+            let bytes = &package.bytes;
             offset = offset
                 .checked_add(30 + name.len() as u64)
                 .ok_or(WriteError::LimitExceeded("bundle offsets"))?;
-            let package = AppxPackage::open(
-                Cursor::new(bytes),
-                reader_limits(&self.options.limits),
-                self.options.limits.max_metadata_bytes,
-            )?;
-            let kind = package_type(package.manifest())?;
-            let qualifiers = resource_qualifiers(package.manifest())?;
+            let kind = package.package_type;
+            let qualifiers = &package.qualifiers;
             let resource = id.get("ResourceId").filter(|id| !id.is_empty());
-            if kind == "resource" && resource.is_none() {
-                return Err(WriteError::Unsupported(
-                    "resource packages require an explicit ResourceId".into(),
-                ));
-            }
             xml.start("Package")?;
             xml.attribute("Type", kind)?;
             xml.attribute("Version", &id["Version"])?;
@@ -234,7 +287,7 @@ impl AppxBundleBuilder {
                 for attributes in qualifiers {
                     xml.start("Resource")?;
                     for (key, value) in attributes {
-                        xml.attribute(&key, &value)?;
+                        xml.attribute(key, value)?;
                     }
                     xml.end()?;
                 }
@@ -257,7 +310,11 @@ impl AppxBundleBuilder {
         }
         self.check_budget(&self.packages)?;
         let manifest = self.manifest()?;
-        let mut entries = self.packages;
+        let mut entries: BTreeMap<_, _> = self
+            .packages
+            .into_iter()
+            .map(|(name, package)| (name, package.bytes))
+            .collect();
         entries.insert(MANIFEST.into(), manifest);
         let source_bytes = entries.values().try_fold(0u64, |n, v| {
             n.checked_add(v.len() as u64)
@@ -308,6 +365,7 @@ pub struct AppxBundleEditor {
 impl AppxBundleEditor {
     /// Open and validate outer and nested integrity before accepting edits.
     /// The initial preservation profile accepts this writer's canonical manifests.
+    /// Effective outer content types must also match the writer's profile.
     pub fn open<R: Read + Seek>(source: R, options: WriteOptions) -> Result<Self, WriteError> {
         let bytes = read_bounded(
             source,
@@ -348,6 +406,28 @@ impl AppxBundleEditor {
                     "unsupported bundle metadata or signature".into(),
                 ));
             }
+        }
+        let types_entry = archive
+            .entries()
+            .iter()
+            .find(|entry| entry.name == "[Content_Types].xml")
+            .ok_or_else(|| WriteError::InvalidInput("missing bundle content types".into()))?
+            .id;
+        let types = archive
+            .read_entry(types_entry, builder.options.limits.max_metadata_bytes)
+            .map_err(crate::Error::from)?;
+        let mappings = resolve_content_types(&types, archive.entries())?;
+        if mappings.iter().any(|(name, content_type)| {
+            content_type
+                != if name == MANIFEST {
+                    "application/vnd.ms-appx.bundlemanifest+xml"
+                } else {
+                    "application/octet-stream"
+                }
+        }) {
+            return Err(WriteError::Unsupported(
+                "bundle content-type preservation profile".into(),
+            ));
         }
         for declaration in bundle.packages() {
             let entry = archive
@@ -396,6 +476,42 @@ impl AppxBundleEditor {
             .map(|_| ())
             .ok_or_else(|| WriteError::InvalidInput("unknown nested package".into()))
     }
+    /// Edit a nested package and rebuild its integrity metadata before replacement.
+    /// Failed edits, finalization, or bundle conflicts preserve the previous package.
+    pub fn edit_package(
+        &mut self,
+        name: &str,
+        edit: impl FnOnce(&mut AppxEditor) -> Result<(), WriteError>,
+    ) -> Result<(), WriteError> {
+        let package = self
+            .builder
+            .packages
+            .get(name)
+            .ok_or_else(|| WriteError::InvalidInput("unknown nested package".into()))?;
+        let retained = self
+            .builder
+            .packages
+            .values()
+            .try_fold(0u64, |total, package| {
+                total
+                    .checked_add(package.bytes.len() as u64)
+                    .ok_or(WriteError::LimitExceeded("bundle scratch"))
+            })?;
+        let mut options = self.builder.options;
+        // Reserve the retained bundle plus both staged output copies. Backend
+        // opening allocations remain outside the logical scratch guarantee.
+        options.limits.max_scratch_bytes = options
+            .limits
+            .max_scratch_bytes
+            .checked_sub(retained)
+            .ok_or(WriteError::LimitExceeded("bundle scratch"))?
+            / 3;
+        let mut editor = AppxEditor::open(Cursor::new(&package.bytes), options)?;
+        edit(&mut editor)?;
+        let mut output = Cursor::new(Vec::new());
+        editor.write(&mut output)?;
+        self.replace_package(name, Cursor::new(output.into_inner()))
+    }
     /// Rebuild outer metadata after nested packages have been edited separately.
     pub fn write<W: Write + Seek>(self, output: W) -> Result<WriteReport, WriteError> {
         self.builder.write(output)
@@ -417,7 +533,12 @@ fn identity(bytes: &[u8]) -> Result<BTreeMap<String, String>, WriteError> {
     }
     let mut identity = BTreeMap::new();
     for attribute in identities[0].attributes() {
-        if attribute.namespace().is_some() {
+        if attribute.namespace().is_some()
+            || !matches!(
+                attribute.name(),
+                "Name" | "Publisher" | "Version" | "ProcessorArchitecture" | "ResourceId"
+            )
+        {
             return Err(WriteError::Unsupported(
                 "identity extension attributes".into(),
             ));
@@ -433,6 +554,147 @@ fn identity(bytes: &[u8]) -> Result<BTreeMap<String, String>, WriteError> {
         ));
     }
     Ok(identity)
+}
+
+fn validate_identity(identity: &BTreeMap<String, String>) -> Result<(), WriteError> {
+    let name = identity.get("Name").map_or("", String::as_str);
+    let publisher = identity.get("Publisher").map_or("", String::as_str);
+    let version = identity.get("Version").map_or("", String::as_str);
+    if !(3..=50).contains(&name.len())
+        || !name
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'-'))
+        || publisher.is_empty()
+        || publisher.encode_utf16().count() > 8192
+        || publisher.chars().any(char::is_control)
+    {
+        return Err(WriteError::InvalidInput(
+            "invalid bundle/package identity".into(),
+        ));
+    }
+    if version.split('.').count() != 4
+        || version.split('.').any(|part| {
+            part.is_empty()
+                || !part.bytes().all(|b| b.is_ascii_digit())
+                || part.parse::<u16>().is_err()
+        })
+    {
+        return Err(WriteError::InvalidInput(
+            "invalid bundle/package version".into(),
+        ));
+    }
+    if identity
+        .get("ProcessorArchitecture")
+        .is_some_and(|architecture| {
+            !matches!(
+                architecture.as_str(),
+                "neutral" | "x86" | "x64" | "arm" | "arm64"
+            )
+        })
+    {
+        return Err(WriteError::Unsupported(
+            "nested package architecture".into(),
+        ));
+    }
+    if identity.get("ResourceId").is_some_and(|id| {
+        id.len() > 30
+            || !id
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'-'))
+    }) {
+        return Err(WriteError::InvalidInput(
+            "invalid nested resource identity".into(),
+        ));
+    }
+    Ok(())
+}
+
+fn validate_resource_package(
+    bytes: &[u8],
+    identity: &BTreeMap<String, String>,
+    qualifiers: &[BTreeMap<String, String>],
+) -> Result<(), WriteError> {
+    if identity.contains_key("ProcessorArchitecture") {
+        return Err(WriteError::InvalidInput(
+            "resource packages must omit ProcessorArchitecture".into(),
+        ));
+    }
+    let document = parse(bytes, bytes.len() as u64)?;
+    let root = document.root_element();
+    if root.children().any(|node| {
+        node.is_element()
+            && matches!(
+                node.tag_name().name(),
+                "Capabilities" | "Applications" | "Extensions"
+            )
+    }) || root
+        .children()
+        .filter(|node| node.is_element() && node.tag_name().name() == "Properties")
+        .flat_map(|node| node.children())
+        .any(|node| node.is_element() && node.tag_name().name() == "Framework")
+    {
+        return Err(WriteError::InvalidInput("resource packages cannot declare dependencies, capabilities, applications, extensions, or framework properties".into()));
+    }
+    for dependencies in root
+        .children()
+        .filter(|node| node.is_element() && node.tag_name().name() == "Dependencies")
+    {
+        let namespace = root.tag_name().namespace();
+        if namespace != Some("http://schemas.microsoft.com/appx/manifest/foundation/windows10")
+            || dependencies.tag_name().namespace() != namespace
+            || dependencies.attributes().len() != 0
+            || !dependencies.children().any(|node| node.is_element())
+        {
+            return Err(WriteError::InvalidInput(
+                "resource package compatibility dependencies must contain TargetDeviceFamily"
+                    .into(),
+            ));
+        }
+        for family in dependencies.children().filter(|node| node.is_element()) {
+            if family.tag_name().namespace() != namespace
+                || family.tag_name().name() != "TargetDeviceFamily"
+                || family.children().any(|node| node.is_element())
+                || family.attributes().any(|attribute| {
+                    attribute.namespace().is_some()
+                        || !matches!(attribute.name(), "Name" | "MinVersion" | "MaxVersionTested")
+                })
+                || family.attribute("Name").is_none_or(str::is_empty)
+                || ["MinVersion", "MaxVersionTested"].iter().any(|name| {
+                    family.attribute(*name).is_none_or(|version| {
+                        version.split('.').count() != 4
+                            || version.split('.').any(|part| {
+                                part.is_empty()
+                                    || !part.bytes().all(|byte| byte.is_ascii_digit())
+                                    || part.parse::<u16>().is_err()
+                            })
+                    })
+                })
+            {
+                return Err(WriteError::InvalidInput(
+                    "unsupported resource package dependency".into(),
+                ));
+            }
+        }
+    }
+    let mut kind = None;
+    for qualifier in qualifiers {
+        if qualifier.len() != 1 {
+            return Err(WriteError::InvalidInput(
+                "resource package qualifiers must describe one resource kind".into(),
+            ));
+        }
+        let key = qualifier
+            .keys()
+            .next()
+            .ok_or_else(|| WriteError::InvalidInput("empty resource qualifier".into()))?;
+        if kind.is_some_and(|previous| previous != key) {
+            return Err(WriteError::InvalidInput(
+                "resource package qualifiers cannot mix resource kinds".into(),
+            ));
+        }
+        kind = Some(key);
+    }
+    Ok(())
 }
 
 fn package_type(bytes: &[u8]) -> Result<&'static str, WriteError> {
@@ -457,9 +719,14 @@ fn package_type(bytes: &[u8]) -> Result<&'static str, WriteError> {
                 "ResourcePackage must be a unique Properties child".into(),
             ));
         }
-        resource = Some(match node.text().map(str::trim) {
-            Some("true") => true,
-            Some("false") => false,
+        let text: String = node
+            .children()
+            .filter(|child| child.is_text())
+            .filter_map(|child| child.text())
+            .collect();
+        resource = Some(match text.trim() {
+            "true" | "1" => true,
+            "false" | "0" => false,
             _ => {
                 return Err(WriteError::InvalidInput(
                     "invalid ResourcePackage property".into(),
@@ -479,6 +746,7 @@ fn resource_qualifiers(bytes: &[u8]) -> Result<Vec<BTreeMap<String, String>>, Wr
     let document = parse(bytes, bytes.len() as u64)?;
     let root = document.root_element();
     let mut resources = Vec::new();
+    let mut declarations = BTreeSet::new();
     let containers: Vec<_> = root
         .descendants()
         .filter(|n| n.is_element() && n.tag_name().name() == "Resources")
@@ -516,7 +784,7 @@ fn resource_qualifiers(bytes: &[u8]) -> Result<Vec<BTreeMap<String, String>>, Wr
                     "unsupported resource declaration content".into(),
                 ));
             }
-            let mut attributes = BTreeMap::new();
+            let mut attributes: BTreeMap<String, String> = BTreeMap::new();
             for attribute in node.attributes() {
                 let key = attribute.name();
                 let value = attribute.value();
@@ -554,7 +822,20 @@ fn resource_qualifiers(bytes: &[u8]) -> Result<Vec<BTreeMap<String, String>>, Wr
                     ));
                 }
             }
-            if attributes.is_empty() || resources.contains(&attributes) {
+            let semantic_key: Vec<_> = attributes
+                .iter()
+                .map(|(key, value)| {
+                    (
+                        key.clone(),
+                        if key == "Language" {
+                            value.to_ascii_lowercase()
+                        } else {
+                            value.clone()
+                        },
+                    )
+                })
+                .collect();
+            if attributes.is_empty() || !declarations.insert(semantic_key) {
                 return Err(WriteError::InvalidInput(
                     "empty or duplicate resource declaration".into(),
                 ));

@@ -1,0 +1,25 @@
+Microsoft (R) MakeAppx Tool
+
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+
+
+The path (/p) parameter is: "\\?\C:\Users\deploy\authoring-resource-bundle-v3-20261009.msixbundle"
+
+The output directory (/d) parameter is: "\\?\C:\Users\deploy\resource-v3-extracted"
+
+Extracting file AppxMetadata\AppxBundleManifest.xml to \\?\C:\Users\deploy\resource-v3-extracted\AppxMetadata\AppxBundleManifest.xml
+
+Extracting file AppxBlockMap.xml to \\?\C:\Users\deploy\resource-v3-extracted\AppxBlockMap.xml
+
+Extracting file authoring-fr.msix to \\?\C:\Users\deploy\resource-v3-extracted\authoring-fr.msix
+
+Extracting file authoring-x64.msix to \\?\C:\Users\deploy\resource-v3-extracted\authoring-x64.msix
+
+Extracting file authoring-x86.msix to \\?\C:\Users\deploy\resource-v3-extracted\authoring-x86.msix
+
+Bundle extraction succeeded.
+
+#< CLIXML
+TOOL_EXIT=0
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><TN RefId="0"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>

@@ -1,0 +1,20 @@
+[
+  {
+    "name": "x64-user-edited-external",
+    "arch": "x64",
+    "context": "user",
+    "media": "edited-external",
+    "payload_sha256": "87ac69d2d3af24e70862f8304d40d7550973fb9cc22314ebfc50dca92c818154",
+    "second_sha256": null,
+    "package_sha256": "d09a350af45c5bb0a44bd110505eca9490f7c2bdb743ccb6b45dd1d47de10c6d"
+  },
+  {
+    "name": "x64-user-edited-mixed",
+    "arch": "x64",
+    "context": "user",
+    "media": "edited-mixed",
+    "payload_sha256": "0447b06f42ccfd18a717737267cd21bffe807d66157a127d153bda18465fbd26",
+    "second_sha256": "14f13d71acf7bb9f4dfece75e179124a83eb10144ad5a6bb2c26295a2d839962",
+    "package_sha256": "62d744d860a11c8f3d66cd9b5278942e30871b1165a3eb9b5fc91cf615fa08cb"
+  }
+]

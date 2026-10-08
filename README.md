@@ -1,9 +1,11 @@
 # ms-package
 
-**0.1 preview:** read-only inspection and payload integrity; see [release scope](docs/release.md) and [changelog](CHANGELOG.md).
+Portable inspection and payload integrity with optional experimental authoring;
+see [release scope](docs/release.md) and [changelog](CHANGELOG.md).
 
 Standalone repository for the `ms-package` crate, preserving APPX/MSIX and
-MSI APIs. Requires sibling `archive-rs`, `cabinet`, `ms-compress`, `wim-rs` and
+MSI APIs. Crate dependencies resolve from crates.io. Browser and source-release
+checks use compatible sibling `archive-rs`, `cabinet`, `ms-compress`, `wim-rs` and
 `mkiso-rs` checkouts. The patched MSI reader comes from the
 [CaddyGlow/rust-msi fork](https://github.com/CaddyGlow/rust-msi/tree/caddy-msi-v0.10.1),
 published as `caddy-msi` and pinned to version `0.10.1` in `Cargo.toml`.
@@ -114,3 +116,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 Its dependency aliases preserve the `archive_core` and `cabinet` imports.
 Version tags validate the library and browser bindings, verify the offline source
 bundle, publish the crate, and create the GitHub Release.
+
+Current development uses published `caddy-archive-core` 0.2.1. The optional
+`write` feature also supports Deflate through `ms-compress` and caller-managed
+external, loose and multiple-cabinet MSI media. See the
+[authoring API and supported profiles](docs/package-authoring.md).
