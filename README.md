@@ -5,12 +5,15 @@
 Standalone repository for the `ms-package` crate, preserving APPX/MSIX and
 MSI APIs. Requires sibling `archive-rs`, `cabinet`, `ms-compress`, `wim-rs` and
 `mkiso-rs` checkouts. The patched MSI reader comes from the
-[CaddyGlow/rust-msi fork](https://github.com/CaddyGlow/rust-msi/tree/ms-package-0.10.0),
-published as `caddy-msi` and pinned to version `0.10.0` in `Cargo.toml`.
+[CaddyGlow/rust-msi fork](https://github.com/CaddyGlow/rust-msi/tree/caddy-msi-v0.10.1),
+published as `caddy-msi` and pinned to version `0.10.1` in `Cargo.toml`.
 See [fork provenance](docs/msi-fork.md).
 
-Portable read-only package interpretation. Public APIs expose no package writer,
-signer, installer, custom action execution, or implicit host media discovery.
+Portable package interpretation with experimental authoring behind the optional
+`write` feature. The default configuration retains the inspection APIs.
+See [authoring profiles and limits](docs/package-authoring.md) and the
+[backend audit](docs/package-authoring-audit.md). Signing, custom action execution,
+and implicit host media discovery remain outside the portable APIs.
 
 `AppxPackage` reads a single APPX/MSIX ZIP using `archive-core`, preserves manifest
 bytes, parses XML metadata, and validates SHA-256 hashes of decoded 64-KiB blocks.
@@ -21,7 +24,8 @@ nested manifest's Name, Publisher, Version, architecture, and ResourceId to the
 bundle declaration. `validate` separately checks the outer block map and metadata
 coverage; callers must also validate each selected nested package. The test-only
 fixture producer emits two-architecture valid/corrupt bundles and native expected
-JSON, without introducing a public writer. Encrypted packages, upload containers, sparse packages, and
+JSON for inspection tests. Optional authoring uses separate public types.
+Encrypted packages, upload containers, sparse packages, and
 signature verification are currently explicit unsupported profiles.
 
 `InstallerPackage` adopts `msi` 0.10 and its `cfb` 0.14 backend for portable compound

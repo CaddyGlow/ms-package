@@ -1,0 +1,54 @@
+=== Verbose logging started: 10/8/2026  21:20:37  Build type: SHIP UNICODE 5.00.10011.00  Calling process: C:\WINDOWS\system32\msiexec.exe ===
+MSI (c) (18:AC) [21:20:37:743]: Resetting cached policy values
+MSI (c) (18:AC) [21:20:37:743]: Machine policy value 'Debug' is 0
+MSI (c) (18:AC) [21:20:37:743]: ******* RunEngine:
+           ******* Product: C:\Users\deploy\ms-package-authored-win1252.msi
+           ******* Action: 
+           ******* CommandLine: **********
+MSI (c) (18:AC) [21:20:37:743]: Client-side and UI is none or basic: Running entire install on the server.
+MSI (c) (18:AC) [21:20:37:743]: Grabbed execution mutex.
+MSI (c) (18:AC) [21:20:37:749]: Cloaking enabled.
+MSI (c) (18:AC) [21:20:37:749]: Attempting to enable all disabled privileges before calling Install on Server
+MSI (c) (18:AC) [21:20:37:761]: Incrementing counter to disable shutdown. Counter after increment: 0
+MSI (s) (70:24) [21:20:37:765]: Running installation inside multi-package transaction C:\Users\deploy\ms-package-authored-win1252.msi
+MSI (s) (70:24) [21:20:37:765]: Grabbed execution mutex.
+MSI (s) (70:88) [21:20:37:767]: Resetting cached policy values
+MSI (s) (70:88) [21:20:37:767]: Machine policy value 'Debug' is 0
+MSI (s) (70:88) [21:20:37:767]: ******* RunEngine:
+           ******* Product: C:\Users\deploy\ms-package-authored-win1252.msi
+           ******* Action: 
+           ******* CommandLine: **********
+MSI (s) (70:88) [21:20:37:770]: Machine policy value 'DisableUserInstalls' is 0
+MSI (s) (70:88) [21:20:37:772]: Note: 1: 2203 2: C:\WINDOWS\Installer\inprogressinstallinfo.ipi 3: -2147287038 
+MSI (s) (70:88) [21:20:37:772]: Note: 1: 2219 2:  3:  4:  
+MSI (s) (70:88) [21:20:37:772]: Note: 1: 1402 2: HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer 3: 2 
+MSI (s) (70:88) [21:20:37:776]: File will have security applied from OpCode.
+MSI (s) (70:88) [21:20:37:781]: SOFTWARE RESTRICTION POLICY: Verifying package --> 'C:\Users\deploy\ms-package-authored-win1252.msi' against software restriction policy
+MSI (s) (70:88) [21:20:38:048]: Note: 1: 2262 2: DigitalSignature 3: -2147287038 
+MSI (s) (70:88) [21:20:38:048]: SOFTWARE RESTRICTION POLICY: C:\Users\deploy\ms-package-authored-win1252.msi is not digitally signed
+MSI (s) (70:88) [21:20:38:052]: SOFTWARE RESTRICTION POLICY: C:\Users\deploy\ms-package-authored-win1252.msi is permitted to run at the 'unrestricted' authorization level.
+MSI (s) (70:88) [21:20:38:052]: MSCOREE not loaded loading copy from system32
+MSI (s) (70:88) [21:20:38:061]: End dialog not enabled
+MSI (s) (70:88) [21:20:38:061]: Original package ==> C:\Users\deploy\ms-package-authored-win1252.msi
+MSI (s) (70:88) [21:20:38:061]: Package we're running from ==> C:\WINDOWS\Installer\4f74d.msi
+MSI (s) (70:88) [21:20:38:061]: Note: 1: 2219 2:  3:  4:  
+DEBUG: Error 2219:  Database: . Invalid Installer database format
+1: 2219 2:  3:  4:  
+MSI (s) (70:88) [21:20:38:063]: Note: 1: 1708 
+MSI (s) (70:88) [21:20:38:063]: Product:  -- Installation failed.
+
+MSI (s) (70:88) [21:20:38:063]: Windows Installer installed the product. Product Name: . Product Version: . Product Language: . Manufacturer: . Installation success or error status: 1620.
+
+MSI (s) (70:88) [21:20:38:063]: MainEngineThread is returning 1620
+This installation package could not be opened. Contact the application vendor to verify that this is a valid Windows Installer package.
+C:\WINDOWS\Installer\4f74d.msi
+MSI (s) (70:24) [21:20:38:065]: User policy value 'DisableRollback' is 0
+MSI (s) (70:24) [21:20:38:065]: Machine policy value 'DisableRollback' is 0
+MSI (s) (70:24) [21:20:38:065]: Incrementing counter to disable shutdown. Counter after increment: 0
+MSI (s) (70:24) [21:20:38:065]: Note: 1: 1402 2: HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Installer\Rollback\Scripts 3: 2 
+MSI (s) (70:24) [21:20:38:065]: Note: 1: 1402 2: HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Installer\Rollback\Scripts 3: 2 
+MSI (s) (70:24) [21:20:38:065]: Decrementing counter to disable shutdown. If counter >= 0, shutdown will be denied.  Counter after decrement: -1
+MSI (c) (18:AC) [21:20:38:067]: Decrementing counter to disable shutdown. If counter >= 0, shutdown will be denied.  Counter after decrement: -1
+MSI (c) (18:AC) [21:20:38:067]: MainEngineThread is returning 1620
+=== Verbose logging stopped: 10/8/2026  21:20:38 ===
+

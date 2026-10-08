@@ -1,6 +1,6 @@
 [package]
 name = "ms-package"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 rust-version = "1.99"
 repository = "https://github.com/CaddyGlow/ms-package"
@@ -11,16 +11,25 @@ keywords = ["msix", "appx", "msi", "windows", "archive"]
 categories = ["parser-implementations", "compression"]
 publish = true
 license = "MIT"
-description = "Portable read-only Windows package inspection and payload validation"
+description = "Portable Windows package inspection, payload validation and experimental authoring"
 
 [dependencies]
+zip = { version = "2.4", default-features = false, optional = true }
+cabinet = { version = "0.1.0", package = "ms-cabinet", optional = true }
+uuid = { version = "1", optional = true }
+roxmltree = { version = "0.21.1", default-features = false, optional = true }
+woxml = { version = "0.6.0", default-features = false, optional = true }
 cfb = "0.14"
 archive-core = { version = "0.1.0", package = "caddy-archive-core" }
-msi = { package = "caddy-msi", version = "=0.10.0" }
+msi = { package = "caddy-msi", version = "=0.10.1" }
 quick-xml = "0.38"
 sha2 = "0.10"
 base64 = "0.22"
 thiserror = "2"
+
+[features]
+default = []
+write = ["dep:zip", "dep:cabinet", "dep:uuid", "dep:roxmltree", "dep:woxml"]
 
 [dev-dependencies]
 zip = { version = "2.4", default-features = false }
@@ -31,5 +40,5 @@ serde_json = "1"
 unsafe_op_in_unsafe_fn = "deny"
 
 [workspace]
-exclude = ["fuzz"]
+exclude = ["fuzz", "tests/browser-authoring"]
 resolver = "3"

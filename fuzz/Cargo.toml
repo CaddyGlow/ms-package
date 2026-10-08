@@ -13,7 +13,7 @@ ms-package = { path = ".." }
 archive-core = { package = "caddy-archive-core", version = "0.1.0" }
 
 zip = { version = "2.4", default-features = false }
-msi = { package = "caddy-msi", version = "=0.10.0" }
+msi = { package = "caddy-msi", version = "=0.10.1" }
 sha2 = "0.10"
 base64 = "0.22"
 

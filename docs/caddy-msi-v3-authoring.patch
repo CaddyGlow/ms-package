@@ -1,0 +1,39 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -3,7 +3,7 @@
+ default-members = [".", "ffi"]
+ 
+ [workspace.package]
+-version = "0.10.0"
++version = "0.10.1"
+ authors = ["Matthew D. Steele <mdsteele@alum.mit.edu>"]
+ repository = "https://github.com/CaddyGlow/rust-msi"
+ keywords = ["msi", "windows", "installer", "package"]
+--- a/src/internal/package.rs
++++ b/src/internal/package.rs
+@@ -532,7 +532,8 @@
+         package_type: PackageType,
+         inner: F,
+     ) -> io::Result<Package<F>> {
+-        let mut comp = cfb::CompoundFile::create(inner)?;
++        // Windows Installer requires the V3 (512-byte-sector) storage profile.
++        let mut comp = cfb::CompoundFile::create_with_version(cfb::Version::V3, inner)?;
+         comp.set_storage_clsid("/", package_type.clsid())?;
+         let mut summary_info = SummaryInfo::new();
+         summary_info.set_title(package_type.default_title().to_string());
+--- a/tests/authoring_storage.rs
++++ b/tests/authoring_storage.rs
+@@ -0,0 +1,13 @@
++use msi::{Package, PackageType};
++use std::io::Cursor;
++
++#[test]
++fn created_installer_uses_native_compatible_v3_compound_storage() {
++    let mut package = Package::create(PackageType::Installer, Cursor::new(Vec::new())).unwrap();
++    package.flush().unwrap();
++    let bytes = package.into_inner().unwrap().into_inner();
++    assert_eq!(u16::from_le_bytes([bytes[26], bytes[27]]), 3);
++    assert_eq!(u16::from_le_bytes([bytes[30], bytes[31]]), 9);
++    let reopened = Package::open(Cursor::new(bytes)).unwrap();
++    assert_eq!(reopened.package_type(), PackageType::Installer);
++}

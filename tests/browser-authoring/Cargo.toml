@@ -1,0 +1,15 @@
+[package]
+name = "ms-package-authoring-worker-check"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+ms-package = { path = "../..", features = ["write"] }
+msi = { package = "caddy-msi", version = "=0.10.1" }
+wasm-bindgen = "0.2.129"
+
+[workspace]

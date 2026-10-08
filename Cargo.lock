@@ -45,8 +45,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
+name = "bytes"
+version = "1.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04"
+dependencies = [
+ "portable-atomic",
+]
+
+[[package]]
 name = "caddy-archive-core"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75e1b98febaa9521589f141b706fa21b42a64a2b30bad3312231093f1cacd416"
 dependencies = [
  "crc64fast",
  "libmkiso",
@@ -61,9 +72,9 @@ dependencies = [
 
 [[package]]
 name = "caddy-msi"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fb3425c7f1319f3daeaa863dbf167a568c413f4b8480a8f01a3a5702ebb16244"
+checksum = "9313f9a6ec85603645a545a81ecf7c39e5acc8f9336b64b88b294d1fe83ebd16"
 dependencies = [
  "byteorder",
  "cfb",
@@ -287,7 +298,9 @@ checksum = "ce5d3ddc6d3fa000eb1536d85e147bfe31aacaba692ed6a876f95cb7c855be78"
 
 [[package]]
 name = "libmkiso"
-version = "0.1.0"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd33c7015ccbe611f686f84f27aa6baa8d075eed8ed26edde55460f72eee54d9"
 dependencies = [
  "thiserror",
 ]
@@ -311,6 +324,8 @@ dependencies = [
 [[package]]
 name = "ms-cabinet"
 version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "17cfbe537ecc5b9642100014b72880f5a2942b8718bea46d758ff9348355272d"
 dependencies = [
  "flate2",
  "ms-compress",
@@ -320,6 +335,8 @@ dependencies = [
 [[package]]
 name = "ms-compress"
 version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a171863591b764e540b4dabd5a73fe89b5380826d92ac4d02d1612ed12812ea"
 dependencies = [
  "ms-compress-ruzstd",
 ]
@@ -332,7 +349,7 @@ checksum = "e3713af486ad3232ebd7bf988bbece755be1dd6848cef701038ada611b88a532"
 
 [[package]]
 name = "ms-package"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "base64",
  "caddy-archive-core",
@@ -340,9 +357,12 @@ dependencies = [
  "cfb",
  "ms-cabinet",
  "quick-xml",
+ "roxmltree",
  "serde_json",
  "sha2",
  "thiserror",
+ "uuid",
+ "woxml",
  "zip 2.4.2",
 ]
 
@@ -363,6 +383,12 @@ name = "pin-project-lite"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
+
+[[package]]
+name = "portable-atomic"
+version = "1.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05c8b63e8d9609db387f0324918f81d68fe27748f084ef092fb35954d0539a85"
 
 [[package]]
 name = "proc-macro2"
@@ -389,6 +415,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001"
 dependencies = [
  "proc-macro2",
+]
+
+[[package]]
+name = "roxmltree"
+version = "0.21.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f1964b10c76125c36f8afe190065a4bf9a87bf324842c05701330bba9f1cacbb"
+dependencies = [
+ "memchr",
 ]
 
 [[package]]
@@ -608,6 +643,16 @@ checksum = "5a6580f308b1fad9207618087a65c04e7a10bc77e02c8e84e9b00dd4b12fa0bb"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "woxml"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2be0b1280e68ad0e93f7972125564e1a6a00b3417c5253b9b880fd6b2d702f7b"
+dependencies = [
+ "bytes",
+ "thiserror",
 ]
 
 [[package]]

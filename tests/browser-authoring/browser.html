@@ -1,0 +1,7 @@
+<!doctype html><meta charset="utf-8"><pre id="result">RUNNING</pre>
+<script type="module">
+const worker = new Worker('./worker.js', {type: 'module'});
+worker.onmessage = ({data}) => {document.querySelector('#result').textContent = JSON.stringify(data); worker.terminate();};
+worker.onerror = (event) => {document.querySelector('#result').textContent = JSON.stringify({ok:false,error:event.message}); worker.terminate();};
+worker.postMessage({});
+</script>

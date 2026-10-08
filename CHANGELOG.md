@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.0 — 2026-10-09
+
+- Use published `caddy-msi` 0.10.1 for correct physical MSI primary-key serialization.
+
+- Add an optional `write` feature for bounded unsigned stored APPX/MSIX creation,
+  payload rebuilding, and narrowly supported bundles.
+- Add MSI database creation and copy editing with typed schemas, rows, streams,
+  summary properties, and explicit finalization.
+- Add an experimental flat file-only embedded-cabinet MSI builder with explicit
+  product, package, upgrade, and component identities.
+- Preserve existing reader APIs, malformed-metadata regressions, and historical
+  fixtures. Authoring qualification and remaining gates are recorded separately.
+
 ## 0.1.0
 
 Initial preview release of the read-only `ms-package` library.

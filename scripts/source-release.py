@@ -39,6 +39,13 @@ def verify(root):
                  '--all-targets', '--all-features', '--frozen'], cwd=root, env=env)
             run(['cargo', f'+{TOOLCHAIN}', 'test', '--manifest-path', str(root / 'ms-package/Cargo.toml'),
                  '--doc', '--frozen'], cwd=root, env=env)
+            run(['cargo', f'+{TOOLCHAIN}', 'test', '--manifest-path', str(root / 'ms-package/Cargo.toml'),
+                 '--doc', '--all-features', '--frozen'], cwd=root, env=env)
+            run(['cargo', f'+{TOOLCHAIN}', 'check', '--manifest-path', str(root / 'ms-package/Cargo.toml'),
+                 '--no-default-features', '--frozen'], cwd=root, env=env)
+            run(['cargo', f'+{TOOLCHAIN}', 'check', '--manifest-path',
+                 str(root / 'ms-package/tests/browser-authoring/Cargo.toml'),
+                 '--all-targets', '--frozen'], cwd=root, env=env)
 
 
 def main():
@@ -94,6 +101,7 @@ def main():
         vendor = run(['cargo', f'+{TOOLCHAIN}', 'vendor', '--locked', '--versioned-dirs',
                       '--manifest-path', str(root / 'ms-package/Cargo.toml'),
                       '--sync', str(root / 'archive-rs/Cargo.toml'),
+                      '--sync', str(root / 'ms-package/tests/browser-authoring/Cargo.toml'),
                       '--sync', str(root / 'archive-rs/fuzz/Cargo.toml'), str(root / 'vendor')],
                      capture_output=True)
         (root / '.cargo').mkdir()

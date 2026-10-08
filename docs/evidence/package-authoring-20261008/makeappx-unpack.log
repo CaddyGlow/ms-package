@@ -1,0 +1,11 @@
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+The path (/p) parameter is: "\\?\C:\Users\deploy\native.msix"
+The output directory (/d) parameter is: "\\?\C:\Users\deploy\authored-unpacked"
+Unpacking "\\?\C:\Users\deploy\native.msix" (package name) to "\\?\C:\Users\deploy\authored-unpacked" (output directory).
+Extracting file AppxManifest.xml to \\?\C:\Users\deploy\authored-unpacked\AppxManifest.xml
+Extracting file AppxBlockMap.xml to \\?\C:\Users\deploy\authored-unpacked\AppxBlockMap.xml
+Extracting file logo.png to \\?\C:\Users\deploy\authored-unpacked\logo.png
+Extracting file payload.txt to \\?\C:\Users\deploy\authored-unpacked\payload.txt
+Package extraction succeeded.

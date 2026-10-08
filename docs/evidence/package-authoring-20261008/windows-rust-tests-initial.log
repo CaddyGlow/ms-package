@@ -1,0 +1,76 @@
+
+running 16 tests
+test appx::tests::rejects_traversing_block_map_names ... ok
+test appx::tests::streaming_block_hashes_verify_arbitrary_chunks_without_buffering_files ... ok
+test appx::tests::rejects_duplicate_block_map_files ... ok
+test appx::tests::rejects_malformed_manifest_and_document_type ... ok
+test installer::tests::directory_cycles_and_short_long_names_are_checked ... ok
+test installer::tests::malformed_compound_storage_is_rejected ... ok
+test appx::tests::validates_decoded_payload_and_detects_corruption ... ok
+test installer::tests::rejects_storage_larger_than_explicit_budget ... ok
+test installer::tests::embedded_external_and_missing_cabinet_media ... ok
+test installer::tests::raw_stream_reads_enforce_actual_byte_limit ... ok
+test installer_metadata::tests::cumulative_lengths_must_fit_the_data_stream ... ok
+test installer_metadata::tests::metadata_budget_excludes_payload_but_includes_string_data ... ok
+test installer::tests::table_relationships_map_multiple_cabinets_and_source_names ... ok
+test installer_metadata::tests::package_opener_rejects_invalid_pool_before_the_msi_parser ... ok
+test installer_metadata::tests::rejects_extended_string_length_before_allocating_it ... ok
+test installer_metadata::tests::rejects_truncated_pool_record ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 9 tests
+test custom_mime_and_manifest_extensions_survive_rebuilding ... ok
+test destination_flush_errors_are_reported ... ok
+test deterministic_output_and_actual_source_limits ... ok
+test boundary_hashes_and_edit_operations_round_trip ... ok
+test manifest_references_block_payload_removal ... ok
+test read_failures_and_exact_output_budget ... ok
+test signed_sources_reject_or_strip_signature ... ok
+test short_reads_and_metadata_scratch_boundaries ... ok
+test zip_headers_match_blockmap_and_part_names_are_uris ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 7 tests
+test bundle_rejects_duplicate_identity_and_publisher_mismatch ... ok
+test bundle_rejects_corrupted_nested_package_and_aggregate_limit ... ok
+test bundle_transfers_resource_qualifiers_and_rejects_unknown_attributes ... ok
+test recorded_bundle_offsets_match_zip_payload_locations ... ok
+test bundles_bind_identities_and_verify_nested_contents ... ok
+test bundle_editor_replaces_and_removes_packages ... ok
+test resource_package_type_uses_property_and_preserves_resource_id ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 10 tests
+test declared_foreign_keys_are_checked_before_destination_is_touched ... ok
+test copy_edit_preserves_custom_schema_summary_and_truncates_stream ... ok
+test destination_flush_failure_is_reported ... ok
+test minimal_profile_coordinates_cabinet_and_explicit_identities ... ok
+test row_edit_operations_preserve_primary_key_constraints ... ok
+test signed_sources_reject_both_signature_policies ... ok
+test source_rows_and_streams_are_bounded ... ok
+test unrepresentable_strings_are_rejected_and_failed_edits_cannot_emit ... ok
+test payload_editor_rejects_unknown_preservation_and_reused_package_codes ... ok
+test canonical_payload_edits_rebuild_all_related_metadata ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+
+running 1 test
+test null_required_column_type_is_rejected_without_panicking ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+test tests::resource_bundle_uses_standard_neutral_architecture_and_type_defaults ... ok
+test tests::bundle_fixture_binding_integrity_and_explicit_selection_limits ... ok
+test tests::ordinary_external_installer_media_matches_embedded_payload ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

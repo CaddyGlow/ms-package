@@ -1,0 +1,10 @@
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+The path (/p) parameter is: "\\?\C:\Users\deploy\authoring-bundle-v2-20261008.msixbundle"
+The output directory (/d) parameter is: "\\?\C:\Users\deploy\authoring-bundle-v2-unpacked"
+Extracting file AppxMetadata\AppxBundleManifest.xml to \\?\C:\Users\deploy\authoring-bundle-v2-unpacked\AppxMetadata\AppxBundleManifest.xml
+Extracting file AppxBlockMap.xml to \\?\C:\Users\deploy\authoring-bundle-v2-unpacked\AppxBlockMap.xml
+Extracting file authoring-x64.msix to \\?\C:\Users\deploy\authoring-bundle-v2-unpacked\authoring-x64.msix
+Extracting file authoring-x86.msix to \\?\C:\Users\deploy\authoring-bundle-v2-unpacked\authoring-x86.msix
+Bundle extraction succeeded.

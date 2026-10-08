@@ -45,6 +45,31 @@ jobs:
           WIM_RS_REF: ${{ vars.WIM_RS_REF || 'main' }}
           MKISO_RS_REF: ${{ vars.MKISO_RS_REF || 'main' }}
         run: python3 scripts/check-release-refs.py
+      - uses: actions/checkout@v7
+        with:
+          repository: CaddyGlow/caddy-archive
+          ref: ${{ vars.ARCHIVE_RS_REF || 'main' }}
+          path: archive-rs
+      - uses: actions/checkout@v7
+        with:
+          repository: CaddyGlow/ms-cabinet
+          ref: ${{ vars.CABINET_REF || 'main' }}
+          path: cabinet
+      - uses: actions/checkout@v7
+        with:
+          repository: CaddyGlow/ms-compress
+          ref: ${{ vars.MS_COMPRESS_REF || 'main' }}
+          path: ms-compress
+      - uses: actions/checkout@v7
+        with:
+          repository: CaddyGlow/wim-rs
+          ref: ${{ vars.WIM_RS_REF || 'main' }}
+          path: wim-rs
+      - uses: actions/checkout@v7
+        with:
+          repository: CaddyGlow/mkiso-rs
+          ref: ${{ vars.MKISO_RS_REF || 'main' }}
+          path: mkiso-rs
       - uses: dtolnay/rust-toolchain@1.99.0
       - uses: Swatinem/rust-cache@v2
         with:

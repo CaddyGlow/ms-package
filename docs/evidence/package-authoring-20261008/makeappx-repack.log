@@ -1,0 +1,13 @@
+Microsoft (R) MakeAppx Tool
+Copyright (C) 2013 Microsoft.  All rights reserved.
+
+The path (/p) parameter is: "\\?\C:\Users\deploy\repacked.msix"
+The content directory (/d) parameter is: "\\?\C:\Users\deploy\authored-unpacked"
+Enumerating files from directory "\\?\C:\Users\deploy\authored-unpacked"
+MakeAppx : warning: Ignoring footprint file "AppxBlockMap.xml".
+Packing 3 file(s) in "\\?\C:\Users\deploy\authored-unpacked" (content directory) to "\\?\C:\Users\deploy\repacked.msix" (output file name).
+Memory limit defaulting to 3176017920 bytes.
+Using "\\?\C:\Users\deploy\authored-unpacked\AppxManifest.xml" as the manifest for the package.
+Processing "\\?\C:\Users\deploy\authored-unpacked\payload.txt" as a payload file.  Its path in the package will be "payload.txt".
+Processing "\\?\C:\Users\deploy\authored-unpacked\logo.png" as a payload file.  Its path in the package will be "logo.png".
+Package creation succeeded.

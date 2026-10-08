@@ -1,0 +1,10 @@
+﻿{
+    "os":  "10.0.26200.0",
+    "installer_version":  "5.0.26100.7920",
+    "package_sha256":  "7a6dca4af5814629f336a060cb214c24518fab5026ae833ca4e785bf0db07692",
+    "install":  0,
+    "payload_sha256":  "93bb899f71227543b80b530867d954845c1c18ec78b0d54fe7ee1bda25e4c902",
+    "repair":  0,
+    "uninstall":  0,
+    "ok":  true
+}

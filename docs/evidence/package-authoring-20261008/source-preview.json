@@ -1,0 +1,40 @@
+{
+  "archive": "/data/cache/ms-package-authoring-published-source-20261008.tar.gz",
+  "archive_sha256": "2f7053e2d108428c55da6843c80126c302358fbb1a234d7679d513c47966762d",
+  "backend": "caddy-msi =0.10.1 from crates.io",
+  "backend_source_commit": "5cea02ecba35c02bfc59ff2547c33a94695628f6",
+  "checks": [
+    "fresh extracted offline all-target/all-feature tests",
+    "reader doctests",
+    "writer doctests",
+    "reader-only check",
+    "standalone browser helper all-target check"
+  ],
+  "implementation_files": {
+    "Cargo.lock": "cdd7ce0380dd171d5ef2a3d6efc3c43216d62e4ed9f9e8b19664ffa329facf3f",
+    "Cargo.toml": "0c311a7c3a7b6c750fcfb1d80ad0450d4ee9f8dcb3febc4fedd6747dbba352f6",
+    "examples/author_appx.rs": "61d2791d3ac04959051ae6bebac1fd09df3b867bbf381109f54663d231a99255",
+    "examples/author_bundle.rs": "ecb85e2f48e1ab0ae05282de46316c9e705c71746f3362cf2c29e9c811fef1cd",
+    "examples/author_installer.rs": "821385a57ff44b8f03fcb1254b019dd193575b8e7735e65e9d44de73182a7a28",
+    "examples/browser_fixtures.rs": "bd2e5375c2d55585f030292685d95109b787d8ff8ad1164ec8f12a38a07b70c7",
+    "scripts/source-release.py": "af06002629dc0e3db7802a9e4a65e6f91c9ad297ed6f984e5bb3d068abd625a2",
+    "src/appx.rs": "25653aec98a72c8a2c6ecd5a4b96e1388ed6e6ce06fe023d21141b09fd132165",
+    "src/authoring/appx.rs": "1885488163faaa99c8e3a05f8ed2d7cc4a98958fe9668802286e106058e54160",
+    "src/authoring/bundle.rs": "f9450b73e60c1a0ac1c862bce34c6146980dfcd4a0d5ab47d4e8653c2d449600",
+    "src/authoring/installer.rs": "6087c554e8dee92083088e43dc49d9d4ba7a0d8451caeafd949b76f45d8f76d1",
+    "src/authoring/installer_builder.rs": "fc504a5ff1fd99e91e9873d143521f84880eb6304c4f1f17110a28e91e4058fb",
+    "src/authoring/mod.rs": "beccabfb5543d33290c8c553c9ee57fb784752efd9fd9d2df15863c9e74392ba",
+    "src/authoring/xml.rs": "d1b989457d12cc88fb3857c7f0cd83e26dea830e307116d430d0549b9d609107",
+    "src/installer.rs": "fe9f54f6d18faf198f1b9889b198be9036fd2da3ab2b6f7246cf29dbbf187b5a",
+    "src/installer_metadata.rs": "7a3b89e545d49d7552a575af37299279a2fc94f1ce1e006160968de9124798c5",
+    "src/lib.rs": "e4b45533a69b90ec72f6bb124f8ec356a60d1a54bbb27591c2acedc15d3b2d8e",
+    "tests/browser-authoring/Cargo.lock": "94894d09d9aa5b462fd90dc88cae6f7e0ea2ba52332d28b45cbee59dd95f13a8",
+    "tests/browser-authoring/Cargo.toml": "e9ac7bdba8d106b36a371d864a4fbc478ebe71152506796c74bc570c7d5afac2",
+    "tests/browser-authoring/browser.html": "96d02e308184da22ce01aec8dc99b714b457cd7cac1d48a230ed43046938be1b",
+    "tests/browser-authoring/examples/native.rs": "6cfa1bb6d39f1268cc97b56328ea85b9276ce160ab97348df45068b536b3d311",
+    "tests/browser-authoring/src/lib.rs": "7282bf9623718eb177a250017d1e302cdd13b0221a40bbdb10f870a8fdbb9903",
+    "tests/browser-authoring/worker.js": "2725eb11d0e7fe7ecbccf4f2079a06a1d7db1cc22320687fb53b969d5e59d8dd"
+  },
+  "preview": true,
+  "verification_exit_code": 0
+}

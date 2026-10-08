@@ -1,5 +1,6 @@
-//! Read-only portable APPX/MSIX and Windows Installer inspection.
+//! Portable APPX/MSIX and Windows Installer inspection, with optional authoring.
 //! Integrity validation is distinct from publisher signature or trust validation.
+//! Enable `write` for the experimental `authoring` APIs.
 //!
 //! # Example
 //!
@@ -21,6 +22,10 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 mod appx;
 mod installer;
 mod installer_metadata;
+
+/// Bounded, unsigned package creation and rebuilding (experimental profiles).
+#[cfg(feature = "write")]
+pub mod authoring;
 
 pub use appx::{AppxBundle, AppxPackage, BlockMapFile, BundlePackage, PackageIntegrity};
 pub use installer::{InstallerFile, InstallerPackage, MediaResolver, TableData};
