@@ -7,8 +7,8 @@ Standalone repository for the `ms-package` crate, preserving APPX/MSIX and
 MSI APIs. Crate dependencies resolve from crates.io. Browser and source-release
 checks use compatible sibling `archive-rs`, `cabinet`, `ms-compress`, `wim-rs` and
 `mkiso-rs` checkouts. The patched MSI reader comes from the
-[CaddyGlow/rust-msi fork](https://github.com/CaddyGlow/rust-msi/tree/caddy-msi-v0.10.1),
-published as `caddy-msi` and pinned to version `0.10.1` in `Cargo.toml`.
+[CaddyGlow/rust-msi fork](https://github.com/CaddyGlow/rust-msi/tree/caddy-msi-v0.10.2),
+published as `caddy-msi` and pinned to version `0.10.2` in `Cargo.toml`.
 See [fork provenance](docs/msi-fork.md).
 
 Portable package interpretation with experimental authoring behind the optional

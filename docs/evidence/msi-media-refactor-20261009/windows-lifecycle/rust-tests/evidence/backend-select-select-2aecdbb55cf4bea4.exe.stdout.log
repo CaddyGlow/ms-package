@@ -1,0 +1,10 @@
+
+running 5 tests
+test join_tables ... ok
+test nested_inner_join ... ok
+test nonexistent_column ... ok
+test nonexistent_table ... ok
+test select_rows ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

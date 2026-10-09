@@ -1,0 +1,8 @@
+   Compiling ms-package-fuzz v0.1.0 (/home/rick/projects-caddy/ms-package/fuzz)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.54s
+     Running `/data/cache/rust/debug/seed appx /home/rick/projects-caddy/ms-package/fuzz/corpus/appx`
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `/data/cache/rust/debug/seed msi /home/rick/projects-caddy/ms-package/fuzz/corpus/msi`
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running `/data/cache/rust/debug/seed authoring /home/rick/projects-caddy/ms-package/fuzz/corpus/authoring`
+/data/cache/ms-package-fuzz-refactor-release-candidate-20261009

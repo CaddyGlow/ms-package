@@ -1,0 +1,20 @@
+
+running 15 tests
+test bundle_editor_rejects_custom_outer_content_types_without_discarding_them ... ok
+test bundle_editor_replaces_and_removes_packages ... ok
+test bundle_entry_limit_rejects_before_consuming_source ... ok
+test bundle_identity_checks_reject_non_schema_values ... ok
+test bundle_rejects_corrupted_nested_package_and_aggregate_limit ... ok
+test bundle_rejects_duplicate_identity_and_publisher_mismatch ... ok
+test bundle_transfers_resource_qualifiers_and_rejects_unknown_attributes ... ok
+test bundles_bind_identities_and_verify_nested_contents ... ok
+test deflate_nested_packages_round_trip_and_enforce_decoded_file_limits ... ok
+test failed_replacement_and_nested_edit_preserve_previous_packages ... ok
+test invalid_nested_identity_and_resource_property_fail_during_add ... ok
+test nested_payload_edit_updates_nested_and_outer_metadata ... ok
+test recorded_bundle_offsets_match_zip_payload_locations ... ok
+test resource_package_type_uses_property_and_preserves_resource_id ... ok
+test resource_semantic_rules_fail_before_bundle_emission ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+

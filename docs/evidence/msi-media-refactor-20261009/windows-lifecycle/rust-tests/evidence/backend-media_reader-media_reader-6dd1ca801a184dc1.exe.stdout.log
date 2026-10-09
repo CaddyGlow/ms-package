@@ -1,0 +1,11 @@
+
+running 6 tests
+test borrowed_file_relationships_are_bounded_and_validate_sparse_sequences ... ok
+test cabinet_references_obey_utf16_media_column_bounds ... ok
+test codecs::embedded_external_and_all_native_codecs_decode_exact_bytes ... ok
+test codecs::malformed_indexes_spanning_and_declared_limits_fail_before_decode ... ok
+test codecs::reserved_header_folder_and_data_bytes_are_bounded_and_supported ... ok
+test media_boundaries_and_compression_overrides_are_explicit ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

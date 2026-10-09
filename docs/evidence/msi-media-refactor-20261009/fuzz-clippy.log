@@ -1,0 +1,4 @@
+    Checking caddy-msi v0.10.2 (/data/cache/caddy-msi-media-refactor)
+    Checking ms-package v0.2.2 (/home/rick/projects-caddy/ms-package)
+    Checking ms-package-fuzz v0.1.0 (/home/rick/projects-caddy/ms-package/fuzz)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.93s

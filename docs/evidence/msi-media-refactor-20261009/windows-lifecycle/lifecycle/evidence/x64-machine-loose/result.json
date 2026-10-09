@@ -1,0 +1,13 @@
+﻿{
+    "os":  "10.0.26200.0",
+    "installer_version":  "5.0.26100.7920",
+    "package_sha256":  "d0c841e5b8cd06aaa96c07036df93335e1b2ddc799b77203f84dfdf79dfda87f",
+    "install":  0,
+    "payload_sha256":  "e32c8e97edaa2ca320e16cf268667a3f0fe25db7469fd6ad23cdec571f008899",
+    "payloads":  {
+                     "C:\\Program Files\\ms-package-matrix-x64-machine-loose\\payload.txt":  "e32c8e97edaa2ca320e16cf268667a3f0fe25db7469fd6ad23cdec571f008899"
+                 },
+    "repair":  0,
+    "uninstall":  0,
+    "ok":  true
+}

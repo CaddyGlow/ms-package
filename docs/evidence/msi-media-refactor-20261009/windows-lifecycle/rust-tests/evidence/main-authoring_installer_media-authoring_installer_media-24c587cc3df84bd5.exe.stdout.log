@@ -1,0 +1,9 @@
+
+running 4 tests
+test caller_media_sink_reports_only_flushed_and_finalized_artifacts ... ok
+test loose_relative_names_are_explicit_and_exact_resource_boundary_succeeds ... ok
+test media_path_conflicts_and_limits_fail_before_opening_any_destination ... ok
+test partial_write_flush_and_finalization_errors_retain_completion_context ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

@@ -1,0 +1,8 @@
+
+running 3 tests
+test tests::bundle_fixture_binding_integrity_and_explicit_selection_limits ... ok
+test tests::ordinary_external_installer_media_matches_embedded_payload ... ok
+test tests::resource_bundle_uses_standard_neutral_architecture_and_type_defaults ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

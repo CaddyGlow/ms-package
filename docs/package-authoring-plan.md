@@ -28,7 +28,7 @@ insufficient.
 - `examples/browser_fixtures.rs` already creates synthetic ZIP packages,
   bundles, MSI databases, and cabinets using `zip`, `caddy-msi`, and `ms-cabinet`.
   These are fixture producers, not qualified public authoring APIs.
-- `caddy-msi = 0.10.1` is the published fork dependency, imported as `msi`.
+- `caddy-msi = 0.10.2` is the current published fork dependency, imported as `msi`.
   Its provenance and parser regressions are documented in [msi-fork.md](msi-fork.md).
 - Existing tests and release evidence establish inspection behavior for specific
   fixtures. They do not establish installation correctness for newly authored
@@ -434,3 +434,6 @@ browser gates must pass for the profiles exposed in that release.
 
 Consult current authoritative format and identity rules during each backend
 audit and record the specific revisions used in its compatibility evidence.
+
+Reusable MSI media ownership was subsequently moved to caddy-msi 0.10.2; see
+[the refactoring qualification](msi-media-refactoring-validation-20261009.md).

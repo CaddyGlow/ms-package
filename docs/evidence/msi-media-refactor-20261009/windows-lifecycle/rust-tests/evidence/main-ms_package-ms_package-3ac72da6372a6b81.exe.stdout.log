@@ -1,0 +1,25 @@
+
+running 20 tests
+test appx::tests::file_hash_extension_requires_declared_namespace_and_verified_digest ... ok
+test appx::tests::rejects_duplicate_block_map_files ... ok
+test appx::tests::rejects_malformed_manifest_and_document_type ... ok
+test appx::tests::rejects_traversing_block_map_names ... ok
+test appx::tests::streaming_block_hashes_verify_arbitrary_chunks_without_buffering_files ... ok
+test appx::tests::validates_decoded_payload_and_detects_corruption ... ok
+test authoring::xml::tests::document_types_and_namespace_errors_fail_closed ... ok
+test authoring::xml::tests::escaped_attributes_round_trip_and_metadata_is_bounded ... ok
+test installer::tests::corrupt_cabinet_payload_keeps_archive_error_classification ... ok
+test installer::tests::directory_cycles_and_short_long_names_are_checked ... ok
+test installer::tests::embedded_external_and_missing_cabinet_media ... ok
+test installer::tests::malformed_compound_storage_is_rejected ... ok
+test installer::tests::raw_stream_reads_enforce_actual_byte_limit ... ok
+test installer::tests::rejects_storage_larger_than_explicit_budget ... ok
+test installer::tests::table_relationships_map_multiple_cabinets_and_source_names ... ok
+test installer_metadata::tests::cumulative_lengths_must_fit_the_data_stream ... ok
+test installer_metadata::tests::metadata_budget_excludes_payload_but_includes_string_data ... ok
+test installer_metadata::tests::package_opener_rejects_invalid_pool_before_the_msi_parser ... ok
+test installer_metadata::tests::rejects_extended_string_length_before_allocating_it ... ok
+test installer_metadata::tests::rejects_truncated_pool_record ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

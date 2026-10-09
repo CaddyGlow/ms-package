@@ -1,0 +1,226 @@
+[
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "b6ddb60bee5d4f70897e3c94c6b85e5115194d7c30c2753e7db51248a180a782",
+        "target":  "author_bundle",
+        "file":  "author_bundle-5d99b84eba6ae48b.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "605847c841f96b2aed6c57538f8e6292ca33582697a0661a257fe07cc49fb139",
+        "target":  "author_appx_deflate",
+        "file":  "author_appx_deflate-2e210a5cef350473.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "3fb469ba705526a05eff0228c29e228d7007df89e342ad23431d3ac3a4725fdc",
+        "target":  "author_appx",
+        "file":  "author_appx-d8a693312d3ca317.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "9fa1b86b8cc3ae475377bb133370d3419aa37291caaaba86ecd985e8cf8f2afc",
+        "target":  "author_installer",
+        "file":  "author_installer-297d30e42ac6a041.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "26ef55a99f61b171abe78cc6f970c082b4163a4b8942b3a7a76f2aca00149cea",
+        "target":  "authoring_installer_media",
+        "file":  "authoring_installer_media-24c587cc3df84bd5.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "6909dcc126b716aeacab66f95aa69495d6d5823515a225ec1d8ac6657035870a",
+        "target":  "msi_malformed_metadata",
+        "file":  "msi_malformed_metadata-4be60a2ba9c498bd.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "1aa8928bcc3f5b7192a786b2638439a3f8e2789d72adc55499c1548e43b7211a",
+        "target":  "authoring_qualified_fixtures",
+        "file":  "authoring_qualified_fixtures-5b0550453ff9ddf9.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "996bee2b9dd5dda367c06cef2bcdb51b0cce9a017d049827ea710d4bac5e4713",
+        "target":  "authoring_appx",
+        "file":  "authoring_appx-84d2597f65248933.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "0761e141dc8f52321a3a7b24d509156511bd1f06519aa6e6d868ba034bff8deb",
+        "target":  "authoring_bundle",
+        "file":  "authoring_bundle-9b5417d55cb97368.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "ea826d4a164cbc52428331847c911ec5a9c7cc8c9f090c7715515fb2e7321389",
+        "target":  "browser_fixtures",
+        "file":  "browser_fixtures-d5227d529989f3c8.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "c93ca46d3d6e074805c68924c2699e7e33003fb7c08e5081121188efc503fc7b",
+        "target":  "ms_package",
+        "file":  "ms_package-3ac72da6372a6b81.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "main",
+        "timed_out":  false,
+        "sha256":  "daab409bb09933c4f9011f28fdf90687c4c154f63285d96c383fb62f6b4c7327",
+        "target":  "authoring_installer",
+        "file":  "authoring_installer-57469a848b7122f0.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "0587dc9866105d817ba0f3e4d3275db3b344b9fc338bf8bcdec7fc408d167a74",
+        "target":  "media_authoring",
+        "file":  "media_authoring-e92c8cd18d54a21f.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "3819e23a411fa2fc5d17d4d0a16cb91244344f885b15f49fa8ca674584e10cf2",
+        "target":  "msiinfo",
+        "file":  "msiinfo-fe68d4c506c9cf68.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "064cc635bed157ab891bf99c77531ed0b55b2ead2292148da6b18cab15de8723",
+        "target":  "msi",
+        "file":  "msi-4720dbb123d46d7f.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "19cb9e83b4e4c346a008d2d5260206a3092ad634ec57853b3bd7859f5bd885af",
+        "target":  "malformed_metadata",
+        "file":  "malformed_metadata-7a2244ec29117a04.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "05d98f2a86e9def2c2b336f78a46ac507d60b6cf1506b5ee6154b8a6b908fb58",
+        "target":  "msiquery",
+        "file":  "msiquery-63a17ae77db24cb2.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "bb60f4927fe4dbff7fa21dd831186c6d7e7379c986e1dd6d70ffd901a615adbd",
+        "target":  "signature",
+        "file":  "signature-52244f6ebee35523.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "5586f35d9405f94b7c0ac9c35a1941f48216f0f9a446f5bc3a7ec9dfb5a9ac8c",
+        "target":  "streams",
+        "file":  "streams-fbf1a78cf843c5fd.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "d2f5fda1bff9de00c1fe14583780eeef590aa05bda64b36910168324504a5721",
+        "target":  "select",
+        "file":  "select-2aecdbb55cf4bea4.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "2a5e135c0e5c89de989a32294c88733d7fe227594ec66bab389bbf80b82fe7d7",
+        "target":  "delete",
+        "file":  "delete-998afc9fb619fef6.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "889cc572d35517066795091f35710398543e7d9c3f5ed4548d2192ca4519e613",
+        "target":  "validation",
+        "file":  "validation-7405d8ce294b33bb.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "05df2cac6128235804cbb8345cb2d267de9e293a6dbba1c670e8c4adb52ff196",
+        "target":  "summary",
+        "file":  "summary-6535b5359e946f24.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "1bd4cec8eeea048a7501cc3a0ffb6936c55814f33bf724624b4f44b86f78eb68",
+        "target":  "tables",
+        "file":  "tables-124991603051bbf3.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "1b7bebefc61273d6333a628d0cd24906b969af95d5cfe94bbc26867efe777440",
+        "target":  "msi_ffi",
+        "file":  "msi_ffi-b5f18784be0a8ccc.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "a9d068bfa7d48a800be75a0a1b3ebd4c2291cd4267c278f32a289cabe109320c",
+        "target":  "media_reader",
+        "file":  "media_reader-6dd1ca801a184dc1.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "e50914e63d271150d1c0896759baf103bfd374d517b9f79e695aef60c48a77bc",
+        "target":  "media_writer",
+        "file":  "media_writer-afb7a528aa45acf1.exe"
+    },
+    {
+        "exit_code":  0,
+        "domain":  "backend",
+        "timed_out":  false,
+        "sha256":  "f1757b1ccee19f1baee744c795460ded31a83c1ed7d114039e8f76df78c7dea9",
+        "target":  "generate-headers",
+        "file":  "generate_headers-e0a4572f8a110ae4.exe"
+    }
+]

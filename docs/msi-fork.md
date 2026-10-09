@@ -1,10 +1,25 @@
 # MSI reader and writer fork
 
-`ms-package` uses [caddy-msi 0.10.1](https://crates.io/crates/caddy-msi/0.10.1),
+`ms-package` uses [caddy-msi 0.10.2](https://crates.io/crates/caddy-msi/0.10.2),
 from [CaddyGlow/rust-msi](https://github.com/CaddyGlow/rust-msi), pinned to
-`=0.10.1` in `Cargo.toml` and imported under the existing `msi` name.
+`=0.10.2` with the optional `media` feature and imported as `msi`.
 Cargo resolves the published registry package automatically. Its locked checksum
-is `9313f9a6ec85603645a545a81ecf7c39e5acc8f9336b64b88b294d1fe83ebd16`.
+is `c59023262a23d30e440433d5958c331f4a9765f23405a5b338624be8ab75b853`.
+
+The 0.10.2 media refactor is committed as
+[`1d9a8fe80766ed81136ab2b8c3b0574f59784d83`](https://github.com/CaddyGlow/rust-msi/commit/1d9a8fe80766ed81136ab2b8c3b0574f59784d83)
+on `ms-package-0.10.2`, tagged
+[`caddy-msi-v0.10.2`](https://github.com/CaddyGlow/rust-msi/tree/caddy-msi-v0.10.2),
+and published after qualification on 2026-10-09. The registry artifact embeds
+that exact VCS revision. The FFI crate remains unpublished. Database APIs and
+the default database-only dependency graph remain intact; cabinet I/O uses
+registry ms-cabinet 0.1.4 behind the media feature. See
+[the refactoring qualification](msi-media-refactoring-validation-20261009.md).
+
+## Historical 0.10.1 provenance
+
+The previous registry checksum is
+`9313f9a6ec85603645a545a81ecf7c39e5acc8f9336b64b88b294d1fe83ebd16`.
 
 The 0.10.1 source was prepared from the unchanged 0.10.0 registry source and
 published on 2026-10-08 after authoring qualification. It corrects physical

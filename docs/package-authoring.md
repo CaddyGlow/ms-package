@@ -2,7 +2,7 @@
 
 Enable `ms-package`'s `write` feature and import `ms_package::authoring`.
 The default feature set retains the inspection dependency graph. Published
-dependencies continue to resolve from crates.io, including `caddy-msi = 0.10.1`.
+dependencies continue to resolve from crates.io, including `caddy-msi = 0.10.2`.
 These APIs do not sign packages, validate publisher trust, or execute custom actions.
 Authoring XML uses `roxmltree` 0.21.1 and `woxml` 0.6.0 with
 default features disabled. Both backends support `no_std` with allocation;
@@ -104,3 +104,7 @@ Native and Worker checks, independent tool observations and outstanding release
 gates are tracked in [authoring validation](package-authoring-validation.md).
 The [implementation plan](package-authoring-plan.md) remains the broader roadmap;
 unsupported profiles cannot be inferred from its milestone list.
+
+Reusable MSI media operations are owned by the optional media API in caddy-msi
+0.10.2, using ms-cabinet 0.1.4. Package authoring profiles and identity policy
+remain here. See [the refactoring qualification](msi-media-refactoring-validation-20261009.md).

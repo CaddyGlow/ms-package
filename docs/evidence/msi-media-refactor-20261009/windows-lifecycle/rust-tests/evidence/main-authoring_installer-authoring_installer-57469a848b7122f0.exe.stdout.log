@@ -1,0 +1,21 @@
+
+running 16 tests
+test canonical_external_loose_and_partitioned_media_roundtrip ... ok
+test canonical_payload_edits_rebuild_all_related_metadata ... ok
+test copy_edit_preserves_custom_schema_summary_and_truncates_stream ... ok
+test declared_foreign_keys_are_checked_before_destination_is_touched ... ok
+test destination_flush_failure_is_reported ... ok
+test detailed_reports_distinguish_raw_validation_and_exact_identity_changes ... ok
+test incomplete_foreign_key_declarations_cannot_be_emitted ... ok
+test minimal_profile_coordinates_cabinet_and_explicit_identities ... ok
+test payload_editor_rejects_identity_collisions_and_retired_components ... ok
+test payload_editor_rejects_noncanonical_property_schema_without_panicking ... ok
+test payload_editor_rejects_unknown_preservation_and_reused_package_codes ... ok
+test replacement_read_reserves_existing_payload_scratch ... ok
+test row_edit_operations_preserve_primary_key_constraints ... ok
+test signed_sources_reject_both_signature_policies ... ok
+test source_rows_and_streams_are_bounded ... ok
+test unrepresentable_strings_are_rejected_and_failed_edits_cannot_emit ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+

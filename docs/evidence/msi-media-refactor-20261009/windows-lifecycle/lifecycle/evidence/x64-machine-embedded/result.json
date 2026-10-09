@@ -1,0 +1,13 @@
+﻿{
+    "os":  "10.0.26200.0",
+    "installer_version":  "5.0.26100.7920",
+    "package_sha256":  "4d9616108184bec539c27fbc457256e742ae31aa23027430bc122c1f9e919a6b",
+    "install":  0,
+    "payload_sha256":  "2a4d63a93b4d21748983ed315f6ab1e24a8a3f74fcab894c23bbb9a5c64f097f",
+    "payloads":  {
+                     "C:\\Program Files\\ms-package-matrix-x64-machine-embedded\\payload.txt":  "2a4d63a93b4d21748983ed315f6ab1e24a8a3f74fcab894c23bbb9a5c64f097f"
+                 },
+    "repair":  0,
+    "uninstall":  0,
+    "ok":  true
+}

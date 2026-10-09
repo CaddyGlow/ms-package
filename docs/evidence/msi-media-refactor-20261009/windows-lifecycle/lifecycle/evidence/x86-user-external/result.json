@@ -1,0 +1,13 @@
+﻿{
+    "os":  "10.0.26200.0",
+    "installer_version":  "5.0.26100.7920",
+    "package_sha256":  "1f60a6f45ee1c25b78344dfea5f7d70f5f6f8dd1b7d173024f2cb57fb13034eb",
+    "install":  0,
+    "payload_sha256":  "678549a5dab09e65584d36d7cb640d0099b124836166db7086b1a00d18b3a306",
+    "payloads":  {
+                     "C:\\Users\\deploy\\AppData\\Local\\ms-package-matrix-x86-user-external\\payload.txt":  "678549a5dab09e65584d36d7cb640d0099b124836166db7086b1a00d18b3a306"
+                 },
+    "repair":  0,
+    "uninstall":  0,
+    "ok":  true
+}

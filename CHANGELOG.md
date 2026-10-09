@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.2 — 2026-10-09
+
+- Move reusable MSI media preparation, extraction and emission to the optional
+  media API in published caddy-msi 0.10.2; preserve package APIs and profiles.
+- Update ms-cabinet to 0.1.4.
+- Preserve all 63 qualified artifacts; repeat the 18-case Windows lifecycle,
+  Worker, native Rust, WASM and fuzz qualification.
+
 ## 0.2.1 — 2026-10-09
 
 - Update the published `caddy-archive-core` dependency to 0.2.1.

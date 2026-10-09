@@ -55,7 +55,8 @@ pub enum WriteError {
         completed: Vec<String>,
         /// Artifact whose creation, writing or finalization failed.
         incomplete: String,
-        /// Bytes successfully accepted for the incomplete artifact.
+        /// Bytes accepted during the failed emission. Standalone media emission
+        /// includes completed sidecars; final MSI emission counts MSI bytes.
         bytes_written: u64,
         /// The underlying failure.
         #[source]

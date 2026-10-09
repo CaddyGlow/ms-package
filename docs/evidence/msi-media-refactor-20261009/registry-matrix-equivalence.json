@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "ms-package": "0.2.2",
+    "caddy-msi": "0.10.2",
+    "ms-cabinet": "0.1.4",
+    "caddy-archive-core": "0.2.1"
+  },
+  "backend_source": "crates.io",
+  "artifacts_compared": 63,
+  "mismatches": {},
+  "ok": true,
+  "producer_lock_sha256": "48aeaa84857ee75db55ed4bf6a3b32c7f73f0643377988d272589481685653de"
+}

@@ -1,0 +1,87 @@
+{
+  "local_backend_overrides": false,
+  "main_version": "0.2.2",
+  "archive_workspace_revision": "cb2394c1bc5faf518a28b6edaa739c11e816cb2d",
+  "locks": {
+    "main": {
+      "sha256": "8114cc6d71e4085edd85391e4fbe942a37084f5d65a9afe113447396a3cb19a2",
+      "dependencies": {
+        "caddy-archive-core": {
+          "version": "0.2.1",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "checksum": "b6eaa0c3506e268fc41b8dfa34a1c6011369ff07a60c6a66287d850b84540f65"
+        },
+        "caddy-msi": {
+          "version": "0.10.2",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "checksum": "c59023262a23d30e440433d5958c331f4a9765f23405a5b338624be8ab75b853"
+        },
+        "ms-cabinet": {
+          "version": "0.1.4",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "checksum": "ffd95ea08ac6201649b59d5bc138543e2a81477cafc74eb7ddf7db3c52b2c76c"
+        }
+      }
+    },
+    "browser": {
+      "sha256": "6420834eb0a08469b5a5cc2d01aafc9cebafeb6d2d49c4e58fc00b2fb3518194",
+      "dependencies": {
+        "caddy-archive-core": {
+          "version": "0.2.1",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "checksum": "b6eaa0c3506e268fc41b8dfa34a1c6011369ff07a60c6a66287d850b84540f65"
+        },
+        "caddy-msi": {
+          "version": "0.10.2",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "checksum": "c59023262a23d30e440433d5958c331f4a9765f23405a5b338624be8ab75b853"
+        },
+        "ms-cabinet": {
+          "version": "0.1.4",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "checksum": "ffd95ea08ac6201649b59d5bc138543e2a81477cafc74eb7ddf7db3c52b2c76c"
+        }
+      }
+    },
+    "fuzz": {
+      "sha256": "f11376e2964de5bc50f46265127c885eeee47d6cc293afedb4e5a5003d87400f",
+      "dependencies": {
+        "caddy-archive-core": {
+          "version": "0.2.1",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "checksum": "b6eaa0c3506e268fc41b8dfa34a1c6011369ff07a60c6a66287d850b84540f65"
+        },
+        "caddy-msi": {
+          "version": "0.10.2",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "checksum": "c59023262a23d30e440433d5958c331f4a9765f23405a5b338624be8ab75b853"
+        },
+        "ms-cabinet": {
+          "version": "0.1.4",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "checksum": "ffd95ea08ac6201649b59d5bc138543e2a81477cafc74eb7ddf7db3c52b2c76c"
+        }
+      }
+    }
+  },
+  "production_source_sha256": {
+    "src/appx.rs": "2329d91ea87c88d6b6b52f5ab5e041bdb97729fa6557300c1fd1820a084c422c",
+    "src/authoring/appx.rs": "69bd3f4953d6fdea66949b5f2339b0a212e36e7a9135f014a297bd5bf5b59bf7",
+    "src/authoring/appx_deflate.rs": "b75099d721e9e12f8d848b8a9fc57885ba51559b225456f0ab479b852c91d337",
+    "src/authoring/bundle.rs": "f0b45cfc51ba5752463f58e4154c7c6f64b42ee081b0810b777084e40a0d85a1",
+    "src/authoring/installer.rs": "e1eb26d6fa393e9771db5fd47889fe87ce433f150aa962efd7fbe2678a179461",
+    "src/authoring/installer_builder.rs": "b283a2bb1c4d7168380c2fc5921b1bb608f8194e224d2aa52171e9c8d267bb20",
+    "src/authoring/installer_media.rs": "5e3222a150a60e46cdb5b09c7f61bc4725326f07dded3c6fb2f28cb2520c2fe6",
+    "src/authoring/mod.rs": "e28ab30c5bb319e4184c749186179cea2bf8b5f2d5cbdf42b1f1b5f1ee459207",
+    "src/authoring/xml.rs": "41eecf304a342f2ddd0e601a273bdedb82e369b07f12017142dae1df5b832f28",
+    "src/installer.rs": "00fffee0812fe92c7789f2fef3f37ace1e2aebbcc81fa48d421cc91457640d45",
+    "src/installer_metadata.rs": "7a3b89e545d49d7552a575af37299279a2fc94f1ce1e006160968de9124798c5",
+    "src/lib.rs": "e4b45533a69b90ec72f6bb124f8ec356a60d1a54bbb27591c2acedc15d3b2d8e"
+  },
+  "backend_registry_vcs": {
+    "git": {
+      "sha1": "1d9a8fe80766ed81136ab2b8c3b0574f59784d83"
+    },
+    "path_in_vcs": ""
+  }
+}

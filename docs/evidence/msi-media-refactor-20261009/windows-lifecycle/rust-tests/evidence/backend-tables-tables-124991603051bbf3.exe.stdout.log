@@ -1,0 +1,17 @@
+
+running 12 tests
+test create_duplicate_table ... ok
+test create_table_with_duplicate_column_names ... ok
+test create_table_with_invalid_column_name ... ok
+test create_table_with_invalid_name ... ok
+test create_table_with_no_columns ... ok
+test create_table_with_no_primary_key ... ok
+test create_valid_table ... ok
+test drop_nonexistent_table ... ok
+test drop_special_tables ... ok
+test drop_table_with_invalid_name ... ok
+test drop_table_with_rows ... ok
+test drop_valid_table ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

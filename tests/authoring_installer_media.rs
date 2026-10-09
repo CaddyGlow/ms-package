@@ -129,6 +129,7 @@ fn media_path_conflicts_and_limits_fail_before_opening_any_destination() {
         ["../one.cab", "two.cab"],
         ["C:/one.cab", "two.cab"],
         ["NUL.cab", "two.cab"],
+        ["résumé.cab", "two.cab"],
         ["one.cab", "ONE.cab"],
         ["Product", "Product/payload.txt"],
     ] {

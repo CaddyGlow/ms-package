@@ -1,0 +1,12 @@
+
+running 7 tests
+test accounts_partial_writes_flush_and_finalization_failures ... ok
+test cabinet_output_and_codec_scratch_have_exact_boundaries ... ok
+test cabinet_reference_representability_is_checked_during_preparation ... ok
+test database_identifiers_are_not_windows_destination_names ... ok
+test emission_preflights_collisions_and_limits_before_opening_sink ... ok
+test prepares_deterministic_mixed_cabinets_and_embedded_streams ... ok
+test validates_partitions_paths_and_exact_resource_budgets ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

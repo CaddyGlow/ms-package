@@ -1,9 +1,8 @@
 //! Explicit, bounded nonspanning MSI media preparation and caller-owned publication.
 use super::{WriteError, WriteLimits};
 use std::{
-    borrow::Cow,
     collections::BTreeSet,
-    io::{self, Cursor, Write},
+    io::{self, Write},
 };
 
 /// A contiguous group of file sequences stored in one independent cabinet.
@@ -179,120 +178,104 @@ pub(super) fn prepare(
     {
         return Err(WriteError::LimitExceeded("MSI media source resources"));
     }
-    let mut prepared = PreparedMedia {
-        rows: Vec::new(),
-        embedded: Vec::new(),
-        external: Vec::new(),
-        compressed: !matches!(layout, InstallerMediaLayout::Loose),
-    };
-    if matches!(layout, InstallerMediaLayout::Loose) {
-        if source_bytes
-            .checked_mul(2)
-            .is_none_or(|n| n > limits.max_scratch_bytes)
-            || source_bytes > limits.max_output_bytes
-        {
-            return Err(WriteError::LimitExceeded("loose MSI media scratch/output"));
-        }
-        for (_, name, bytes) in files {
-            prepared
-                .external
-                .push((format!("{directory_name}/{name}"), bytes.to_vec()));
-        }
-        prepared.rows.push((files.len() as i32, None));
-        return Ok(prepared);
-    }
-    let specs: Cow<'_, [InstallerCabinetSpec]> = match layout {
-        InstallerMediaLayout::Embedded => Cow::Owned(vec![InstallerCabinetSpec {
-            name: "payload.cab".into(),
-            file_count: files.len() as u64,
-            embedded: true,
-        }]),
+    let backend_layout = match layout {
+        InstallerMediaLayout::Embedded => msi::media::Layout::Embedded,
+        InstallerMediaLayout::Loose => msi::media::Layout::Loose,
         InstallerMediaLayout::ExternalCabinet { name } => {
-            leaf(name)?;
-            Cow::Owned(vec![InstallerCabinetSpec {
-                name: name.clone(),
-                file_count: files.len() as u64,
-                embedded: false,
-            }])
+            cabinet_name(name)?;
+            msi::media::Layout::ExternalCabinet { name: name.clone() }
         }
-        InstallerMediaLayout::Cabinets { cabinets } => Cow::Borrowed(cabinets),
-        InstallerMediaLayout::Loose => return Err(invalid("unexpected cabinet layout")),
+        InstallerMediaLayout::Cabinets { cabinets } => {
+            if cabinets.len() as u64 > limits.max_entries || cabinets.len() > 32767 {
+                return Err(WriteError::LimitExceeded("MSI cabinet count"));
+            }
+            for cabinet in cabinets {
+                cabinet_name(&cabinet.name)?;
+                metadata = metadata
+                    .checked_add(cabinet.name.len() as u64)
+                    .ok_or(WriteError::LimitExceeded("MSI media metadata"))?;
+            }
+            if metadata > limits.max_metadata_bytes {
+                return Err(WriteError::LimitExceeded("MSI media metadata"));
+            }
+            msi::media::Layout::Cabinets {
+                cabinets: cabinets
+                    .iter()
+                    .map(|cabinet| msi::media::CabinetSpec {
+                        name: cabinet.name.clone(),
+                        file_count: cabinet.file_count,
+                        embedded: cabinet.embedded,
+                    })
+                    .collect(),
+            }
+        }
     };
-    if specs.is_empty() || specs.len() > 32767 || specs.len() as u64 > limits.max_entries {
-        return Err(WriteError::LimitExceeded("MSI cabinet count"));
+    let prepared = msi::media::prepare(
+        files,
+        &backend_layout,
+        directory_name,
+        &backend_limits(limits),
+    )
+    .map_err(backend_error)?;
+    let (rows, embedded, external, compressed) = prepared.into_parts();
+    Ok(PreparedMedia {
+        rows,
+        embedded,
+        external,
+        compressed,
+    })
+}
+
+fn cabinet_name(name: &str) -> Result<(), WriteError> {
+    leaf(name)?;
+    if name.starts_with('#') || name.len() > 60 || !name.to_ascii_lowercase().ends_with(".cab") {
+        return Err(invalid("invalid MSI cabinet specification"));
     }
-    let mut media_names = BTreeSet::new();
-    let mut file_count = 0u64;
-    for spec in specs.iter() {
-        leaf(&spec.name)?;
-        if !spec.name.to_ascii_lowercase().ends_with(".cab")
-            || spec.name.starts_with('#')
-            || spec.name.len() > 60
-            || spec.file_count == 0
-            || !media_names.insert(spec.name.to_ascii_lowercase())
-        {
-            return Err(invalid("invalid or duplicate MSI cabinet specification"));
-        }
-        file_count = file_count
-            .checked_add(spec.file_count)
-            .ok_or(WriteError::LimitExceeded("MSI cabinet files"))?;
-        metadata = metadata
-            .checked_add(spec.name.len() as u64)
-            .ok_or(WriteError::LimitExceeded("MSI media metadata"))?;
+    Ok(())
+}
+
+fn backend_limits(limits: &WriteLimits) -> msi::media::Limits {
+    msi::media::Limits {
+        max_entries: limits.max_entries,
+        max_metadata_bytes: limits.max_metadata_bytes,
+        max_file_bytes: limits.max_file_bytes,
+        max_total_bytes: limits.max_total_bytes,
+        max_output_bytes: limits.max_output_bytes,
+        max_scratch_bytes: limits.max_scratch_bytes,
     }
-    if file_count != files.len() as u64 {
-        return Err(invalid("cabinet groups must cover every file exactly once"));
+}
+
+fn backend_error(error: msi::media::Error) -> WriteError {
+    match error {
+        msi::media::Error::Io(error) => WriteError::Io(error),
+        msi::media::Error::Limit(limit) => WriteError::LimitExceeded(limit),
+        msi::media::Error::Invalid(message) => WriteError::InvalidInput(message),
+        msi::media::Error::Integrity(message) => WriteError::InvalidInput(message),
+        msi::media::Error::Unsupported(message) => WriteError::Unsupported(message),
+        msi::media::Error::Emission {
+            completed,
+            incomplete,
+            bytes_written,
+            source,
+        } => WriteError::Media {
+            completed,
+            incomplete,
+            bytes_written,
+            source: Box::new(backend_error(*source)),
+        },
+        error => WriteError::Unsupported(error.to_string()),
     }
-    if metadata > limits.max_metadata_bytes {
-        return Err(WriteError::LimitExceeded("MSI media metadata"));
+}
+
+struct SinkAdapter<'a, S>(&'a mut S);
+impl<S: InstallerMediaSink> msi::media::Sink for SinkAdapter<'_, S> {
+    type Writer = S::Writer;
+    fn create(&mut self, name: &str) -> io::Result<Self::Writer> {
+        self.0.create(name)
     }
-    let mut index = 0usize;
-    let mut staged = 0u64;
-    for spec in specs.iter() {
-        let end = index
-            .checked_add(
-                usize::try_from(spec.file_count)
-                    .map_err(|_| WriteError::LimitExceeded("MSI cabinet files"))?,
-            )
-            .ok_or(WriteError::LimitExceeded("MSI cabinet files"))?;
-        let mut cabinet = cabinet::CabinetBuilder::new(cabinet::WriteCompression::None);
-        for (id, _, bytes) in &files[index..end] {
-            cabinet.add_file(id, bytes)?;
-        }
-        let available = limits
-            .max_scratch_bytes
-            .checked_sub(source_bytes)
-            .and_then(|n| n.checked_sub(staged))
-            .and_then(|n| n.checked_sub(32768))
-            .ok_or(WriteError::LimitExceeded("MSI cabinet scratch"))?;
-        let mut output = super::installer::BoundedCursor {
-            inner: Cursor::new(Vec::new()),
-            limit: available
-                .min(limits.max_file_bytes)
-                .min(limits.max_output_bytes.saturating_sub(staged)),
-        };
-        cabinet.write(&mut output)?;
-        output.flush()?;
-        let bytes = output.inner.into_inner();
-        staged = staged
-            .checked_add(bytes.len() as u64)
-            .ok_or(WriteError::LimitExceeded("MSI media output"))?;
-        prepared.rows.push((
-            end as i32,
-            Some(if spec.embedded {
-                format!("#{}", spec.name)
-            } else {
-                spec.name.clone()
-            }),
-        ));
-        if spec.embedded {
-            prepared.embedded.push((spec.name.clone(), bytes));
-        } else {
-            prepared.external.push((spec.name.clone(), bytes));
-        }
-        index = end;
+    fn finish(&mut self, name: &str, writer: Self::Writer) -> io::Result<()> {
+        self.0.finish(name, writer)
     }
-    Ok(prepared)
 }
 
 /// Finalize explicitly named media artifacts in caller-provided destinations.
@@ -306,76 +289,23 @@ pub fn write_installer_media<S: InstallerMediaSink>(
     if artifacts.len() as u64 > limits.max_entries {
         return Err(WriteError::LimitExceeded("MSI media artifacts"));
     }
-    let mut names = BTreeSet::new();
-    let mut total = 0u64;
-    let mut metadata = 0u64;
-    for (name, bytes) in artifacts {
+    // The public wrapper retains the qualified ASCII admission profile. The
+    // backend owns duplicate/sequence checks, budgets, writes and finalization.
+    for (name, _) in artifacts {
         relative_name(name)?;
-        if !names.insert(name.to_ascii_lowercase()) {
-            return Err(invalid("duplicate MSI media artifact name"));
-        }
-        if bytes.len() as u64 > limits.max_file_bytes {
-            return Err(WriteError::LimitExceeded("MSI media artifact bytes"));
-        }
-        total = total
-            .checked_add(bytes.len() as u64)
-            .ok_or(WriteError::LimitExceeded("MSI media output"))?;
-        metadata = metadata
-            .checked_add(name.len() as u64)
-            .ok_or(WriteError::LimitExceeded("MSI media names"))?;
     }
-    for name in &names {
-        for (index, _) in name.match_indices('/') {
-            if names.contains(&name[..index]) {
-                return Err(invalid("MSI media artifact file/directory collision"));
-            }
-        }
-    }
-    if total > limits.max_output_bytes
-        || total > limits.max_scratch_bytes
-        || metadata > limits.max_metadata_bytes
-    {
-        return Err(WriteError::LimitExceeded("MSI media emission resources"));
-    }
-    let mut report = InstallerMediaReport::default();
-    for (name, bytes) in artifacts {
-        let mut written = 0u64;
-        let result = (|| -> Result<(), WriteError> {
-            let mut output = sink.create(name)?;
-            while (written as usize) < bytes.len() {
-                match output.write(&bytes[written as usize..]) {
-                    Ok(0) => return Err(io::Error::from(io::ErrorKind::WriteZero).into()),
-                    Ok(count) if count <= bytes.len() - written as usize => written += count as u64,
-                    Ok(_) => {
-                        return Err(
-                            io::Error::other("media sink returned an invalid write count").into(),
-                        );
-                    }
-                    Err(error) if error.kind() == io::ErrorKind::Interrupted => continue,
-                    Err(error) => return Err(error.into()),
-                }
-            }
-            output.flush()?;
-            sink.finish(name, output)?;
-            Ok(())
-        })();
-        report.bytes_written += written;
-        if let Err(source) = result {
-            return Err(WriteError::Media {
-                completed: report
-                    .completed
-                    .iter()
-                    .map(|artifact| artifact.name.clone())
-                    .collect(),
-                incomplete: name.clone(),
-                bytes_written: report.bytes_written,
-                source: Box::new(source),
-            });
-        }
-        report.completed.push(InstallerMediaArtifact {
-            name: name.clone(),
-            bytes: written,
-        });
-    }
-    Ok(report)
+    let report =
+        msi::media::write_media(artifacts, &mut SinkAdapter(sink), &backend_limits(limits))
+            .map_err(backend_error)?;
+    Ok(InstallerMediaReport {
+        completed: report
+            .completed
+            .into_iter()
+            .map(|artifact| InstallerMediaArtifact {
+                name: artifact.name,
+                bytes: artifact.bytes,
+            })
+            .collect(),
+        bytes_written: report.bytes_written,
+    })
 }

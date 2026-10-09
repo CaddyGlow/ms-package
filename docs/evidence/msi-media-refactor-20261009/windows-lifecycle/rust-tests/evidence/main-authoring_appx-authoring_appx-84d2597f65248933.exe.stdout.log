@@ -1,0 +1,24 @@
+
+running 19 tests
+test boundary_hashes_and_edit_operations_round_trip ... ok
+test compressed_editor_rejects_wrong_physical_block_sizes ... ok
+test content_type_extensions_fail_instead_of_being_discarded ... ok
+test custom_mime_and_manifest_extensions_survive_rebuilding ... ok
+test deflate_block_boundaries_and_metadata_layout_round_trip ... ok
+test deflate_workspace_limit_fails_before_destination_changes ... ok
+test destination_flush_errors_are_reported ... ok
+test deterministic_output_and_actual_source_limits ... ok
+test malformed_metadata_and_source_integrity_fail_before_output ... ok
+test manifest_references_block_payload_removal ... ok
+test manifest_storage_is_bounded_before_retention ... ok
+test read_failures_and_exact_output_budget ... ok
+test replacement_charges_final_decoded_size_and_case_only_rename_preserves_payload ... ok
+test reserved_metadata_files_cannot_be_used_as_payload_directories ... ok
+test short_reads_and_metadata_scratch_boundaries ... ok
+test signed_sources_reject_or_strip_signature ... ok
+test source_payload_limit_is_checked_before_integrity_extraction ... ok
+test sparse_external_content_is_rejected_using_its_namespace_and_boolean_value ... ok
+test zip_headers_match_blockmap_and_part_names_are_uris ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+

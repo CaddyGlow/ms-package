@@ -316,13 +316,14 @@ impl InstallerBuilder {
             summary.set_author(&self.identity.manufacturer);
             summary.set_subject(&self.identity.name);
             summary.set_creating_application("ms-package experimental file-only authoring");
-            summary.set_word_count(
-                (if self.identity.context == InstallationContext::PerUser {
+            summary.set_word_count(msi::media::summary_word_count(
+                if self.identity.context == InstallationContext::PerUser {
                     8
                 } else {
                     0
-                }) | if media.compressed { 2 } else { 0 },
-            );
+                },
+                media.compressed,
+            ));
             summary.set_page_count(400);
         })?;
         create_schema(&mut database)?;

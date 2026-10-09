@@ -1,0 +1,14 @@
+﻿{
+    "os":  "10.0.26200.0",
+    "installer_version":  "5.0.26100.7920",
+    "package_sha256":  "62d744d860a11c8f3d66cd9b5278942e30871b1165a3eb9b5fc91cf615fa08cb",
+    "install":  0,
+    "payload_sha256":  "0447b06f42ccfd18a717737267cd21bffe807d66157a127d153bda18465fbd26",
+    "payloads":  {
+                     "C:\\Users\\deploy\\AppData\\Local\\ms-package-matrix-x64-user-edited-mixed\\payload.txt":  "0447b06f42ccfd18a717737267cd21bffe807d66157a127d153bda18465fbd26",
+                     "C:\\Users\\deploy\\AppData\\Local\\ms-package-matrix-x64-user-edited-mixed\\second.txt":  "14f13d71acf7bb9f4dfece75e179124a83eb10144ad5a6bb2c26295a2d839962"
+                 },
+    "repair":  0,
+    "uninstall":  0,
+    "ok":  true
+}

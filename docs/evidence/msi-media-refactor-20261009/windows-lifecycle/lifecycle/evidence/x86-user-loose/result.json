@@ -1,0 +1,13 @@
+﻿{
+    "os":  "10.0.26200.0",
+    "installer_version":  "5.0.26100.7920",
+    "package_sha256":  "c585ad7ce02a06f5901e5a1830606827e9e7e9275a0f2b4aca594313cd7d32a4",
+    "install":  0,
+    "payload_sha256":  "97df1ccadef327f50b1e47914b9bc139de8b068e0213516c73c34afb4feb2b17",
+    "payloads":  {
+                     "C:\\Users\\deploy\\AppData\\Local\\ms-package-matrix-x86-user-loose\\payload.txt":  "97df1ccadef327f50b1e47914b9bc139de8b068e0213516c73c34afb4feb2b17"
+                 },
+    "repair":  0,
+    "uninstall":  0,
+    "ok":  true
+}

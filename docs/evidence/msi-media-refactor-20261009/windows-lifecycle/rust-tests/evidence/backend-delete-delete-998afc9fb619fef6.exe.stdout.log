@@ -1,0 +1,10 @@
+
+running 5 tests
+test delete_all_rows ... ok
+test delete_multiple_rows ... ok
+test delete_one_row ... ok
+test nonexistent_column ... ok
+test nonexistent_table ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+

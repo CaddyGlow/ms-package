@@ -1,0 +1,7 @@
+
+running 2 tests
+test independently_unbundled_architecture_packages_validate_separately ... ok
+test independently_unpacked_stored_package_retains_payload_integrity ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

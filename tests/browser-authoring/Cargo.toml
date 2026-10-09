@@ -9,7 +9,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 ms-package = { path = "../..", features = ["write"] }
-msi = { package = "caddy-msi", version = "=0.10.1" }
+msi = { package = "caddy-msi", version = "=0.10.2" }
 wasm-bindgen = "0.2.129"
 
 [workspace]

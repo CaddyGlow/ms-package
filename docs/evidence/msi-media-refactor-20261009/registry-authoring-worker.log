@@ -1,0 +1,11 @@
+warning: Git tree '/data/cache/ms-package-authoring-integration-20261009/archive-rs-refactor-registry' is dirty
+   Compiling ms-package v0.2.2 (/home/rick/projects-caddy/ms-package)
+   Compiling ms-package-authoring-worker-check v0.0.0 (/home/rick/projects-caddy/ms-package/tests/browser-authoring)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.45s
+   Compiling caddy-msi v0.10.2
+   Compiling ms-package v0.2.2 (/home/rick/projects-caddy/ms-package)
+   Compiling ms-package-authoring-worker-check v0.0.0 (/home/rick/projects-caddy/ms-package/tests/browser-authoring)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.15s
+     Running `/data/cache/rust/debug/examples/native /tmp/ms-package-authoring-worker.GXVaAh/native.msix`
+{"ok":true,"checks":["Deflate APPX and nested bundle create/edit parity and reader validation","external/loose/multiple MSI media sink/resolver parity","APPX native create/edit parity","archive-rs reopen and payload bytes","bundle native create/edit parity","outer and nested integrity and payload bytes","MSI database native create/edit parity","custom MSI table and stream preservation","APPX/bundle/MSI limit failures"],"cancellation":"synchronous calls; Worker termination is caller-owned"}
+authoring Worker evidence: /tmp/ms-package-authoring-worker.GXVaAh

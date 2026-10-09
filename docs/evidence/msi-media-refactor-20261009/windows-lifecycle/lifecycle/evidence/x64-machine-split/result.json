@@ -1,0 +1,14 @@
+﻿{
+    "os":  "10.0.26200.0",
+    "installer_version":  "5.0.26100.7920",
+    "package_sha256":  "cb062c4778839f058f800941a40c45cad9fa07685f1929c86dc045873cf6606c",
+    "install":  0,
+    "payload_sha256":  "3dcfcb2997a4e3551caef83be3501490c4a291249e24118d572d0a5b5a3c3c11",
+    "payloads":  {
+                     "C:\\Program Files\\ms-package-matrix-x64-machine-split\\payload.txt":  "3dcfcb2997a4e3551caef83be3501490c4a291249e24118d572d0a5b5a3c3c11",
+                     "C:\\Program Files\\ms-package-matrix-x64-machine-split\\second.txt":  "160ba942f4c4d626d43a2940c89fb57f1b5139776b81b42f4aa10056849dcb27"
+                 },
+    "repair":  0,
+    "uninstall":  0,
+    "ok":  true
+}

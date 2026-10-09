@@ -1,0 +1,146 @@
+[
+  {
+    "name": "x64-machine-embedded",
+    "arch": "x64",
+    "context": "machine",
+    "media": "embedded",
+    "payload_sha256": "2a4d63a93b4d21748983ed315f6ab1e24a8a3f74fcab894c23bbb9a5c64f097f",
+    "second_sha256": null,
+    "package_sha256": "4d9616108184bec539c27fbc457256e742ae31aa23027430bc122c1f9e919a6b"
+  },
+  {
+    "name": "x64-machine-external",
+    "arch": "x64",
+    "context": "machine",
+    "media": "external",
+    "payload_sha256": "af392bf277385705b2249317b1f5b887f4286349564d101aecc6f79c446c82c4",
+    "second_sha256": null,
+    "package_sha256": "30e042bcefe63ecb027abac9a58eec188b03000401dd10721cc0976890c5800d"
+  },
+  {
+    "name": "x64-machine-loose",
+    "arch": "x64",
+    "context": "machine",
+    "media": "loose",
+    "payload_sha256": "e32c8e97edaa2ca320e16cf268667a3f0fe25db7469fd6ad23cdec571f008899",
+    "second_sha256": null,
+    "package_sha256": "d0c841e5b8cd06aaa96c07036df93335e1b2ddc799b77203f84dfdf79dfda87f"
+  },
+  {
+    "name": "x64-machine-split",
+    "arch": "x64",
+    "context": "machine",
+    "media": "split",
+    "payload_sha256": "3dcfcb2997a4e3551caef83be3501490c4a291249e24118d572d0a5b5a3c3c11",
+    "second_sha256": "160ba942f4c4d626d43a2940c89fb57f1b5139776b81b42f4aa10056849dcb27",
+    "package_sha256": "cb062c4778839f058f800941a40c45cad9fa07685f1929c86dc045873cf6606c"
+  },
+  {
+    "name": "x64-user-embedded",
+    "arch": "x64",
+    "context": "user",
+    "media": "embedded",
+    "payload_sha256": "4b405b6d1934d2a5cf460bf966729f53ceabfdd520204a71d38fb519aafed307",
+    "second_sha256": null,
+    "package_sha256": "37e7f0bc4fb1cd5a68b3391eb6b4bb063556384a0d705575da39eb1b25be45a0"
+  },
+  {
+    "name": "x64-user-external",
+    "arch": "x64",
+    "context": "user",
+    "media": "external",
+    "payload_sha256": "88a4911d2e59b9fc9991013fc42687093cef12e9f75251d6c8c9fd9c1317cf41",
+    "second_sha256": null,
+    "package_sha256": "d6b133d46bfbff5719266c1dd0999937b9b49ec68af5dcb034e95589d67f0dd6"
+  },
+  {
+    "name": "x64-user-loose",
+    "arch": "x64",
+    "context": "user",
+    "media": "loose",
+    "payload_sha256": "4dc52c71decc08221e52e863a937e213845bf52ac4767fdbac83f7a59e2acacf",
+    "second_sha256": null,
+    "package_sha256": "f847d02b93824f7fcdbefa921de06cd7fbb1dc81aa8c708e5b822df0d65044b9"
+  },
+  {
+    "name": "x64-user-split",
+    "arch": "x64",
+    "context": "user",
+    "media": "split",
+    "payload_sha256": "93f88a1f54836accdbf1573d596a112bae2415120ca4ae28f873f496a7fce0ea",
+    "second_sha256": "c5447aa3b80ca1d8b454a78c8f1ab6713af02dc184b2450d87e1c9d8074e16c3",
+    "package_sha256": "ebb681a69bdf21314e96e659e00fd0bbbf92f6cf8bad9fce7369960ae551246c"
+  },
+  {
+    "name": "x86-machine-embedded",
+    "arch": "x86",
+    "context": "machine",
+    "media": "embedded",
+    "payload_sha256": "9afe5e28590e885b33817c68f0dcdf47628f8e9afd73d6b7c7a00dd6a2d5c43a",
+    "second_sha256": null,
+    "package_sha256": "9763326770092630bb2e127a00567f4f8291f8726294dab25870051bbdbde2a5"
+  },
+  {
+    "name": "x86-machine-external",
+    "arch": "x86",
+    "context": "machine",
+    "media": "external",
+    "payload_sha256": "81eb2b15cafa6e2487ff27aef68012ea6619ee32ac4eebbbc9b64e1502a16e0b",
+    "second_sha256": null,
+    "package_sha256": "c351b9f22238bf81293c0782543717dfda28315a3b5ac5a7531bab6bacfdcf4b"
+  },
+  {
+    "name": "x86-machine-loose",
+    "arch": "x86",
+    "context": "machine",
+    "media": "loose",
+    "payload_sha256": "97883a8fbd1646908db50eafa7657979a8b5c3d50d2149c86439c7bb27b0a8f2",
+    "second_sha256": null,
+    "package_sha256": "db88c8443c22bc9d48df95672dd9cf93771b80547745864aa56cd100ede217f6"
+  },
+  {
+    "name": "x86-machine-split",
+    "arch": "x86",
+    "context": "machine",
+    "media": "split",
+    "payload_sha256": "4ea4aadd3dc32ae495ccb12debbdadaf6bc12b9666ee02def54ab33079e4f6bf",
+    "second_sha256": "79944022f89d80fd00603c8e21ffe7e405a95f912b3d27e01e1fcd138b4d3401",
+    "package_sha256": "3225a3aa256fc1ea61d4960bccced8d320943fb44522019ed47f3d840f13fc26"
+  },
+  {
+    "name": "x86-user-embedded",
+    "arch": "x86",
+    "context": "user",
+    "media": "embedded",
+    "payload_sha256": "a1fcbd720bbc1bc6949eee1c07818afa514f36eb46a0e7c70462cd0d7c7aeac0",
+    "second_sha256": null,
+    "package_sha256": "3377de2300552a1769ba816779a0657b6cb4c14f3dc328145a14b28949223368"
+  },
+  {
+    "name": "x86-user-external",
+    "arch": "x86",
+    "context": "user",
+    "media": "external",
+    "payload_sha256": "678549a5dab09e65584d36d7cb640d0099b124836166db7086b1a00d18b3a306",
+    "second_sha256": null,
+    "package_sha256": "1f60a6f45ee1c25b78344dfea5f7d70f5f6f8dd1b7d173024f2cb57fb13034eb"
+  },
+  {
+    "name": "x86-user-loose",
+    "arch": "x86",
+    "context": "user",
+    "media": "loose",
+    "payload_sha256": "97df1ccadef327f50b1e47914b9bc139de8b068e0213516c73c34afb4feb2b17",
+    "second_sha256": null,
+    "package_sha256": "c585ad7ce02a06f5901e5a1830606827e9e7e9275a0f2b4aca594313cd7d32a4"
+  },
+  {
+    "name": "x86-user-split",
+    "arch": "x86",
+    "context": "user",
+    "media": "split",
+    "payload_sha256": "0181de9cdf6f9fd77cfc21888376f6299c7a25dce66729f58676742b5250268f",
+    "second_sha256": "1f1a122cd17593221479e4db0c2763aa5eb9034d1aedeaa0878a21346e6d2df8",
+    "package_sha256": "4f563de46e2ff6fa1499e345db558649dd6f0e3978220573185a9b5043f9468e"
+  }
+]

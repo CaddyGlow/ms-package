@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "ms-package": "0.2.2",
+    "caddy-msi": "0.10.2",
+    "ms-cabinet": "0.1.4",
+    "caddy-archive-core": "0.2.1"
+  },
+  "artifacts_compared": 63,
+  "mismatches": {},
+  "ok": true,
+  "producer_lock_sha256": "61f78ca032e79bbd2d02daafd79b3406b0a502ccba7f612c9430dd654fe6b1f0"
+}

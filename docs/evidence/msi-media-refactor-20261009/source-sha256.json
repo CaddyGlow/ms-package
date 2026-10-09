@@ -1,0 +1,43 @@
+{
+  "ms-package": {
+    "Cargo.toml": "b26f446ea8171ab786a231a8f0535d4b7a4563a92234069a303743c3b4c03127",
+    "Cargo.lock": "03dc96ff808d8193c1091e09e407a58db999d5b7a8fba922139a02dd871b3b4c",
+    "src/appx.rs": "2329d91ea87c88d6b6b52f5ab5e041bdb97729fa6557300c1fd1820a084c422c",
+    "src/authoring/appx.rs": "69bd3f4953d6fdea66949b5f2339b0a212e36e7a9135f014a297bd5bf5b59bf7",
+    "src/authoring/appx_deflate.rs": "b75099d721e9e12f8d848b8a9fc57885ba51559b225456f0ab479b852c91d337",
+    "src/authoring/bundle.rs": "f0b45cfc51ba5752463f58e4154c7c6f64b42ee081b0810b777084e40a0d85a1",
+    "src/authoring/installer.rs": "e1eb26d6fa393e9771db5fd47889fe87ce433f150aa962efd7fbe2678a179461",
+    "src/authoring/installer_builder.rs": "e5485299598a7fb682f2c93805547b9a8df910abc4e58a4e0c95ae0d9705a817",
+    "src/authoring/installer_media.rs": "5e3222a150a60e46cdb5b09c7f61bc4725326f07dded3c6fb2f28cb2520c2fe6",
+    "src/authoring/mod.rs": "e28ab30c5bb319e4184c749186179cea2bf8b5f2d5cbdf42b1f1b5f1ee459207",
+    "src/authoring/xml.rs": "41eecf304a342f2ddd0e601a273bdedb82e369b07f12017142dae1df5b832f28",
+    "src/installer.rs": "00fffee0812fe92c7789f2fef3f37ace1e2aebbcc81fa48d421cc91457640d45",
+    "src/installer_metadata.rs": "7a3b89e545d49d7552a575af37299279a2fc94f1ce1e006160968de9124798c5",
+    "src/lib.rs": "e4b45533a69b90ec72f6bb124f8ec356a60d1a54bbb27591c2acedc15d3b2d8e"
+  },
+  "caddy-msi": {
+    "Cargo.toml": "68f3972948b9d40e25b3bd656979796e1b6d0a7a7b8650bd6d93b78cd9d79dd7",
+    "Cargo.lock": "1567a981341ff16072d69dd20608f4cae0161f9a3b7a2b2c171e9ff3eaf20295",
+    "src/internal/category.rs": "d81114ca560342408816796d1cd131bbea658835a3ab7319d7b69e66c4e4c6df",
+    "src/internal/codepage.rs": "265c910ae53d161953d41b165fe1bc9e290e8e4050de06a9390b56cb0fed77cf",
+    "src/internal/column.rs": "daaeeed6bfc15e75d06d07bd0581e57e1e3b523b812d1e690c4b8206c00f428a",
+    "src/internal/expr.rs": "cf0d1f0c1bf1c19e86e958e9e66ff3cebbb1c74da3c354423fcd590b5d3da8d9",
+    "src/internal/language.rs": "390b501551ea07ad173248ed260d6fc52dc71b8582a57a6ba1aa6936079c2786",
+    "src/internal/macros.rs": "0b5cedd3bce7cb488204dbb0c33cb6a32ac1cef0b1d3b6d012b7a9073d41bcf0",
+    "src/internal/mod.rs": "85ea3271dbc7a54904b243e3a3390544013bc4fb627a324868157a478e017f71",
+    "src/internal/package.rs": "a7f44be692d67c634e5fdc8934460e0a2ca95bb467eb07324c4e58f2139038f3",
+    "src/internal/propset.rs": "c0717a68c668acc55b4fb3c02378c6bb79d500394a649a393ed561fcf31d5d90",
+    "src/internal/query.rs": "8cd936c5bed5408318211d968ea5ded7f3ca3efd828cdacc90d26749731151fc",
+    "src/internal/stream.rs": "8c8dc4f1c8f281cf0dc4aa1bcde1d3ff8e4d85947416e5bd3e8c4eaa86e5c6ce",
+    "src/internal/streamname.rs": "c95556a47b6a3a955460df1085c84f51fd0e5dc1f5fd67e915257ce7927fd7af",
+    "src/internal/stringpool.rs": "057f3357f00db322b1332dca7e70f9f9f6e6ba59c3f6645b24d09de58ec8032e",
+    "src/internal/summary.rs": "ce8f7cf68f2f64b4b8c9fa4bde187840bb7ee56e20f55e2a44d4bbcbf1c8a0ca",
+    "src/internal/table.rs": "fced53e5291547a5efe90fdf9e887a68b8844ad1f38f8427a557187f92225492",
+    "src/internal/timestamp.rs": "7b3ba8910649873825f9cf52b6142babe5bb914c28173b7efe60b477b95c93cc",
+    "src/internal/value.rs": "09f9241ab9f198e3cc005877a1565fb185f6fa465c5026898cd56ed6ad464735",
+    "src/lib.rs": "bd5a2935cb4651139f2c5e24aee82a39cf4726976bf2a3698a68930b693ebc7b",
+    "src/media/reader.rs": "a8a405485e6a096f3ccd129ad05ae7e08c83c326b479125479a2d81fd207fb00",
+    "src/media/writer.rs": "7ba84800aada97a9dc03c6c81d337fcb33bdc8733738c4d1f2c4106dd828a633",
+    "src/media.rs": "3e299f5173bf64a1d4177ddd8b2ed7b20365cae696389853b3f05b59f2f34ecd"
+  }
+}

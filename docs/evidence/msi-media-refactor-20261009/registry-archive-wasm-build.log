@@ -1,0 +1,7 @@
+warning: Git tree '/data/cache/ms-package-authoring-integration-20261009/archive-rs-refactor-registry' is dirty
+    Blocking waiting for file lock on build directory
+   Compiling caddy-archive-core v0.2.1 (/data/cache/ms-package-authoring-integration-20261009/archive-rs-refactor-registry/crates/archive-core)
+   Compiling caddy-msi v0.10.2
+   Compiling ms-package v0.2.2 (/home/rick/projects-caddy/ms-package)
+   Compiling caddy-archive-wasm v0.2.1 (/data/cache/ms-package-authoring-integration-20261009/archive-rs-refactor-registry/crates/archive-wasm)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.76s

@@ -1,0 +1,4 @@
+    Blocking waiting for file lock on build directory
+    Checking caddy-msi v0.10.2
+    Checking ms-package v0.2.2 (/home/rick/projects-caddy/ms-package)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.54s

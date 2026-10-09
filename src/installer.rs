@@ -1,8 +1,7 @@
 use crate::{Error, Result, safe_name};
-use archive_core::{Archive, Limits};
 use std::{
     collections::{BTreeMap, BTreeSet},
-    io::{Cursor, Read, Seek, SeekFrom},
+    io::{Read, Seek, SeekFrom},
 };
 
 /// Typed MSI table contents, preserving database column order.
@@ -41,6 +40,8 @@ pub trait MediaResolver {
 pub struct InstallerPackage<R: Read + Seek> {
     package: msi::Package<R>,
     max_rows: usize,
+    max_metadata: u64,
+    max_storage: u64,
 }
 
 impl<R: Read + Seek> InstallerPackage<R> {
@@ -76,7 +77,12 @@ impl<R: Read + Seek> InstallerPackage<R> {
         if package.package_type() != msi::PackageType::Installer {
             return Err(Error::Unsupported("transforms and patches".into()));
         }
-        Ok(Self { package, max_rows })
+        Ok(Self {
+            package,
+            max_rows,
+            max_metadata,
+            max_storage,
+        })
     }
     /// Table names present in the database.
     pub fn tables(&self) -> Vec<String> {
@@ -152,19 +158,35 @@ impl<R: Read + Seek> InstallerPackage<R> {
         }
         let mut cabinets = Vec::new();
         for r in &media.rows {
-            cabinets.push((
-                integer(&media, r, "LastSequence")?,
-                cell(&media, r, "Cabinet")?.as_str().map(str::to_owned),
-            ));
+            cabinets.push(msi::media::MediaRow {
+                last_sequence: integer(&media, r, "LastSequence")?,
+                cabinet: cell(&media, r, "Cabinet")?.as_str().map(str::to_owned),
+            });
         }
-        cabinets.sort_by_key(|m| m.0);
-        if cabinets.windows(2).any(|w| w[0].0 >= w[1].0) {
-            return Err(Error::Malformed("media sequence ordering".into()));
-        }
+        let file_sequences: Vec<_> = files
+            .rows
+            .iter()
+            .map(|row| {
+                Ok(msi::media::FileSequence {
+                    id: text(&files, row, "File")?,
+                    sequence: integer(&files, row, "Sequence")?,
+                    attributes: cell(&files, row, "Attributes")?.as_int().unwrap_or(0),
+                })
+            })
+            .collect::<Result<_>>()?;
+        // Encoded strings can expand when decoded. The relationship index borrows
+        // their data and uses the opener's budgets, rather than smaller defaults.
+        let relationship_limits = msi::media::Limits {
+            max_entries: self.max_rows as u64,
+            max_metadata_bytes: self.max_metadata.saturating_mul(4),
+            max_scratch_bytes: self.max_storage.saturating_mul(4),
+            ..msi::media::Limits::default()
+        };
+        let relationships =
+            msi::media::resolve_files(&file_sequences, &cabinets, word_count, &relationship_limits)
+                .map_err(media_error)?;
         let mut output = Vec::new();
-        let mut ids = BTreeSet::new();
         let mut paths = BTreeSet::new();
-        let mut sequences = BTreeSet::new();
         for r in &files.rows {
             let id = text(&files, r, "File")?.to_owned();
             let component = text(&files, r, "Component_")?;
@@ -198,34 +220,12 @@ impl<R: Read + Seek> InstallerPackage<R> {
             let sequence = integer(&files, r, "Sequence")?;
             let size = u64::try_from(integer(&files, r, "FileSize")?)
                 .map_err(|_| Error::Malformed("negative file size".into()))?;
-            let media_cabinet = cabinets
-                .iter()
-                .find(|m| sequence <= m.0)
-                .ok_or_else(|| Error::Malformed("missing media sequence".into()))?
-                .1
-                .clone();
-            let attributes = cell(&files, r, "Attributes")?.as_int().unwrap_or(0);
-            if attributes & 0x6000 == 0x6000 {
-                return Err(Error::Malformed(
-                    "contradictory file compression attributes".into(),
-                ));
-            }
-            let compressed =
-                attributes & 0x4000 != 0 || (attributes & 0x2000 == 0 && word_count & 2 != 0);
-            let cabinet =
-                if compressed {
-                    Some(media_cabinet.ok_or_else(|| {
-                        Error::Malformed("compressed file without cabinet".into())
-                    })?)
-                } else {
-                    None
-                };
-            if !ids.insert(id.clone())
-                || !paths.insert(path.to_lowercase())
-                || !sequences.insert(sequence)
-                || sequence <= 0
-            {
-                return Err(Error::Malformed("duplicate file/path/sequence".into()));
+            let index = relationships
+                .binary_search_by_key(&sequence, |file| file.sequence)
+                .map_err(|_| Error::Malformed("missing resolved file sequence".into()))?;
+            let cabinet = relationships[index].cabinet.map(str::to_owned);
+            if !paths.insert(path.to_lowercase()) {
+                return Err(Error::Malformed("duplicate file path".into()));
             }
             output.push(InstallerFile {
                 id,
@@ -246,33 +246,48 @@ impl<R: Read + Seek> InstallerPackage<R> {
         resolver: &mut impl MediaResolver,
         max: u64,
     ) -> Result<Vec<u8>> {
-        if file.size > max {
-            return Err(Error::Limit("payload bytes"));
+        struct Adapter<'a, R> {
+            resolver: &'a mut R,
+            original: Option<Error>,
         }
-        let bytes = match &file.cabinet {
-            Some(name) => {
-                let data = if let Some(stream) = name.strip_prefix('#') {
-                    self.read_stream(stream, max)?
-                } else {
-                    resolver.resolve(name, max)?
-                };
-                if data.len() as u64 > max {
-                    return Err(Error::Limit("media bytes"));
-                }
-                let mut cab = Archive::open(Cursor::new(data), Limits::default())?;
-                let member = cab
-                    .entries()
-                    .iter()
-                    .find(|e| e.name == file.id)
-                    .ok_or_else(|| Error::Integrity(format!("cabinet member {}", file.id)))?;
-                cab.read_entry(member.id, file.size)?
+        impl<R: MediaResolver> msi::media::Resolver for Adapter<'_, R> {
+            fn resolve(&mut self, name: &str, max: u64) -> std::io::Result<Vec<u8>> {
+                self.resolver.resolve(name, max).map_err(|error| {
+                    self.original = Some(error);
+                    std::io::Error::other("explicit MSI media resolver failed")
+                })
             }
-            None => resolver.resolve(&file.source_path, file.size)?,
-        };
-        if bytes.len() as u64 != file.size {
-            return Err(Error::Integrity(format!("size of {}", file.id)));
         }
-        Ok(bytes)
+        let mut adapter = Adapter {
+            resolver,
+            original: None,
+        };
+        let result = msi::media::read_payload(
+            &mut self.package,
+            &file.id,
+            &file.source_path,
+            file.size,
+            file.cabinet.as_deref(),
+            &mut adapter,
+            max,
+        );
+        if let Some(error) = adapter.original {
+            return Err(error);
+        }
+        result.map_err(media_error)
+    }
+}
+
+fn media_error(error: msi::media::Error) -> Error {
+    match error {
+        msi::media::Error::Io(error) => Error::Io(error),
+        msi::media::Error::Cabinet(error) => Error::Archive(archive_core::Error::Io(error)),
+        msi::media::Error::Limit(name) => Error::Limit(name),
+        msi::media::Error::Invalid(message) => Error::Malformed(message),
+        msi::media::Error::Integrity(message) => Error::Integrity(message),
+        msi::media::Error::Unsupported(message) => Error::Unsupported(message),
+        msi::media::Error::Emission { source, .. } => media_error(*source),
+        other => Error::Unsupported(other.to_string()),
     }
 }
 
@@ -364,6 +379,7 @@ fn source_directory_path(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Cursor;
     use std::io::Write;
     struct Resolver(Option<Vec<u8>>);
     impl MediaResolver for Resolver {
@@ -557,6 +573,31 @@ mod tests {
             Err(Error::Limit(_))
         ));
         assert_eq!(reader.read_stream("cabinet", 7).unwrap(), b"payload");
+    }
+    #[test]
+    fn corrupt_cabinet_payload_keeps_archive_error_classification() {
+        let mut builder = cabinet::CabinetBuilder::new(cabinet::WriteCompression::None);
+        builder.add_file("payload", b"hello").unwrap();
+        let mut bytes = Cursor::new(Vec::new());
+        builder.write(&mut bytes).unwrap();
+        let mut bytes = bytes.into_inner();
+        let last = bytes.len() - 1;
+        bytes[last] ^= 1; // Invalidate the nonzero CFDATA checksum.
+        let package =
+            msi::Package::create(msi::PackageType::Installer, Cursor::new(Vec::new())).unwrap();
+        let mut reader = InstallerPackage::open(package.into_inner().unwrap(), 100).unwrap();
+        let file = InstallerFile {
+            id: "payload".into(),
+            path: "hello".into(),
+            source_path: "hello".into(),
+            size: 5,
+            sequence: 1,
+            cabinet: Some("external.cab".into()),
+        };
+        assert!(matches!(
+            reader.read_file(&file, &mut Resolver(Some(bytes)), 4096),
+            Err(Error::Archive(archive_core::Error::Io(_)))
+        ));
     }
     #[test]
     fn directory_cycles_and_short_long_names_are_checked() {
