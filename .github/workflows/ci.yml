@@ -127,6 +127,8 @@ jobs:
           cargo build --release -p caddy-archive-wasm --features packages,crypto,sevenz,bzip2,brotli --target wasm32-unknown-unknown --locked
           wasm-bindgen target/wasm32-unknown-unknown/release/archive_wasm.wasm --target web --out-dir /tmp/archive-browser/pkg
           cargo run --manifest-path ../ms-package/Cargo.toml --example browser_fixtures --locked -- /tmp/archive-browser/pkg/fixtures
+          (cd crates/archive-wasm/tests/fixtures/package/media-migration && sha256sum --check SHA256SUMS)
+          cp -R crates/archive-wasm/tests/fixtures/package/media-migration /tmp/archive-browser/pkg/fixtures/
       - name: Run Chromium Worker checks
         working-directory: archive-rs
         env:

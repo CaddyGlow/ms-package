@@ -1,0 +1,15 @@
+embedded/installer.msi: OK
+external/installer.msi: OK
+external/sidecars/external.cab: OK
+loose/installer.msi: OK
+loose/sidecars/MediaFixture/first.txt: OK
+loose/sidecars/MediaFixture/second.txt: OK
+loose/sidecars/MediaFixture/third.txt: OK
+mixed-loose/installer.msi: OK
+mixed-loose/sidecars/SourceMedia/third.txt: OK
+mixed-loose/sidecars/outside.cab: OK
+mixed/installer.msi: OK
+mixed/sidecars/outside.cab: OK
+partitioned/installer.msi: OK
+partitioned/sidecars/first.cab: OK
+partitioned/sidecars/later.cab: OK

@@ -1,0 +1,5 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.14s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running `/data/cache/rust/debug/examples/native /tmp/ms-package-authoring-worker.HPQ8lg/native.msix`
+{"ok":true,"checks":["Deflate APPX and nested bundle create/edit parity and reader validation","external/loose/multiple MSI media sink/resolver parity","APPX native create/edit parity","archive-rs reopen and payload bytes","bundle native create/edit parity","outer and nested integrity and payload bytes","MSI database native create/edit parity","custom MSI table and stream preservation","APPX/bundle/MSI limit failures"],"cancellation":"synchronous calls; Worker termination is caller-owned"}
+authoring Worker evidence: /tmp/ms-package-authoring-worker.HPQ8lg

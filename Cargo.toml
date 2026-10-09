@@ -1,6 +1,6 @@
 [package]
 name = "ms-package"
-version = "0.2.2"
+version = "0.3.0"
 edition = "2024"
 rust-version = "1.99"
 repository = "https://github.com/CaddyGlow/ms-package"
@@ -21,7 +21,7 @@ roxmltree = { version = "0.21.1", default-features = false, optional = true }
 woxml = { version = "0.6.0", default-features = false, optional = true }
 ms-compress = { version = "0.1.2", default-features = false, features = ["std"], optional = true }
 cfb = "0.14"
-archive-core = { version = "0.2.1", package = "caddy-archive-core" }
+archive-core = { version = "0.3.1", package = "caddy-archive-core" }
 msi = { package = "caddy-msi", version = "=0.10.2", features = ["media"] }
 quick-xml = "0.38"
 sha2 = "0.10"

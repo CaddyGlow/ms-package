@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 — 2026-10-09
+
+- Update caddy-archive-core to 0.3.1 and qualify the matching archive Worker suite.
+- Public archive entry, metadata, limit and error types now come from core 0.3.1.
+  The minor version boundary keeps consumers using core 0.2.1 on ms-package 0.2.x.
+- Preserve the new archive MSI media regression fixtures in browser CI.
+
 ## 0.2.2 — 2026-10-09
 
 - Move reusable MSI media preparation, extraction and emission to the optional

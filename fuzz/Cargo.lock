@@ -55,9 +55,9 @@ dependencies = [
 
 [[package]]
 name = "caddy-archive-core"
-version = "0.2.1"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6eaa0c3506e268fc41b8dfa34a1c6011369ff07a60c6a66287d850b84540f65"
+checksum = "037a4d82a6a4c3964e456f3b9cdd1610ac6036f99a9cf88aec93a86b86076a4f"
 dependencies = [
  "crc64fast",
  "libmkiso",
@@ -372,7 +372,7 @@ checksum = "e3713af486ad3232ebd7bf988bbece755be1dd6848cef701038ada611b88a532"
 
 [[package]]
 name = "ms-package"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "base64",
  "caddy-archive-core",

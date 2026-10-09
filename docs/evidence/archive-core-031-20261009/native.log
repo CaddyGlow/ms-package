@@ -1,0 +1,179 @@
+    Blocking waiting for file lock on build directory
+   Compiling ms-package v0.3.0 (/home/rick/projects-caddy/ms-package)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.69s
+     Running unittests src/lib.rs (/data/cache/rust/debug/deps/ms_package-0728e126a0a38619)
+
+running 20 tests
+test appx::tests::rejects_malformed_manifest_and_document_type ... ok
+test appx::tests::rejects_duplicate_block_map_files ... ok
+test appx::tests::rejects_traversing_block_map_names ... ok
+test authoring::xml::tests::document_types_and_namespace_errors_fail_closed ... ok
+test authoring::xml::tests::escaped_attributes_round_trip_and_metadata_is_bounded ... ok
+test appx::tests::file_hash_extension_requires_declared_namespace_and_verified_digest ... ok
+test installer::tests::directory_cycles_and_short_long_names_are_checked ... ok
+test installer::tests::malformed_compound_storage_is_rejected ... ok
+test installer::tests::rejects_storage_larger_than_explicit_budget ... ok
+test appx::tests::streaming_block_hashes_verify_arbitrary_chunks_without_buffering_files ... ok
+test appx::tests::validates_decoded_payload_and_detects_corruption ... ok
+test installer_metadata::tests::rejects_extended_string_length_before_allocating_it ... ok
+test installer_metadata::tests::rejects_truncated_pool_record ... ok
+test installer::tests::raw_stream_reads_enforce_actual_byte_limit ... ok
+test installer_metadata::tests::cumulative_lengths_must_fit_the_data_stream ... ok
+test installer::tests::corrupt_cabinet_payload_keeps_archive_error_classification ... ok
+test installer::tests::embedded_external_and_missing_cabinet_media ... ok
+test installer_metadata::tests::package_opener_rejects_invalid_pool_before_the_msi_parser ... ok
+test installer_metadata::tests::metadata_budget_excludes_payload_but_includes_string_data ... ok
+test installer::tests::table_relationships_map_multiple_cabinets_and_source_names ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/authoring_appx.rs (/data/cache/rust/debug/deps/authoring_appx-b9ad9f6cb750f6e6)
+
+running 19 tests
+test deflate_workspace_limit_fails_before_destination_changes ... ok
+test manifest_storage_is_bounded_before_retention ... ok
+test destination_flush_errors_are_reported ... ok
+test reserved_metadata_files_cannot_be_used_as_payload_directories ... ok
+test deterministic_output_and_actual_source_limits ... ok
+test content_type_extensions_fail_instead_of_being_discarded ... ok
+test manifest_references_block_payload_removal ... ok
+test malformed_metadata_and_source_integrity_fail_before_output ... ok
+test zip_headers_match_blockmap_and_part_names_are_uris ... ok
+test read_failures_and_exact_output_budget ... ok
+test source_payload_limit_is_checked_before_integrity_extraction ... ok
+test custom_mime_and_manifest_extensions_survive_rebuilding ... ok
+test compressed_editor_rejects_wrong_physical_block_sizes ... ok
+test sparse_external_content_is_rejected_using_its_namespace_and_boolean_value ... ok
+test replacement_charges_final_decoded_size_and_case_only_rename_preserves_payload ... ok
+test signed_sources_reject_or_strip_signature ... ok
+test boundary_hashes_and_edit_operations_round_trip ... ok
+test deflate_block_boundaries_and_metadata_layout_round_trip ... ok
+test short_reads_and_metadata_scratch_boundaries ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/authoring_bundle.rs (/data/cache/rust/debug/deps/authoring_bundle-9d9520000612108a)
+
+running 15 tests
+test bundle_entry_limit_rejects_before_consuming_source ... ok
+test bundle_identity_checks_reject_non_schema_values ... ok
+test bundle_rejects_corrupted_nested_package_and_aggregate_limit ... ok
+test bundle_rejects_duplicate_identity_and_publisher_mismatch ... ok
+test invalid_nested_identity_and_resource_property_fail_during_add ... ok
+test resource_package_type_uses_property_and_preserves_resource_id ... ok
+test bundle_transfers_resource_qualifiers_and_rejects_unknown_attributes ... ok
+test recorded_bundle_offsets_match_zip_payload_locations ... ok
+test bundles_bind_identities_and_verify_nested_contents ... ok
+test bundle_editor_rejects_custom_outer_content_types_without_discarding_them ... ok
+test failed_replacement_and_nested_edit_preserve_previous_packages ... ok
+test nested_payload_edit_updates_nested_and_outer_metadata ... ok
+test bundle_editor_replaces_and_removes_packages ... ok
+test resource_semantic_rules_fail_before_bundle_emission ... ok
+test deflate_nested_packages_round_trip_and_enforce_decoded_file_limits ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/authoring_installer.rs (/data/cache/rust/debug/deps/authoring_installer-fb4d455b4a758860)
+
+running 16 tests
+test declared_foreign_keys_are_checked_before_destination_is_touched ... ok
+test payload_editor_rejects_noncanonical_property_schema_without_panicking ... ok
+test incomplete_foreign_key_declarations_cannot_be_emitted ... ok
+test destination_flush_failure_is_reported ... ok
+test unrepresentable_strings_are_rejected_and_failed_edits_cannot_emit ... ok
+test row_edit_operations_preserve_primary_key_constraints ... ok
+test signed_sources_reject_both_signature_policies ... ok
+test copy_edit_preserves_custom_schema_summary_and_truncates_stream ... ok
+test source_rows_and_streams_are_bounded ... ok
+test minimal_profile_coordinates_cabinet_and_explicit_identities ... ok
+test payload_editor_rejects_unknown_preservation_and_reused_package_codes ... ok
+test payload_editor_rejects_identity_collisions_and_retired_components ... ok
+test replacement_read_reserves_existing_payload_scratch ... ok
+test detailed_reports_distinguish_raw_validation_and_exact_identity_changes ... ok
+test canonical_payload_edits_rebuild_all_related_metadata ... ok
+test canonical_external_loose_and_partitioned_media_roundtrip ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests/authoring_installer_media.rs (/data/cache/rust/debug/deps/authoring_installer_media-bbbef984a329cba3)
+
+running 4 tests
+test loose_relative_names_are_explicit_and_exact_resource_boundary_succeeds ... ok
+test caller_media_sink_reports_only_flushed_and_finalized_artifacts ... ok
+test media_path_conflicts_and_limits_fail_before_opening_any_destination ... ok
+test partial_write_flush_and_finalization_errors_retain_completion_context ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/authoring_qualified_fixtures.rs (/data/cache/rust/debug/deps/authoring_qualified_fixtures-4200f11eef69da78)
+
+running 2 tests
+test independently_unpacked_stored_package_retains_payload_integrity ... ok
+test independently_unbundled_architecture_packages_validate_separately ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/msi_malformed_metadata.rs (/data/cache/rust/debug/deps/msi_malformed_metadata-5c0fd03a9e921bd2)
+
+running 1 test
+test null_required_column_type_is_rejected_without_panicking ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/author_appx.rs (/data/cache/rust/debug/examples/author_appx-2822d64e27fe24d6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/author_appx_deflate.rs (/data/cache/rust/debug/examples/author_appx_deflate-19e334aee0205ca0)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/author_bundle.rs (/data/cache/rust/debug/examples/author_bundle-b183dc36c91c35d4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/author_installer.rs (/data/cache/rust/debug/examples/author_installer-d8f21ea541e059bb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/browser_fixtures.rs (/data/cache/rust/debug/examples/browser_fixtures-b8924e701a4f0113)
+
+running 3 tests
+test tests::resource_bundle_uses_standard_neutral_architecture_and_type_defaults ... ok
+test tests::bundle_fixture_binding_integrity_and_explicit_selection_limits ... ok
+test tests::ordinary_external_installer_media_matches_embedded_payload ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Compiling ms-package v0.3.0 (/home/rick/projects-caddy/ms-package)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.35s
+   Doc-tests ms_package
+
+running 1 test
+test src/lib.rs - (line 7) - compile ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.68s; merged doctests compilation took 0.68s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
+   Doc-tests ms_package
+
+running 4 tests
+test src/lib.rs - (line 7) - compile ... ok
+test src/authoring/bundle.rs - authoring::bundle::AppxBundleBuilder (line 28) ... ok
+test src/authoring/installer.rs - authoring::installer::InstallerDatabaseBuilder (line 167) ... ok
+test src/authoring/appx.rs - authoring::appx::AppxBuilder (line 30) ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 1.18s; merged doctests compilation took 1.17s
+    Checking ms-package v0.3.0 (/home/rick/projects-caddy/ms-package)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.71s

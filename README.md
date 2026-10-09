@@ -117,7 +117,7 @@ Its dependency aliases preserve the `archive_core` and `cabinet` imports.
 Version tags validate the library and browser bindings, verify the offline source
 bundle, publish the crate, and create the GitHub Release.
 
-Current development uses published `caddy-archive-core` 0.2.1. The optional
+Current development uses published `caddy-archive-core` 0.3.1. The optional
 `write` feature also supports Deflate through `ms-compress` and caller-managed
 external, loose and multiple-cabinet MSI media. See the
 [authoring API and supported profiles](docs/package-authoring.md).
