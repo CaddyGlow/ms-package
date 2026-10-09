@@ -2,7 +2,17 @@ name: Microsoft packages CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - 'licenses/**'
   pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - 'licenses/**'
   workflow_call:
 concurrency:
   group: ${{ github.workflow }}-checks-${{ github.ref }}
@@ -48,6 +58,7 @@ jobs:
           RUSTDOCFLAGS: -D warnings
 
   windows:
+    if: ${{ github.event_name != 'push' || startsWith(github.ref, 'refs/tags/') }}
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
@@ -70,6 +81,7 @@ jobs:
       - run: cargo test --all-targets --all-features --locked
 
   browser:
+    if: ${{ github.event_name != 'push' || startsWith(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -115,7 +127,22 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-      - run: cargo install wasm-bindgen-cli --version 0.2.129 --locked
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: browser-validation
+          workspaces: |
+            ms-package -> target
+            ms-package/tests/browser-authoring -> target
+            archive-rs -> target
+      - name: Cache wasm-bindgen CLI
+        id: wasm-bindgen-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/wasm-bindgen
+          key: ${{ runner.os }}-${{ runner.arch }}-wasm-bindgen-cli-0.2.129
+      - name: Install wasm-bindgen CLI
+        if: steps.wasm-bindgen-cache.outputs.cache-hit != 'true'
+        run: cargo install wasm-bindgen-cli --version 0.2.129 --locked
       - name: Reconcile sibling workspace dependencies
         # Integration must use this checkout, including across pre-1.0 minor bumps.
         run: |
@@ -143,17 +170,3 @@ jobs:
         env:
           ARCHIVE_BROWSER: google-chrome
         run: bash scripts/check-authoring-browser.sh ../archive-rs /tmp/archive-browser/pkg
-
-  fuzz-check:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
-    steps:
-      - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@1.99.0
-        with:
-          components: rustfmt, clippy
-      - run: cargo fmt --manifest-path fuzz/Cargo.toml -- --check
-      - run: cargo clippy --manifest-path fuzz/Cargo.toml --all-targets --locked -- -D warnings
-      - run: cargo test --manifest-path fuzz/Cargo.toml --locked

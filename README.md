@@ -121,3 +121,18 @@ Current development uses published `caddy-archive-core` 0.3.1. The optional
 `write` feature also supports Deflate through `ms-compress` and caller-managed
 external, loose and multiple-cabinet MSI media. See the
 [authoring API and supported profiles](docs/package-authoring.md).
+
+## Continuous integration
+
+Main-branch pushes run Linux Rust tests, formatting and Clippy. Pull requests
+and release tags also run Windows tests and browser Worker checks.
+Documentation-only changes skip branch and pull-request CI; release tags still
+run validation. Browser builds and the pinned wasm-bindgen CLI are cached to
+reduce repeated compilation.
+
+Fuzzing runs locally rather than in GitHub Actions:
+
+```sh
+cargo test --manifest-path fuzz/Cargo.toml --locked
+python3 scripts/fuzz-campaign.py --iterations 10000
+```
