@@ -4,13 +4,13 @@ on:
     branches: [main]
     paths-ignore:
       - '**/*.md'
-      - 'docs/**'
+      - 'docs/**/*.log'
       - 'LICENSE'
       - 'licenses/**'
   pull_request:
     paths-ignore:
       - '**/*.md'
-      - 'docs/**'
+      - 'docs/**/*.log'
       - 'LICENSE'
       - 'licenses/**'
   workflow_call:
