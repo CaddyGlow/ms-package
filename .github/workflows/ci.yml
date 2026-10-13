@@ -147,11 +147,11 @@ jobs:
         # Integration must use this checkout, including across pre-1.0 minor bumps.
         run: |
           python3 scripts/authoring_workspace.py ../archive-rs
-          cargo update --manifest-path ../archive-rs/Cargo.toml --workspace
+          cargo +1.96.0 update --manifest-path ../archive-rs/Cargo.toml --workspace
       - name: Build browser bindings and parity fixtures
         working-directory: archive-rs
         run: |
-          cargo build --release -p caddy-archive-wasm --features packages,crypto,sevenz,bzip2,brotli --target wasm32-unknown-unknown --locked
+          cargo +1.96.0 build --release -p caddy-archive-wasm --features packages,crypto,sevenz,bzip2,brotli --target wasm32-unknown-unknown --locked
           wasm-bindgen target/wasm32-unknown-unknown/release/archive_wasm.wasm --target web --out-dir /tmp/archive-browser/pkg
           cargo run --manifest-path ../ms-package/Cargo.toml --example browser_fixtures --locked -- /tmp/archive-browser/pkg/fixtures
           (cd crates/archive-wasm/tests/fixtures/package/media-migration && sha256sum --check SHA256SUMS)
