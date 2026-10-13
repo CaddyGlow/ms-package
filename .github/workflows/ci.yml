@@ -38,7 +38,7 @@ jobs:
           WIM_RS_REF: ${{ vars.WIM_RS_REF || 'main' }}
           MKISO_RS_REF: ${{ vars.MKISO_RS_REF || 'main' }}
         run: python3 scripts/check-release-refs.py
-      - uses: dtolnay/rust-toolchain@1.99.0
+      - uses: dtolnay/rust-toolchain@1.96.0
         with:
           components: rustfmt, clippy
           targets: wasm32-unknown-unknown
@@ -73,7 +73,7 @@ jobs:
           WIM_RS_REF: ${{ vars.WIM_RS_REF || 'main' }}
           MKISO_RS_REF: ${{ vars.MKISO_RS_REF || 'main' }}
         run: python3 scripts/check-release-refs.py
-      - uses: dtolnay/rust-toolchain@1.99.0
+      - uses: dtolnay/rust-toolchain@1.96.0
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: validation
@@ -121,7 +121,7 @@ jobs:
           repository: CaddyGlow/mkiso-rs
           ref: ${{ vars.MKISO_RS_REF || 'main' }}
           path: mkiso-rs
-      - uses: dtolnay/rust-toolchain@1.99.0
+      - uses: dtolnay/rust-toolchain@1.96.0
         with:
           targets: wasm32-unknown-unknown
       - uses: actions/setup-node@v6

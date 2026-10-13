@@ -11,13 +11,13 @@ profiles require their own independent gates before publication claims expand.
 
 ## Reproduce the source artifact
 
-Install Rust 1.99.0, Python 3.12 or newer, and a native C/C++ build toolchain.
+Install Rust 1.96.0, Python 3.12 or newer, and a native C/C++ build toolchain.
 Keep ms-package, archive-rs, cabinet, ms-compress, wim-rs and mkiso-rs
 in adjacent directories. Preserve their licenses and fixtures.
 
 ```sh
-python3 scripts/source-release.py --output /tmp/ms-package-0.2.1-source.tar.gz
-python3 scripts/source-release.py --verify /tmp/ms-package-0.2.1-source.tar.gz
+python3 scripts/source-release.py --output /tmp/ms-package-0.3.1-source.tar.gz
+python3 scripts/source-release.py --verify /tmp/ms-package-0.3.1-source.tar.gz
 ```
 
 Official packaging requires every source checkout to be clean and committed.
@@ -43,7 +43,7 @@ To override them, configure repository variables
 to exact 40-character commit hashes. These revisions must
 contain the compatible sources validated with ms-package. Repository URLs may
 be overridden using the corresponding `_REPOSITORY` variables. Release jobs
-reject moving branches, tags and empty revisions. Tag `v0.2.1` only after the
+reject moving branches, tags and empty revisions. Tag `v0.3.1` only after the
 reviewed source and dependency commits are available to CI.
 
 The tag workflow runs native tests, strict Clippy, doctests, the pinned Rust

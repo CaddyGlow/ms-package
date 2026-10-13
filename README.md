@@ -89,7 +89,7 @@ archive capability document records target-specific archive backend availability
 
 ## Use
 
-Requires Rust 1.99.0. Source release archives include sibling sources and vendored
+Requires Rust 1.96.0. Source release archives include sibling sources and vendored
 Cargo dependencies; see `BUILD.md` at the archive root for offline build commands.
 From a checkout, run `cargo test --all-targets --all-features --locked`.
 

@@ -1,7 +1,7 @@
 {
-  "archive-rs": "8e0724332641e5f6a1315c4544497016e3152322",
-  "cabinet": "6eaa28d396810bfe8183ad2f6c79b519daee88b3",
-  "ms-compress": "2f07fb24a518d5887bcdf315cef824b37f1e20b0",
-  "wim-rs": "54603df479e61e898ffaf8b731a3f8791acc708b",
-  "mkiso-rs": "b22b43e030fbcf073e9d98240465cc4afe43ccb7"
+  "archive-rs": "29ee5a27912c98e2a07b787b2c94179ca394146f",
+  "cabinet": "db989bf47d8ef6128f97343be21c33fa37393511",
+  "ms-compress": "96ab465bfbb7eba0f82b2cb279e486079c8cc46d",
+  "wim-rs": "dee39f17be9430b020580ea58651862c746bcbe0",
+  "mkiso-rs": "e5d8e75bbf9dd5dd33c0c6b12a9a0686efe916e9"
 }

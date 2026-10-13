@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1 — 2026-10-13
+
+- Update caddy-archive-core to 0.3.4, caddy-msi to 0.10.3, ms-cabinet to
+  0.1.5 and ms-compress to 0.2.1; refresh package, fuzz and browser lockfiles.
+- Lower the minimum supported Rust version and pin development, CI and source
+  release builds to Rust 1.96.0.
+
 ## 0.3.0 — 2026-10-09
 
 - Update caddy-archive-core to 0.3.1 and qualify the matching archive Worker suite.

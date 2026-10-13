@@ -13,7 +13,7 @@ import tempfile
 from authoring_workspace import reconcile
 
 REPOS = ('ms-package', 'archive-rs', 'cabinet', 'ms-compress', 'wim-rs', 'mkiso-rs')
-TOOLCHAIN = '1.99.0'
+TOOLCHAIN = '1.96.0'
 
 
 def run(args, **kwargs):
@@ -120,9 +120,9 @@ def main():
         config = vendor.stdout.replace(str(root / 'vendor'), 'vendor')
         (root / '.cargo/config.toml').write_text(config)
         (root / 'BUILD.md').write_text(
-            '# Offline source release\n\nInstall Rust 1.99.0 and a native C/C++ toolchain.\n'
+            '# Offline source release\n\nInstall Rust 1.96.0 and a native C/C++ toolchain.\n'
             'From this directory, run:\n\n'
-            '```sh\ncargo +1.99.0 test --manifest-path ms-package/Cargo.toml --all-targets --all-features --frozen\n```\n\n'
+            '```sh\ncargo +1.96.0 test --manifest-path ms-package/Cargo.toml --all-targets --all-features --frozen\n```\n\n'
             'Registry and Git dependencies are included in vendor/ with their licenses.\n'
             'SOURCE-MANIFEST.json records every file hash and source revision.\n')
         files = {str(p.relative_to(root)): digest(p) for p in root.rglob('*') if p.is_file()}

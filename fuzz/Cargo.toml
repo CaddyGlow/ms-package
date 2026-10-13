@@ -2,7 +2,7 @@
 name = "ms-package-fuzz"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.99"
+rust-version = "1.96"
 publish = false
 
 [workspace]
@@ -10,10 +10,10 @@ publish = false
 [dependencies]
 honggfuzz = "=0.5.62"
 ms-package = { path = "..", features = ["write"] }
-archive-core = { package = "caddy-archive-core", version = "0.3.1" }
+archive-core = { package = "caddy-archive-core", version = "0.3.4" }
 
 zip = { version = "2.4", default-features = false }
-msi = { package = "caddy-msi", version = "=0.10.2" }
+msi = { package = "caddy-msi", version = "=0.10.3" }
 sha2 = "0.10"
 base64 = "0.22"
 
